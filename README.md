@@ -124,6 +124,18 @@ subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
 [`skills/`](skills/): `grill`, `plan`, and `clean-room`.
 
+## Wiring it in
+
+The [`bootstrap`](skills/bootstrap/SKILL.md) skill wires a project's
+cloud sessions to Metis: a `SessionStart` hook clones this repo,
+symlinks `agents/` and `skills/` into `~/.claude`, makes `AGENTS.md`
+the global instructions, and points `core.hooksPath` at
+[`.githooks/`](.githooks/) so a direct push to the default branch is
+refused. Installing it over the predecessor repo's hook is the
+migration — same path, same settings entry, and the hook prunes the
+old symlinks itself. This repo dogfoods the same hook in its own
+`.claude/hooks/`.
+
 ## The name
 
 Zeus swallowed Metis because he could not control her cunning. This

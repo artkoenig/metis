@@ -1,0 +1,77 @@
+---
+name: bootstrap
+description: Wires a project so its Claude Code CLOUD sessions (CLAUDE_CODE_REMOTE) load the Metis rulebook, subagents and skills, by installing a SessionStart hook that clones the metis repo and symlinks its agents/ and skills/ into ~/.claude. Run it at the start of any session in one of Artjom's git repositories whose hook is missing or has drifted — proactively, not only when asked. Also trigger on "set up cloud sessions for this project", "wire up metis here", "install the metis hook", or "migrate this project from the old agents repo".
+user-invocable: true
+---
+
+# Bootstrap
+
+Cloud sessions start from a bare clone with no `~/.claude` of their own. This
+skill installs the SessionStart hook that fills the gap: it clones
+[metis](https://github.com/artkoenig/metis), symlinks its `agents/` and
+`skills/` into `~/.claude`, makes `AGENTS.md` the global instructions, and
+points `core.hooksPath` at metis's `.githooks` so a direct push to the default
+branch is refused. Locally the hook no-ops — the user owns their own
+`~/.claude` there.
+
+## When to run it
+
+At the start of a session in any git repository Artjom owns — no remote yet,
+or `origin` on `github.com/artkoenig` — when the hook is missing or differs
+from this skill's canonical asset. Anything else (work, client, third-party)
+is out of scope; skip it silently. Compare, don't assume:
+
+```bash
+diff <target>/.claude/hooks/session-start.sh <this-skill>/assets/session-start.sh
+```
+
+Identical → nothing to do. Missing or different → install.
+
+## What to install
+
+1. **The hook script.** Copy `assets/session-start.sh` to the target's
+   `.claude/hooks/session-start.sh` (create the directory if needed) and make
+   it executable. Always copy the asset verbatim — never hand-edit the copy,
+   never inline the script into settings as a `bash -c` blob; both create a
+   second, independently drifting version.
+2. **The settings wiring.** Ensure `.claude/settings.json` contains:
+
+   ```json
+   {
+     "hooks": {
+       "SessionStart": [
+         {
+           "hooks": [
+             {
+               "type": "command",
+               "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+   Create the file with just this content if it is absent; otherwise merge the
+   `SessionStart` entry in without disturbing existing hooks or settings.
+3. **Commit both files** — they are ordinary versioned project files, and a
+   cloud session only benefits from a hook that was committed before it
+   started.
+
+## Migrating from the predecessor
+
+Projects wired to `global-agents-config-and-skills` use the same file path and
+the same settings entry, so installing this hook over the old one *is* the
+migration — nothing to unwire. The hook itself prunes `~/.claude` symlinks
+left by the predecessor's clone, so a migrated session never loads both skill
+sets side by side. Legacy `PreToolUse`/`WorktreeCreate` entries (the old
+worktree machinery) are not managed by metis: leave them if the project still
+wants them locally, remove them if it is going all-in on metis — ask only if
+the project's own files leave it genuinely unclear.
+
+## Keeping it honest
+
+This repo dogfoods the same hook in its own `.claude/hooks/`, copied from
+`assets/`. When the asset changes, update every copy the same way: re-run this
+skill, don't hand-edit.
