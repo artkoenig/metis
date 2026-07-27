@@ -3,9 +3,12 @@ set -euo pipefail
 
 # ---------------------------------------------------------------------------
 # Metis loader — the ONLY file installed per project, kept deliberately thin
-# and stable: it clones or updates the metis repo, then hands over to the
-# sync logic INSIDE the clone (session-start-core.sh). Workflow changes
-# therefore reach already-bootstrapped projects on their next session start,
+# and stable: its single responsibility is keeping metis current. In a cloud
+# session it clones or updates ~/.claude/metis and hands over to the sync
+# logic INSIDE the clone (session-start-core.sh); in a local session it
+# fast-forwards the user's own metis clone (found via the ~/.claude symlinks)
+# and touches nothing else. Workflow changes therefore reach every
+# bootstrapped project on its next session start, cloud and local alike,
 # without anyone re-running the bootstrap skill there.
 #
 # Installed by the `bootstrap` skill in https://github.com/artkoenig/metis.
@@ -25,10 +28,46 @@ failure_handler() {
 }
 trap 'failure_handler ${LINENO}' ERR
 
-# Only manage skills/agents in the remote (Claude Code on the web) environment;
-# locally the user owns their own ~/.claude.
+# Local session: ~/.claude belongs to the user, so no symlink management —
+# the only job is keeping the local metis clone current, since the symlinked
+# skills/agents and CLAUDE.md are exactly as fresh as that clone. Without
+# this, local sessions accumulate the same drift the loader/core split fixes
+# for cloud sessions.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
-  echo "Executed locally. Skipping remote skill/agent setup."
+  echo "Local session: looking for the local metis clone..."
+  clone=""
+  for link in "$CLAUDE_HOME"/skills/* "$CLAUDE_HOME"/agents/*; do
+    [ -L "$link" ] || continue
+    target=$(readlink "$link") || continue
+    case "$target" in /*) ;; *) continue ;; esac   # need an absolute target
+    candidate="${target%/skills/*}"
+    candidate="${candidate%/agents/*}"
+    [ -d "${candidate}/.git" ] || continue
+    url=$(git -C "$candidate" remote get-url origin 2>/dev/null || true)
+    case "$url" in
+      *artkoenig/metis*|*/metis|*/metis.git) clone="$candidate"; break ;;
+    esac
+  done
+  if [ -z "$clone" ]; then
+    echo "No local metis clone found via ~/.claude symlinks; nothing to update."
+    exit 0
+  fi
+  if [ -n "$(git -C "$clone" status --porcelain)" ]; then
+    echo "⚠️  Local clone at ${clone} has uncommitted changes; not touching it."
+    exit 0
+  fi
+  before=$(git -C "$clone" rev-parse HEAD)
+  if ! git -C "$clone" pull --quiet --ff-only; then
+    echo "⚠️  Pull failed (diverged or offline); leaving the clone as it is."
+    exit 0
+  fi
+  after=$(git -C "$clone" rev-parse HEAD)
+  if [ "$before" = "$after" ]; then
+    echo "Local clone already up to date."
+  else
+    echo "Updated local clone: ${before:0:7} -> ${after:0:7}"
+    echo '{"hookSpecificOutput": {"hookEventName": "SessionStart", "reloadSkills": true}}' >&3
+  fi
   exit 0
 fi
 

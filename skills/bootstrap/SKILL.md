@@ -11,8 +11,10 @@ skill installs the SessionStart hook that fills the gap: it clones
 [metis](https://github.com/artkoenig/metis), symlinks its `agents/` and
 `skills/` into `~/.claude`, makes `AGENTS.md` the global instructions, and
 points `core.hooksPath` at metis's `.githooks` so a direct push to the default
-branch is refused. Locally the hook no-ops — the user owns their own
-`~/.claude` there.
+branch is refused. In a local session the hook manages no symlinks — the user
+owns their own `~/.claude` — but it does fast-forward the local metis clone
+(found via those symlinks, skipped when it has uncommitted changes), so local
+sessions stop accumulating the drift of a clone nobody remembers to pull.
 
 ## Loader and core — why the hook is split in two
 

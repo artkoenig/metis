@@ -135,7 +135,9 @@ making `AGENTS.md` the global instructions, and pointing
 default branch is refused. Because the logic lives in the clone,
 workflow changes reach every bootstrapped project on its next session
 start — no re-bootstrapping, no drifting per-project copies (the
-predecessor's design flaw). Installing the loader over the predecessor
+predecessor's design flaw). In local sessions the loader instead
+fast-forwards the user's own metis clone, so the symlinked skills stay
+current there too. Installing the loader over the predecessor
 repo's hook is the migration — same path, same settings entry, and the
 sync prunes the old symlinks itself. This repo dogfoods the same
 loader in its own `.claude/hooks/`.
