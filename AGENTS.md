@@ -66,13 +66,19 @@ parks the work. Anything else: pick a sensible default, record it in the issue
 Heavier tools exist and you reach for them when the change warrants it — never
 because a condition fired:
 
-- a full requirements-grilling session, when the idea is genuinely vague
-- an explicit architecture plan, when the change spans modules
-- a clean-room second opinion, when the design could be wrong in a way you
-  would not notice
-- a separate test author, when independent verification is worth a dispatch
+- a full requirements-grilling session (the `grill` skill), when the idea is
+  genuinely vague
+- an explicit architecture plan (the `plan` skill), when the change spans
+  modules
+- a clean-room second opinion (the `clean-room` skill), when the design could
+  be wrong in a way you would not notice
+- a separate test author (the `test-author` subagent), when independent
+  verification is worth a dispatch
 - slicing into steps with intermediate commits, when the change is too big to
-  land whole
+  land whole — a task list in the issue file, no tooling needed
+
+For facts about the codebase — before writing intent, deciding, or planning —
+dispatch the `researcher` subagent rather than assuming.
 
 ## The run
 
