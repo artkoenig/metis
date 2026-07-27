@@ -2,12 +2,14 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Loads the Metis rulebook, subagents and skills into a cloud session by
-# cloning https://github.com/artkoenig/metis and exposing its agents/ and
-# skills/ under ~/.claude, where a SessionStart `reloadSkills` picks them up.
+# Metis loader — the ONLY file installed per project, kept deliberately thin
+# and stable: it clones or updates the metis repo, then hands over to the
+# sync logic INSIDE the clone (session-start-core.sh). Workflow changes
+# therefore reach already-bootstrapped projects on their next session start,
+# without anyone re-running the bootstrap skill there.
 #
-# Installed and kept in sync by the `bootstrap` skill in that repo. Re-run
-# the skill to update this file rather than hand-editing it.
+# Installed by the `bootstrap` skill in https://github.com/artkoenig/metis.
+# Re-run that skill to update this file rather than hand-editing it.
 # ---------------------------------------------------------------------------
 
 # stdout is reserved for the final hook JSON; everything else goes to the log.
@@ -16,7 +18,7 @@ LOG_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-start.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 exec 3>&1            # fd 3 = real stdout (hook JSON only)
 exec 1>"$LOG_FILE" 2>&1
-echo "=== Metis hook initialized: $(date) ==="
+echo "=== Metis loader initialized: $(date) ==="
 
 failure_handler() {
   echo "❌ CRASH on line $1 (Exit Code: $?)"
@@ -32,70 +34,28 @@ fi
 
 repo_url="https://github.com/artkoenig/metis.git"
 repo_dir="${CLAUDE_HOME}/metis"
-legacy_dir="${CLAUDE_HOME}/artkoenig-agents"   # the predecessor repo's clone
-skills_dir="${CLAUDE_HOME}/skills"
-agents_dir="${CLAUDE_HOME}/agents"
 
-# 1. Clone or update the metis repo.
+# Clone, or update — and on a failed update, re-clone rather than silently
+# serving a stale cache: a session that loads yesterday's workflow because a
+# pull failed is exactly the drift this loader exists to prevent.
 if [ -d "${repo_dir}/.git" ]; then
   echo "Updating metis repo..."
-  git -C "$repo_dir" pull --quiet --ff-only || \
-    echo "⚠️  Pull failed; using cached clone."
-else
+  git -C "$repo_dir" pull --quiet --ff-only || {
+    echo "⚠️  Pull failed; re-cloning for a fresh copy."
+    rm -rf "$repo_dir"
+  }
+fi
+if [ ! -d "${repo_dir}/.git" ]; then
   echo "Cloning metis repo..."
   rm -rf "$repo_dir"
   git clone --quiet --depth 1 "$repo_url" "$repo_dir"
 fi
 
-# 2. Expose each skill at the one-level depth that skill discovery expects.
-#    Symlink so `git pull` updates are reflected without copying. Prune links
-#    we own — including any left by the predecessor repo, so a migrated
-#    session does not load both skill sets side by side.
-mkdir -p "$skills_dir"
-for link in "$skills_dir"/*; do
-  [ -L "$link" ] || continue
-  case "$(readlink "$link")" in
-    "${repo_dir}/skills/"*|"${legacy_dir}/skills/"*) rm -f "$link" ;;
-  esac
-done
-for skill in "${repo_dir}/skills"/*/; do
-  [ -f "${skill}SKILL.md" ] || continue
-  ln -sfn "${skill%/}" "${skills_dir}/$(basename "$skill")"
-  echo "Linked skill: $(basename "$skill")"
-done
-
-# 3. Same treatment for subagents (agents/<name>/agent.md; Claude Code scans
-#    ~/.claude/agents recursively and takes identity from the `name` field).
-mkdir -p "$agents_dir"
-for link in "$agents_dir"/*; do
-  [ -L "$link" ] || continue
-  case "$(readlink "$link")" in
-    "${repo_dir}/agents/"*|"${legacy_dir}/agents/"*) rm -f "$link" ;;
-  esac
-done
-for agent in "${repo_dir}/agents"/*/; do
-  [ -f "${agent}agent.md" ] || continue
-  ln -sfn "${agent%/}" "${agents_dir}/$(basename "$agent")"
-  echo "Linked agent: $(basename "$agent")"
-done
-
-# 4. The rulebook becomes the global instructions.
-if [ -f "${repo_dir}/AGENTS.md" ]; then
-  cp "${repo_dir}/AGENTS.md" "${CLAUDE_HOME}/CLAUDE.md"
-  echo "Synced AGENTS.md -> ~/.claude/CLAUDE.md"
+# Hand over to the current sync logic from the clone. `exec bash` keeps the
+# log redirection and fd 3, so the core script inherits both.
+core="${repo_dir}/skills/bootstrap/assets/session-start-core.sh"
+if [ ! -f "$core" ]; then
+  echo "❌ Core script missing at ${core}."
+  exit 1
 fi
-
-# 5. Guard the default branch: point the project's git hooks at metis's
-#    .githooks so pre-push refuses a direct push to main/master. Nothing is
-#    copied into the project; the hook is shared from the clone.
-project_dir="${CLAUDE_PROJECT_DIR:-.}"
-if [ -d "${repo_dir}/.githooks" ] && \
-   git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
-  git -C "$project_dir" config core.hooksPath "${repo_dir}/.githooks"
-  echo "Set core.hooksPath -> ${repo_dir}/.githooks"
-fi
-
-echo "✅ Metis hook finished successfully."
-
-# 6. Tell Claude Code to reload skills now that they're in place.
-echo '{"hookSpecificOutput": {"hookEventName": "SessionStart", "reloadSkills": true}}' >&3
+exec bash "$core"

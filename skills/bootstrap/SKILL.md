@@ -14,6 +14,19 @@ points `core.hooksPath` at metis's `.githooks` so a direct push to the default
 branch is refused. Locally the hook no-ops — the user owns their own
 `~/.claude` there.
 
+## Loader and core — why the hook is split in two
+
+The predecessor's hook carried all of its sync logic in the per-project copy,
+so a workflow change never reached an already-bootstrapped project until
+someone re-ran the bootstrap skill there — which nobody did. This skill
+therefore installs only a thin, stable **loader** (`assets/session-start.sh`):
+it clones or updates the metis repo — re-cloning instead of silently serving a
+stale cache when the update fails — and then hands over to the **core**
+(`assets/session-start-core.sh`) *inside the clone*. Editing the core changes
+what every bootstrapped project does on its next session start; the loader
+itself should almost never need to change again, and the core is never copied
+anywhere.
+
 ## When to run it
 
 At the start of a session in any git repository Artjom owns — no remote yet,
@@ -29,11 +42,12 @@ Identical → nothing to do. Missing or different → install.
 
 ## What to install
 
-1. **The hook script.** Copy `assets/session-start.sh` to the target's
+1. **The loader.** Copy `assets/session-start.sh` to the target's
    `.claude/hooks/session-start.sh` (create the directory if needed) and make
    it executable. Always copy the asset verbatim — never hand-edit the copy,
    never inline the script into settings as a `bash -c` blob; both create a
-   second, independently drifting version.
+   second, independently drifting version. The core is not installed — it runs
+   from the clone.
 2. **The settings wiring.** Ensure `.claude/settings.json` contains:
 
    ```json
