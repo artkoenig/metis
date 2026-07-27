@@ -124,6 +124,24 @@ subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
 [`skills/`](skills/): `grill`, `plan`, and `clean-room`.
 
+## Wiring it in
+
+The [`bootstrap`](skills/bootstrap/SKILL.md) skill wires a project's
+cloud sessions to Metis. It installs only a thin, stable *loader* hook
+that clones or updates this repo and then runs the sync logic *from
+the clone*: symlinking `agents/` and `skills/` into `~/.claude`,
+making `AGENTS.md` the global instructions, and pointing
+`core.hooksPath` at [`.githooks/`](.githooks/) so a direct push to the
+default branch is refused. Because the logic lives in the clone,
+workflow changes reach every bootstrapped project on its next session
+start — no re-bootstrapping, no drifting per-project copies (the
+predecessor's design flaw). In local sessions the loader instead
+fast-forwards the user's own metis clone, so the symlinked skills stay
+current there too. Installing the loader over the predecessor
+repo's hook is the migration — same path, same settings entry, and the
+sync prunes the old symlinks itself. This repo dogfoods the same
+loader in its own `.claude/hooks/`.
+
 ## The name
 
 Zeus swallowed Metis because he could not control her cunning. This
