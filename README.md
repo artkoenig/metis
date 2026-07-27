@@ -118,9 +118,11 @@ constitution.
 
 ## Status
 
-Early. [`AGENTS.md`](AGENTS.md) is the one-page rulebook that puts the
-above into operation — for a workflow, the text *is* the product. Next:
-the subagent definitions and the skills on the shelf.
+[`AGENTS.md`](AGENTS.md) is the one-page rulebook that puts the above
+into operation — for a workflow, the text *is* the product. The
+subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
+`researcher`, and `test-author` (a shelf tool). The shelf skills live in
+[`skills/`](skills/): `grill`, `plan`, and `clean-room`.
 
 ## The name
 
