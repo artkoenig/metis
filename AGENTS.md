@@ -100,9 +100,21 @@ default.
 ## Bookkeeping
 
 - One issue = one branch = one pull request. An issue is one markdown file
-  under `docs/issues/` — intent, decisions, observations, checkpoints, retro,
-  all in one place. No child issues; a large change gets a task list inside
-  its file.
+  under `docs/issues/`, shaped by `docs/issues/TEMPLATE.md` — the sections
+  are the interface between the agents that read and write the file, so
+  their names and order are fixed while their content stays free. No child
+  issues; a large change gets a task list inside its file.
+- The frontmatter states the facts: `status` (`backlog | active | waiting |
+  done`), `branch`, `pr`. At most one issue is `active` at any moment; any
+  number may be `waiting` — with `pr` set it awaits the human's merge,
+  without it is parked on a question. Merged means `done`.
+- A new session orients itself from the tracker alone: scan the `status`
+  lines under `docs/issues/`, open the `active` file (or the one matching
+  the current branch), and read it whole — the filled sections are the
+  progress, and the Decisions and Checkpoint entries are what the previous
+  session knew. Read nothing else to "get oriented".
+- Issues build independently: branch each new one from the current default
+  branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.
 - Work found mid-run that serves the current intent joins the task list.
   Anything else becomes a new issue file and waits for its own run.
