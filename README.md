@@ -118,8 +118,9 @@ constitution.
 
 ## Status
 
-Early. The next artifact is the agent rulebook (`AGENTS.md`) that puts
-the above into operation — for a workflow, the text *is* the product.
+Early. [`AGENTS.md`](AGENTS.md) is the one-page rulebook that puts the
+above into operation — for a workflow, the text *is* the product. Next:
+the subagent definitions and the skills on the shelf.
 
 ## The name
 
