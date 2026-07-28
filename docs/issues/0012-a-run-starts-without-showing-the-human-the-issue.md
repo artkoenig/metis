@@ -44,9 +44,22 @@ Acceptance criteria:
   criteria, as a table. What 'done' means is visible before implementation
   starts — not on request." Perception style: it prescribes what the human
   sees, no mechanism. Nothing to run (invariant 2's honest path): the two
-  criteria are about rulebook prose; the shell suites touch nothing in
-  this diff. Dogfooded in the same turn — this run itself opened with the
+  criteria are about rulebook prose; no suite covers rulebook content
+  (the core harness copies AGENTS.md as a presence fixture, nothing
+  more). Dogfooded in the same turn — this run itself opened with the
   0012 criteria table.
+
+- Review round 1 (fresh context): both criteria met — the paragraph
+  carries title, numbered criteria, table, before-implementation, and
+  names no mechanism; placement after the run diagram checked, README
+  silence and non-overlap with agents/skills verified by grep; all three
+  suites run as baseline, exit 0 each (none covers rulebook prose — this
+  review is the change's only check). One minor, no criterion: the Log
+  claimed "the shell suites touch nothing in this diff" while the core
+  harness copies AGENTS.md as a fixture — wording fixed to "no suite
+  covers rulebook content". No repeat round for the one-line record
+  correction: judgment call, recorded (third data point for the
+  repeat-waiver thread). Trend: 1.
 
 ## Checkpoints
 
@@ -62,8 +75,15 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the rule states exactly what the
+  human asked for in run 0006, in perception style; reviewer confirmed
+  both criteria with quoted evidence.
+- What surprised me? Even in a two-line prose run the claims-success
+  class appeared again: the Log stated something falsifiable and false
+  ("suites touch nothing in this diff").
+- What am I assuming without having verified it? That skipping the repeat
+  round for a one-line record correction is safe — the rulebook text the
+  criteria are about is unchanged since the review; recorded as a
+  judgment call.
 
 ## Retro
