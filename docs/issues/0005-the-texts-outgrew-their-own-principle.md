@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: 0005-simplify-texts
-pr:
+pr: https://github.com/artkoenig/metis/pull/9
 ---
 
 # The texts outgrew their own principle
@@ -157,3 +157,14 @@ Acceptance criteria:
   in all three places that state a trigger.
 
 ## Retro
+
+Compression is lossy in ways a single reading does not catch: four fresh
+rounds found four different ways a load-bearing sentence disappears. What
+worked was naming the failure class after each round and checking for that
+class mechanically; what did not work was assuming one sweep method covers
+all classes. The perception rule (same criterion missed twice) fired at the
+right moments and forced both approach changes — no fixed round budget was
+missed. One improvement worth considering: when a future change compresses
+prose, write the "no statement lost" criterion with the classes named
+(deleted, weakened, scope widened, scope narrowed) so the first review round
+already hunts all four.
