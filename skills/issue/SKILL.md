@@ -11,9 +11,34 @@ tracker: no database, no script, no status transitions to keep valid. The
 sections are the interface between the agents that read and write it, which is
 why the shape is fixed and this skill exists.
 
-The rulebook (`AGENTS.md`) owns what the states *mean* — when `done` is set,
-what parks an issue at `waiting`, what a run does between them. This skill owns
-what the file *looks like*. Where the two touch, the rulebook wins.
+This skill owns the file whole: its name, its frontmatter, its sections, and
+what the states mean. Nothing else in the workflow describes any of that.
+Other documents may *name* a field or a section — "record it in `## Decisions`"
+— and then point here; they never explain one. A second explanation is the
+defect this arrangement exists to prevent, and it fails in both directions:
+two descriptions drift apart, and moving a description out of one document
+without landing it in this one leaves the question unanswered anywhere.
+
+The rulebook (`AGENTS.md`) owns the run — what happens between the states,
+not what they are.
+
+## The interface, and what is behind it
+
+Treat this skill as a class. Four things are public, and a caller outside
+`skills/issue/` may rely on exactly these:
+
+- the directory `docs/issues/`, and that one issue is one file in it
+- the filename form `NNNN-slug.md`, so a listing is the order they were opened
+- the frontmatter keys `status`, `branch`, `pr`, and the four values `status`
+  takes
+- the heading names — an agent reads and writes them, so renaming one is a
+  breaking change
+
+Everything else is behind the interface: `assets/TEMPLATE.md` and that it
+exists at all, the filing steps, and above all *what belongs in each section*.
+Those change without anything outside this directory changing with them. A
+document that explains one of them has reached inside, and it will be wrong
+the first time this skill moves.
 
 ## Filing one
 
@@ -39,7 +64,7 @@ what the file *looks like*. Where the two touch, the rulebook wins.
 
 | part | what belongs in it |
 | --- | --- |
-| frontmatter | three lines, no more. `status` — which of the four states the issue is in; the rulebook says what each one means and when it changes. `branch` — the branch carrying this issue, set as soon as one exists. `pr` — its pull request, set when the PR is opened. |
+| frontmatter | three lines, no more. `status` — one of the four states below. `branch` — the branch carrying this issue, set as soon as one exists. `pr` — its pull request, set when the PR is opened. |
 | `# <title>` | one H1, the issue in a phrase — what a human sees in a listing |
 | `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable, "when X, then Y" |
 | `## Plan` | optional content, and the `plan` skill writes it — that skill says what belongs in it, this one does not |
@@ -57,6 +82,20 @@ information; a reader who finds it missing learns nothing and has to search.
 The sections fill in run order, so **the filled sections are the progress**:
 Intent only = not started; Checkpoint 1 answered = implementing; Checkpoint 2
 answered = in review; Retro written = finished.
+
+## The four states
+
+`status` tracks the work, not the last section that got written.
+
+- **`backlog`** — filed, nobody has started it.
+- **`active`** — someone is on it now. At most one issue is `active` at any
+  moment.
+- **`waiting`** — parked on a question, and nothing else. Not "waiting for a
+  merge", not "waiting for CI".
+- **`done`** — set when the pull request is opened, in the same breath as the
+  `pr` field. The work is finished at the handover: the merge is the human's
+  and changes nothing in the file. `## Retro` is written *afterwards*, into an
+  issue that is already `done`.
 
 ## Why there is no version field, and what would change that
 

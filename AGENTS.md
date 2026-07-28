@@ -83,6 +83,12 @@ because a condition fired:
 - slicing into steps with intermediate commits, when the change is too big to
   land whole — a task list in the issue file, no tooling needed
 
+A skill is a class, not a document: you call it through the interface its page
+declares, and what it does inside is its own. Never restate a skill's internals
+anywhere else — a caller that depends on how a skill works instead of on what
+it promises turns every change inside that skill into a search through the
+repository.
+
 For facts about the codebase — before writing intent, deciding, or planning —
 dispatch the `researcher` subagent rather than assuming.
 
@@ -111,25 +117,17 @@ what the previous round got wrong and finds what it passed over.
 ## Bookkeeping
 
 - One issue = one branch = one pull request. An issue is one markdown file
-  under `docs/issues/`, filed through the `issue` skill, which carries its
-  name, its frontmatter and its sections — that shape is the interface
-  between the agents that read and write the file, which is why it is the one
-  skill that is not a shelf tool. The skill reaches every session the way the
-  subagents do; nothing is copied into a project. No child issues; a large
-  change gets a task list inside its file.
-- The frontmatter states the facts, and this is what they mean. An issue is
-  `backlog` until someone starts it and `active` while they are on it — at
-  most one is `active` at any moment. `waiting` means parked on a question.
-  `done` is set when the pull request is opened, in the same breath as the
-  `pr` field: the work is finished at the handover, and the merge is the
-  human's — it changes nothing in the file. The retro is written afterwards,
-  into an issue that is already `done`; the status tracks the work, not the
-  last section.
+  under `docs/issues/`, and the `issue` skill owns that file whole — its
+  name, its frontmatter, its sections, and what the states mean. Invoke the
+  skill; do not work from memory of the shape, and do not restate any of it
+  here or anywhere else. That is why it is the one skill that is not a shelf
+  tool. It reaches every session the way the subagents do; nothing is copied
+  into a project. No child issues; a large change gets a task list inside its
+  file.
 - A new session orients itself from the tracker alone: scan the `status`
-  lines under `docs/issues/`, open the `active` file (or the one matching
-  the current branch), and read it whole — the filled sections are the
-  progress, and the Decisions, Log and Checkpoint entries are what the
-  previous session knew. Read nothing else to "get oriented".
+  lines under `docs/issues/`, open the `active` file (or the one matching the
+  current branch), and read it whole — what the previous session knew is in
+  it. Read nothing else to "get oriented".
 - Issues build independently: branch each new one from the current default
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.

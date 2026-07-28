@@ -35,12 +35,16 @@ was posed; it only had to be recognised as the same problem.
 
 Acceptance criteria:
 
-1. The shape of an issue file — its name, its frontmatter, its sections and
-   what belongs in each — is stated in exactly one place, and that place
-   reaches every session without anything being copied into a project.
-2. `AGENTS.md` says an issue is filed through that skill and does not restate
-   the shape. It keeps what the states *mean*; the skill keeps what the file
-   *looks like*.
+1. No file outside `skills/issue/` describes the name, the frontmatter or the
+   sections of an issue file; every mention of one of them names the `issue`
+   skill instead of explaining it. **And** `skills/issue/SKILL.md` describes
+   every frontmatter field and every heading the template contains. The second
+   half is not decoration: without it, deleting the information everywhere
+   satisfies the first half, which is how `branch` came to have no stated
+   meaning at all.
+2. `AGENTS.md` says an issue is filed through that skill and restates none of
+   it — not the shape, and not what the states mean. The skill owns the issue
+   file whole; the rulebook owns the run.
 3. Nothing writes a template into a project: no step in
    `skills/bootstrap/assets/session-start-core.sh` copies one, and
    `skills/bootstrap/SKILL.md` claims none.
@@ -119,7 +123,9 @@ Acceptance criteria:
   cheaper.
 - **Projects that already carry a copy** — `tome_of_battle` has one — are not
   touched from here. Removing it is a change in that repository, on its own
-  branch.
+  branch. It is a removal, not an update: the `sync-template` branch already
+  pushed there brings the copy up to date, which is the wrong repair, and it
+  is superseded by a branch that deletes the file.
 - **Superseded again — the rulebook-carries-the-table decision is withdrawn.**
   It removed the copy but kept the duplication: `AGENTS.md` restated the
   template instead of replacing it, and the review found the two levels of
@@ -153,6 +159,48 @@ Acceptance criteria:
 - **Four digits instead of three**, on the human's instruction: more headroom.
   The four existing files are renamed in the same change, because `0005` sorts
   before `001` and a mixed directory loses the ordering the padding is for.
+- **Decided by the human, after a grilling session, four answers that settle
+  where a fact about an issue file lives.** The grilling was called because
+  criterion 1 had been missed three rounds running and the fourth round would
+  have been the fourth patch:
+  - *There are no copies in projects, full stop.* The first answer was that
+    metis outranks a target project, and the human then sharpened it: a
+    precedence rule presumes two versions, and there are never meant to be
+    two. The copy in `tome_of_battle` is not a stale peer to be reconciled,
+    it is a bug — it gets deleted, not synchronised. A rule for resolving a
+    conflict that cannot arise is machinery this workflow exists without.
+  - *The `issue` skill outranks everything inside metis for the issue file,
+    and it owns the file whole* — the fields, the sections, and what they
+    mean. A reference to the skill names it and stops; it does not expose the
+    skill's internals by retelling them.
+  - *Therefore the frontmatter semantics leave `AGENTS.md`.* The rulebook
+    keeps the run and says an issue is filed through the skill; the skill
+    keeps the file. The previous cut — shape in the skill, meaning in the
+    rulebook — is what rounds 2 to 4 kept falling through, because every move
+    left the question open which half was moving.
+  - *Skill and template are assumed consistent, and that assumption is not
+    checked.* Both live in `skills/issue/`, the template is a bare skeleton,
+    and a mechanical check would only cover the enumerable part anyway. The
+    human took the risk deliberately over the cost of a script and a rule.
+- **A skill is a class, on the human's instruction.** The four decisions above
+  settle where the issue file is described; this settles the general rule they
+  are an instance of. A skill declares an interface and hides how it works
+  inside, so that changing the inside costs nothing outside. Landed in two
+  places, because they are two different statements: `AGENTS.md` says it of
+  skills in general, and `skills/issue/SKILL.md` declares its own public
+  surface — the directory, the filename form, the frontmatter keys and their
+  values, and the heading names. Everything else, above all *what belongs in
+  each section*, is behind the interface. This is what makes criterion 1
+  checkable by reading a reference rather than the whole repository: a
+  reference is legal if it uses only the declared surface.
+- **Criterion 1 rewritten, and this is the actual repair.** The old wording —
+  "stated in exactly one place" — describes a state of the repository, not a
+  property of a diff. Nothing in a diff shows it, so checking it demands
+  reading the whole repository, which is why each round's leftover sat
+  somewhere the round did not look. Worse, "zero places" satisfies it: the
+  `branch` hole in round 4 was criterion 1 being met by deletion. The new
+  wording has two halves, an absence and a presence, and the presence half is
+  the one deletion cannot satisfy.
 
 ## Log
 
@@ -281,6 +329,19 @@ Acceptance criteria:
   *repetition* nor *surprise* catches "the problem was framed wrong", and
   what caught it both times was the human asking a question rather than any
   rule.
+- **A clean-room second opinion was taken and then set aside.** It arrived at
+  writer-owns-the-part with a name-versus-restate distinction, which is close
+  to what the human decided independently — worth recording as agreement from
+  a source that had never seen this repository. It also proposed a two-column
+  part table as the checkable artifact; that was not adopted, because the
+  human's cut removes the split the table would have governed.
+- **The grilling was restarted once, at the human's instruction.** The first
+  attempt asked which failure mode — duplication or hole — should be caught
+  mechanically, which presupposed my own answer and offered three variants of
+  it. The instruction: forget the solution, grill on the original problem. The
+  four decisions above came out of the second attempt. The lesson is about
+  briefs to humans as much as briefs to subagents — a question whose options
+  are all one design is not a question.
 
 ## Checkpoints
 
