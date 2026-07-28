@@ -17,8 +17,9 @@ call, every time; rules remain only where self-assessment fails. A fact like
 Five invariants hold for every change, whatever process judgment picks:
 
 1. The intent — acceptance criteria — is written down before any code.
-2. The tests for those criteria are written first and seen to fail; a change
-   with nothing to run says so instead.
+2. The tests for those criteria are written first — blind, by the
+   test-author — and seen to fail; a change with nothing to run says so
+   instead.
 3. A fresh context reviews the diff against the written intent before the
    PR, with a concrete reproduction per finding — for a change with nothing
    to run, this review is the only check it gets.
@@ -29,7 +30,8 @@ Five invariants hold for every change, whatever process judgment picks:
 
 ```
 idea → issue with acceptance criteria → checkpoint 1
-     → implementer (tests first)      → reviewer (fresh context)
+     → test-author (failing tests)    → implementer
+     → reviewer (fresh context)
      → checkpoint 2 → PR → human merges → retro
 ```
 

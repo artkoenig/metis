@@ -16,10 +16,12 @@ need. This holds for the work and for these texts alike.
 
 1. **Intent first.** Acceptance criteria are recorded in the issue before any
    production code is written.
-2. **Tests before code.** The implementer writes the tests for the criteria
-   first and sees them fail, then makes them pass. A change with nothing to
-   run — the class invariant 3 names — has no tests to write; saying so is
-   how this invariant holds for it.
+2. **Tests before code.** Whether a change has anything to run is your
+   call; a change with nothing to run — the class invariant 3 names — has
+   no tests to write, and saying so is how this invariant holds for it.
+   When tests are due, the `test-author` writes them from the intent alone
+   and sees them fail; the implementer makes them pass and may not edit
+   them.
 3. **A fresh context reviews the result.** Before the PR, a reviewer that has
    seen only the diff and the written intent checks one against the other. A
    finding without a concrete reproduction is not a finding. For a change
@@ -88,8 +90,6 @@ a condition fired:
 - the `grill` skill, when the idea is too vague to write criteria
 - the `plan` skill, when the change spans modules
 - the `clean-room` skill, when you are stuck or want a second opinion
-- the `test-author` subagent, when a test could pass without exercising the
-  behaviour — criteria about absence, invariance, something *not* happening
 - a task list with intermediate commits, when the change is too big to land
   whole
 
@@ -105,7 +105,10 @@ dispatch the `researcher` subagent instead of assuming.
 ```
 idea → issue with acceptance criteria      (grilling only if unclear)
      → checkpoint 1
-     → implementer                         (plans, tests first, implements)
+     → test-author                         (failing tests from the intent,
+                                            when there is something to run)
+     → implementer                         (plans, implements, makes the
+                                            tests pass without editing them)
      → reviewer                            (fresh context: diff vs. intent,
                                             facts by exit code, repro per finding)
      → checkpoint 2

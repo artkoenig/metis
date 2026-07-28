@@ -98,13 +98,16 @@ Acceptance criteria:
 
 ## Retro
 
-- What got in the way: the metis `reviewer` is not a registered subagent
-  type in the cloud harness — `Agent(subagent_type: "reviewer")` fails.
-  Worked around by running a general-purpose agent with the reviewer
-  definition pasted verbatim; same fresh context, but the definition can
-  silently drift from the pasted copy. Worth a look: either the loader
-  registers the agents where the harness finds them, or the rulebook
-  names this fallback.
+- What got in the way: the metis `reviewer` was not a registered
+  subagent type when the reviews ran — `Agent(subagent_type:
+  "reviewer")` failed. Worked around by running a general-purpose agent
+  with the reviewer definition pasted verbatim; same fresh context, but
+  the definition can silently drift from the pasted copy. Resolved
+  mid-session: the hook's links were fine all along ("4 agents
+  reachable"), the harness just builds its subagent registry at session
+  start before the links land and only picked them up on a later
+  refresh. So: not a loader bug; a session whose early turns need the
+  reviewer may still have to fall back to pasting the definition.
 - The branch-pinned cloud session cannot honour "one issue = one branch
   = one PR" for a "fix all open issues" request. This run's default
   (sequential runs, one commit pair each, one shared PR, `done` at
