@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/18
 ---
 
 # The self-check ignores the hooksPath step
@@ -104,3 +104,14 @@ Acceptance criteria:
   recorded as the dismissal reason, not verified by a test.
 
 ## Retro
+
+Clean run: one implementer pass, one review round, both criteria met, no
+fix round needed. Worth keeping: the run-0013 lesson did its job twice in
+triage — the untested defensive branch was dismissed instead of chased,
+and the out-of-intent hermeticity finding was filed (0017) instead of
+fixed in-run. Worth watching: the weaker grep-style pass guards in core
+cases 2–4 are the claims-success class's third sighting (0013 installer,
+0010 loader harness, now noted again by the implementer) — that crosses
+the threshold the 0010 retro set; a harness convention ("every pass line
+rests on the failure counter") is now a candidate rule, not filed yet
+because 0017 touches the same files and could carry it.
