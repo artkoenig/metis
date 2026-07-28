@@ -103,9 +103,10 @@ corrects itself through lived feedback.
 
 Everything in between is the agent's call — including when to reach for
 the heavier tools: a full requirements-grilling session, an explicit
-architecture plan, a clean-room second opinion, a separate test author,
-slicing a large change into steps. They exist as skills invoked by
-judgment, never as conditions that fire automatically.
+architecture plan, a clean-room second opinion (skills), a separate test
+author (a subagent), slicing a large change into steps (a task list, no
+tooling at all). Each is reached for by judgment, never because a
+condition fired.
 
 ## The minimal run
 

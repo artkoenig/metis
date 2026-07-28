@@ -519,6 +519,22 @@ Acceptance criteria:
   - *"Never restate a skill's internals anywhere else"* collided with the
     documentation rule that allows the README to repeat. Fixed by scoping it
     to callers, which is what it meant.
+- **Review round 9 — criterion 2 holds, both halves, for the first time in
+  nine rounds.** Criteria 1 through 7 met, each with the evidence enumerated;
+  the reviewer's sweep covered every tracked file whole plus two exhaustive
+  greps, and the exclusivity claims that survived the de-absolutising all
+  reproduce. Two findings, both low, both criterion 8:
+  - *`bootstrap` pointed at a page that could not answer* — "invoke the
+    `issue` skill to find out which file that is", but the skill said nothing
+    about legacy template copies. The reviewer named the repair shape
+    correctly: stating the path in `bootstrap` would breach criterion 2, so
+    the answer belongs in the skill. Fixed as a migration note there — the
+    section on migrations-in-prose is exactly where a legacy artifact
+    belongs.
+  - *`README` called five heavier tools "skills"* — `test-author` is a
+    subagent and slicing is a task list, no tooling at all. Predates the
+    branch, but criterion 8 is a property of the state, not of the added
+    sentences. Fixed.
 - **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
   against a design the human replaced mid-round. Re-arming it rather than
   spending it is the honest call — but it does not reset: if criterion 2

@@ -133,3 +133,8 @@ What would change it: a shape change that an old file does **not** reveal — a
 section that keeps its name and changes its meaning. If that ever happens, the
 migration belongs here, in prose ("issues before `NNNN` have no `## Log`; read
 their `## Decisions` as carrying both"), not in a field.
+
+One such migration note exists already: earlier setups copied a template into
+each project as `docs/issues/TEMPLATE.md`. That copy is obsolete — this skill
+carries the template now — and a project still holding one can simply delete
+it.
