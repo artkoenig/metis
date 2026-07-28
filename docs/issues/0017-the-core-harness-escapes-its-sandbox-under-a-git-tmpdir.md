@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 branch: claude/offene-issues-3hysxf
 pr:
 ---
@@ -62,9 +62,11 @@ Acceptance criteria:
 ## Log
 
 - Reproduced red first (the failing test for this change): `TMPDIR`
-  inside a scratch git repo → core harness exit 1, 3 FAILs, enclosing
-  repo's local config gained `core.hookspath`. Siblings under the same
-  TMPDIR: exit 0, config untouched.
+  inside a scratch git repo → core harness exit 1, one failing case
+  (case 6, "non-git project"; the earlier "3 FAILs" note counted FAIL
+  lines including the summary), enclosing repo's local config gained
+  `core.hookspath`. Siblings under the same TMPDIR: exit 0, config
+  untouched.
 - Guard added to all three harnesses, identical three lines after the
   scratch base is made: if `git -C "$base" rev-parse --git-dir` succeeds,
   print a refusal naming the script, the path and TMPDIR as the likely
@@ -75,6 +77,16 @@ Acceptance criteria:
     (`git config --local -l` diff empty).
   - Core under a TMPDIR inside a `.git` directory → same refusal.
   - `bash test.sh` under a normal TMPDIR → exit 0, "PASS: all 3 suites".
+- Review round 1 (fresh context, diff 1b14c6b..HEAD): one finding, minor,
+  record-only — the Log's "3 FAILs" did not reproduce (1 failing case;
+  the 3 was FAIL lines incl. the summary). Both criteria met; the
+  reviewer reproduced pre-fix red, post-fix refusal on all three
+  harnesses, the `.git`-dir edge and the untouched config independently.
+  Triage: fixed the Log wording. Repeat round skipped as a judgment
+  call: the fix touches only the tracker record, no file the criteria
+  are about — the same shape 0015/0010/0012 recorded, which issue 0018
+  (next in this run) turns into a written waiver. Trend: AC1 0, AC2 0,
+  no-criterion 1 → total 1 in round 1, fix record-only.
 
 ## Checkpoints
 
@@ -96,8 +108,17 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — all three harnesses refuse under
+  a git TMPDIR before any case, the enclosing repo's config stays
+  untouched, and `bash test.sh` under a normal TMPDIR exits 0. Review
+  round 1 confirmed every fact independently; its one finding was a
+  wording slip in this file's Log, fixed.
+- What surprised me? The siblings never false-failed — only the core's
+  non-git case walks up. And my own FAIL count was sloppy: `grep -c FAIL`
+  counts the summary line too. Facts want exact oracles even in a log
+  entry.
+- What am I assuming without having verified it? That refusing (rather
+  than adapting via GIT_CEILING_DIRECTORIES) never blocks a real
+  workflow — normal `/tmp` is repo-free everywhere this runs today.
 
 ## Retro
