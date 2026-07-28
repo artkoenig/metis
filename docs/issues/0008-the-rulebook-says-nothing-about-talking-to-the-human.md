@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: 0008-how-to-talk-to-the-human
-pr:
+pr: https://github.com/artkoenig/metis/pull/11
 ---
 
 # The rulebook says nothing about talking to the human
@@ -78,3 +78,15 @@ Acceptance criteria:
   answers, the list needs an explicit "or the answer asked for".
 
 ## Retro
+
+**The smallest possible run, and every invariant still held.** Four lines of
+prose, one review round, zero findings. The cost of the full shape — issue,
+checkpoints, fresh review, record — was a few minutes, and the review still
+earned its keep: it verified the README carries no restatement and pinned
+the one soft spot (the illustrative list) into the record instead of leaving
+it to drift.
+
+**A zero-finding round is information, not luck.** The change was small
+because the rulebook already had a place for it. When a rule addition needs
+no new section and touches nothing else, the review converges immediately —
+the 0004 lesson in reverse: less surface, fewer findings.
