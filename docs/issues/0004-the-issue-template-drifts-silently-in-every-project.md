@@ -599,3 +599,24 @@ moment; these answer for what is actually on the branch.
   true for the two projects that exist today, unchecked for any future one.
 
 ## Retro
+
+Nine review rounds for a modest diff, and the record shows why: the two
+expensive mistakes were framing errors, and nothing in the workflow catches
+those. Four rounds were spent patching findings before anyone questioned the
+criterion that kept producing them; three more were spent writing absolute
+sentences that the next sweep falsified. The perception rules fired correctly
+on the repetition — but both times the *diagnosis* came from the human, once
+by rejecting my grilling frame outright, once by pulling the rules back to
+judgment. Worth carrying forward:
+
+- A criterion that describes a repository state ("stated in exactly one
+  place") instead of a property of the change cannot be reviewed from a diff
+  and is satisfiable by deletion. Write criteria as absence *and* presence.
+- An absolute sentence is a claim about every file. Where it can be a claim
+  about the intent instead ("hand over content, not places"), make it one.
+- A fix that removes half the finding (the location, not the condition) reads
+  as done and is not; round 7 to 8 paid for that. Re-read the finding, not
+  the diff, before calling something fixed.
+- What finally converged was not more sweeping but less surface: operations
+  instead of fields removed the information callers kept leaking. When the
+  same class of finding survives structural fixes, shrink the interface.
