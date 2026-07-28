@@ -85,6 +85,20 @@ Acceptance criteria:
   the four stale claims with file:line evidence, the bootstrap skill's
   declared install interface, and the fact that the loader hard-codes the
   `artkoenig/metis` URL — the basis of the grilling questions.
+- Task 1 done (implementer, tests first): `install.sh` + `test-install.sh`.
+  Harness seen failing first, then `bash test-install.sh` 3 cases exit 0;
+  whole-repo suite `test-session-start-core.sh` 5 cases exit 0; `bash -n`
+  both files exit 0 (no shellcheck in this environment). Both re-run by the
+  caller before committing, same exit codes. Implementer's choices:
+  `METIS_SOURCE` override (local path or raw-URL base, default
+  artkoenig/metis main), python3 for the JSON merge with a clear failure if
+  missing, refusal to touch invalid settings JSON, sanity check on the
+  fetched loader before installing, harness pipes the script via stdin to
+  enforce the curl|bash contract.
+- Task 2 done in the main context (prose): README rewritten to 440 words
+  (`wc -w`, was 1205) — preamble kept, then "How it works" (invariants,
+  run diagram with checkpoints and retro, retro-as-self-correction focus)
+  and "Installing it" (the one-liner plus the fork sentence).
 
 ## Checkpoints
 
