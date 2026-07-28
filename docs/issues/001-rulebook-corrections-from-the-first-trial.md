@@ -1,5 +1,5 @@
 ---
-status: waiting
+status: done
 branch: retro-proposals
 pr: https://github.com/artkoenig/metis/pull/6
 ---
@@ -109,8 +109,10 @@ Acceptance criteria:
   added), `agents/reviewer/agent.md` (re-review premise, fact reporting, the
   report's opening), `agents/implementer/agent.md` (repetition rule, fact
   reporting, report list), `agents/test-author/agent.md` (description).
-- **Owed:** the fresh-context review of this diff against this intent
-  (invariant 3), before any PR.
+- **Owed and never paid:** the fresh-context review of this diff against this
+  intent (invariant 3). Offered before the PR, and the human's answer was to
+  open it. All six criteria therefore rest on one reading — mine.
+- Merged as `3a83fd8` (PR #6). The rule the retro asks for is filed as `002`.
 
 ## Checkpoints
 

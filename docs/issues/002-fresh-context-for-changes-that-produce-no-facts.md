@@ -1,0 +1,74 @@
+---
+status: backlog
+branch:
+pr:
+---
+
+# The fresh context is not optional for a change that produces no facts
+
+## Intent
+
+Invariant 4 establishes facts by exit code — a suite, a linter, a type check.
+Some changes produce none of those: the rulebook itself, the agent
+definitions, the skills, an ADR, a README. Nothing runs against them, nothing
+can fail, and no receipt exists at the end. For that class of change,
+invariant 3 — the fresh context reading the diff against the written intent —
+is not one safeguard among several. It is the only one.
+
+Metis does not say so, and the omission has already cost something twice: in
+the trial run the fresh context caught a wrong claim I had written into
+`docs/evaluator-architecture.md` — the same defect I had sent back to the
+implementer a round earlier — and on issue `001`, the rulebook change itself
+shipped with no fresh reading at all, so six rule changes rest on a single
+pair of eyes.
+
+The rule follows from the asymmetry, not from a preference: where there is a
+suite, skipping the review risks a defect the suite might still catch; where
+there is no suite, skipping it risks a defect nothing catches.
+
+Acceptance criteria:
+
+1. `AGENTS.md` states that a change producing no facts by exit code — the
+   rulebook, an agent definition, a skill, documentation — is reviewed by a
+   fresh context before the PR, and that this one is not a judgment call.
+2. The rule names why: with no suite and no static analysis, invariant 3 is
+   the only check the change gets.
+3. The `reviewer` agent's definition accounts for a diff with no suite to run,
+   rather than opening its report with a fact it cannot establish.
+
+## Plan
+
+## Tasks
+
+## Decisions
+
+- **Source: the Retro of `001`**, which proposed the rule and did not
+  implement it — the run that discovered the gap was itself the run that fell
+  into it.
+- **Not folded into `001`.** It arrived from that issue's retro, which is
+  written after the PR; adding a criterion there would have meant reopening a
+  change that was already merged. A new issue is the route the rulebook
+  prescribes for work that does not serve the running intent.
+- **Criterion 3 is a consequence, not a wish.** The reviewer is told to open
+  its report with the suite and the static analysis by exit code. Given a diff
+  of pure prose there is nothing to run, and an agent instructed to report a
+  fact it cannot establish will invent a form of words for it. Whatever the
+  fix, it has to leave the agent an honest way to say "nothing to run here".
+
+## Log
+
+## Checkpoints
+
+### Before implementation
+
+- Does this match what was asked?
+- What surprised me?
+- What am I assuming without having verified it?
+
+### Before the PR
+
+- Does this match what was asked?
+- What surprised me?
+- What am I assuming without having verified it?
+
+## Retro
