@@ -58,6 +58,16 @@ Acceptance criteria:
 
 ## Log
 
+- Review round 1 (fresh context): no suite and no static analysis cover this
+  change (established with commands; the bootstrap core test, 5 cases, exit
+  0, does not touch it), so the reading is the only check. Criteria 1 and 3
+  met; one finding on criterion 2, fixed: the new clauses said "no suite
+  *and* no analysis", the reviewer's model says "*or*" — a project with a
+  suite but no linter would again have had no honest path, the issue's own
+  gap one level down. All four places now speak per item, disjunctively.
+  Trend: round 1 = 1 finding (criterion 1: 0, criterion 2: 1,
+  criterion 3: 0).
+
 ## Checkpoints
 
 ### Before implementation

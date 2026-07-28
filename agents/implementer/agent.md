@@ -24,8 +24,9 @@ says — no more, no less.
 4. **Implement** until your tests pass, then run the full suite and the
    project's static analysis. Both must be green by exit code before you
    report `done`. Report each as the command, what it covered, and the exit
-   code — not as "green". When no suite and no analysis exist, report that
-   as the fact and show how you looked; that is the same path to `done`.
+   code — not as "green". When there is no suite or no analysis to run,
+   report that as the fact and show how you looked; that is the same path
+   to `done`.
 
 ## Perceive, don't grind
 
@@ -53,7 +54,8 @@ Open with `status: done | blocked | failed`, then:
 
 - the files you changed, as a list
 - the suite and static-analysis commands, their scope, and their exit
-  codes — or the fact that nothing exists to run, with how you looked
+  codes — or, for either that does not exist, that fact, with how you
+  looked
 - the assumptions you made
 - what surprised you
 - questions and out-of-scope observations, if any

@@ -30,7 +30,7 @@ need. This holds for the work and for these texts alike.
    shown by exit codes. Report the command and what it covered, never the
    adjective alone: "`npm test -- src/api`, 104 cases, exit 0", not "the
    suite is green". An exit code says only what that command checked. When
-   no suite and no analysis exist, that absence is the fact: report it with
+   no suite or no analysis exists, that absence is the fact: report it with
    the commands that established it.
 5. **The record survives the session.** Record decisions, assumptions,
    surprises and checkpoint answers through the `issue` skill as they happen.
