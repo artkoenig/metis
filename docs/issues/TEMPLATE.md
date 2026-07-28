@@ -4,6 +4,13 @@ branch:             # set as soon as one exists
 pr:                 # set when the PR is opened — set status: done with it
 ---
 
+<!--
+GENERATED FILE — do not edit this copy. Every session start overwrites it
+with the template from the metis clone, so any change made here is silently
+lost. Edit docs/issues/TEMPLATE.md in the metis repo instead:
+https://github.com/artkoenig/metis
+-->
+
 # <title>
 
 <!--
@@ -15,7 +22,8 @@ The sections below are the interface between the agents that read and write
 this file — their names and order are fixed, their content is free. They fill
 in run order, so the filled sections ARE the progress: Intent only = not
 started; Checkpoint 1 answered = implementing; Checkpoint 2 answered = in
-review; Retro written = finished. Delete these comments when filing.
+review; Retro written = finished. Delete these comments — including the
+generated-file notice above — when filing.
 -->
 
 ## Intent

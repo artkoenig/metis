@@ -116,8 +116,10 @@ what the previous round got wrong and finds what it passed over.
   directory lists the issues in the order they were opened. It is shaped by
   `docs/issues/TEMPLATE.md`: the sections are the interface between the
   agents that read and write the file, so their names and order are fixed
-  while their content stays free. No child issues; a large change gets a task
-  list inside its file.
+  while their content stays free. That template is a generated file — every
+  session start refreshes it from metis, so a correction belongs there, never
+  in the local copy. No child issues; a large change gets a task list inside
+  its file.
 - The frontmatter states the facts: `status` (`backlog | active | waiting |
   done`), `branch`, `pr`. At most one issue is `active` at any moment; any
   number may be `waiting`, parked on a question. `done` is set when the pull

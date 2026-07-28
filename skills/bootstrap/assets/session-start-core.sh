@@ -71,7 +71,25 @@ if [ -d "${repo_dir}/.githooks" ] && \
   echo "Set core.hooksPath -> ${repo_dir}/.githooks"
 fi
 
+# 5. Refresh the project's issue template from the clone. The template is a
+#    generated file: it is versioned in the project and read on GitHub, so it
+#    has to be a real file rather than a symlink into the clone (which would
+#    be committed and dangle for everyone else) — and a copy that is never
+#    refreshed is a copy that silently drifts. Overwriting it every session
+#    start is what makes the clone, not the copy, authoritative.
+#
+#    Only ever into an EXISTING docs/issues/. A project without one has not
+#    opted into the tracker, and creating the directory would opt it in behind
+#    the user's back.
+template_src="${repo_dir}/docs/issues/TEMPLATE.md"
+template_dst="${project_dir}/docs/issues/TEMPLATE.md"
+if [ -f "$template_src" ] && [ -d "${project_dir}/docs/issues" ] && \
+   ! [ "$template_src" -ef "$template_dst" ]; then
+  cp "$template_src" "$template_dst"
+  echo "Refreshed ${template_dst}"
+fi
+
 echo "✅ Metis core finished successfully."
 
-# 5. Tell Claude Code to reload skills now that they're in place.
+# 6. Tell Claude Code to reload skills now that they're in place.
 echo '{"hookSpecificOutput": {"hookEventName": "SessionStart", "reloadSkills": true}}' >&3
