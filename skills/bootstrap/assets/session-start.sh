@@ -12,8 +12,9 @@ set -euo pipefail
 # bootstrapped project on its next session start, cloud and local alike,
 # without anyone re-running the bootstrap skill there.
 #
-# Installed by the `bootstrap` skill in https://github.com/artkoenig/metis.
-# Re-run that skill to update this file rather than hand-editing it.
+# Installed by the `bootstrap` skill or by install.sh, both in
+# https://github.com/artkoenig/metis. Re-run either to update this file
+# rather than hand-editing it.
 # ---------------------------------------------------------------------------
 
 # stdout is reserved for the final hook JSON; everything else goes to the log.
