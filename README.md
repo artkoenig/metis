@@ -126,12 +126,14 @@ constitution.
 into operation — for a workflow, the text *is* the product. The
 subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
-[`skills/`](skills/): `grill`, `plan`, and `clean-room`. One skill there is
-not optional: [`issue`](skills/issue/SKILL.md) is the tracker itself. Every
-read and every write goes through one of its operations — you hand it a
-decision, an observation, a new state, and it knows where that belongs. Where
-the content lands is behind the interface, so it can move without a single
-other file changing.
+[`skills/`](skills/): `grill`, `plan`, and `clean-room`. Two more skills live
+there and neither is a shelf tool. [`bootstrap`](skills/bootstrap/SKILL.md)
+wires a project up, described below. [`issue`](skills/issue/SKILL.md) is the
+tracker itself: every read and every write goes through one of its
+operations — you hand it a decision, an observation, a new state, and it knows
+where that belongs. Subagents included; the reviewer holds the `Skill` tool so
+it can orient there instead of being handed a path. Where the content lands is
+behind the interface, so it can move without a single other file changing.
 
 ## Wiring it in
 

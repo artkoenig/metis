@@ -12,7 +12,13 @@ sections are the interface between the agents that read and write it, which is
 why the shape is fixed and this skill exists.
 
 This skill owns the file whole: its name, its frontmatter, its sections, and
-what the states mean. Nothing else in the workflow describes any of that.
+what the states mean. Nothing else in the workflow describes any of that,
+except the four parts this page hands to a named owner below.
+
+Subagents are bound by this too, which is why the `reviewer` is granted the
+`Skill` tool: it orients here rather than being handed a path. A caller that
+passes a path has told a subagent where issues live, and that is the leak
+this arrangement exists to close.
 
 The rulebook (`AGENTS.md`) owns the run — what happens between the states,
 not what they are.
@@ -33,7 +39,7 @@ first time this skill moves.
 | **record a plan** | handed straight to the `plan` skill, which owns this one — see below |
 | **record checkpoint answers** | the rulebook's three answers, and which of the two checkpoints they belong to |
 | **record a retro** | what got in the way, what should change |
-| **record a task list** | the steps a change is being landed in, when it is too big to land whole |
+| **record a task list** | the steps a change is being landed in — the rulebook says when one is due |
 | **set the state** | which state the issue is now in, and the branch or the pull request if one now exists |
 | **orient a session** | nothing. Returns which issue is running and everything the previous session knew about it |
 

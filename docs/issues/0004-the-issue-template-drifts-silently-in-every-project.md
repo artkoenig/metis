@@ -1,5 +1,5 @@
 ---
-status: waiting
+status: active
 branch: 004-template-drift
 pr:
 ---
@@ -474,7 +474,20 @@ Acceptance criteria:
     away two paragraphs below.
   - *F6:* `README.md` says one skill in `skills/` is not optional; `bootstrap`
     is a second. Round 6's finding, relocated rather than removed.
-- **Parked at `waiting` for the human.**
+- **Decided by the human: subagents are bound by the interface too.**
+  Verified before deciding how — `Skill` is a grantable subagent tool, shown
+  by `agents/test-author/agent.md:4` and `agents/issue-implementer/agent.md:4`
+  in the predecessor repository, both of which list it. Only the `reviewer`
+  touches the tracker; the other three work from their brief. So `reviewer`
+  gains `Skill` and stops being handed a path: it orients through the skill
+  itself. That turns F2's false sentence true rather than softening it, which
+  is the outcome worth having — the alternative was to admit an exception for
+  subagents and lose the property on the one path that matters, since the
+  reviewer is the only agent that reads an issue at all.
+- **Round 7's other five findings fixed as reported:** the path out of
+  `skills/bootstrap/`, the exclusivity claim in the skill's own opening, the
+  task-list condition in `skills/plan/` and in the operation row, and the
+  skill count in `README.md`.
 - **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
   against a design the human replaced mid-round. Re-arming it rather than
   spending it is the honest call — but it does not reset: if criterion 2

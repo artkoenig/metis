@@ -123,9 +123,10 @@ what the previous round got wrong and finds what it passed over.
   answer, a new state — and name the operation; it knows where that content
   belongs. Never state a path, a filename or a field yourself, here or
   anywhere else. Unlike the shelf tools it is not optional: there is no other
-  way to read or write an issue. It reaches every session the way the
-  subagents do, so nothing about the tracker is ever copied into a project.
-  No child issues.
+  way to read or write an issue, and that binds subagents too — dispatch one
+  that needs the tracker with the `Skill` tool and let it orient there, never
+  with a path. It reaches every session the way the subagents do, so nothing
+  about the tracker is ever copied into a project. No child issues.
 - A new session orients itself with that skill and reads nothing else to "get
   oriented".
 - `README.md` and the rest of the documentation describe the current state,
