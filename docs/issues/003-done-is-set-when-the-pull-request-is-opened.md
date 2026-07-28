@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: close-001
-pr:
+pr: https://github.com/artkoenig/metis/pull/7
 ---
 
 # `done` is set when the pull request is opened
@@ -86,3 +86,25 @@ Acceptance criteria:
   one.
 
 ## Retro
+
+**The new rule was used the moment it existed.** This issue went to `done`
+when PR #7 was opened, and this retro is being written into it afterwards —
+the ordering the rulebook now describes, exercised once. It reads fine: the
+status answered "is anyone still working on this?" correctly at every point,
+which the old one could not.
+
+**The rule it replaced was unsatisfiable from the start.** It survived the
+writing of the rulebook, a full trial run against a foreign project, and a
+review round whose subject was the bookkeeping section itself. What surfaced
+it was not a review but a cost — closing `001` needed a whole branch for one
+line, and that was too much friction to ignore. Worth noticing: the rules that
+do not work are found by using them, not by reading them, and Metis has no
+mechanism that uses them except a real run.
+
+**Three issues on one branch is a compromise, not a pattern.** The rule
+"branch each new one from the current default branch" and the rule "number
+after the highest already filed" pull against each other while a numbered
+issue file sits unmerged: two branches off `main` would both file a `002`.
+It cost nothing here because all three are bookkeeping on the same thread. It
+would cost a collision in a repository with real parallel work, and there is
+no rule covering it.
