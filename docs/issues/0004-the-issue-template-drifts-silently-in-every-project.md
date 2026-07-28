@@ -569,8 +569,33 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+A note first: the answers under "Before implementation" describe the
+refresh design, which was withdrawn twice. They stand as the record of that
+moment; these answer for what is actually on the branch.
+
+- **Does this match what was asked?** Yes, and the ask grew underway — each
+  time by the human, each time recorded as a decision: no copies anywhere
+  (the original criterion), operations instead of fields, subagents bound
+  through the `Skill` tool, absolutes replaced by intent-plus-reason, the
+  documentation kept current as a rule. The final state satisfies the eight
+  criteria as reviewed in round 9, with the two round-9 findings fixed on
+  top and verified directly rather than by a tenth round — they were two
+  sentences of documentation, and re-reading them against their sources is
+  a check I could complete myself.
+- **What surprised me?** How long it took: nine review rounds for a change
+  whose final diff is modest. The cause is recorded in the Log — I patched
+  findings for four rounds before questioning the criterion, and then wrote
+  absolute sentences for three more rounds until the human pulled the rule
+  back to judgment. The workflow's perception rules caught the repetition;
+  they did not catch either framing error. Both times it was the human.
+- **What am I assuming without having verified it?** (a) That a subagent
+  granted `Skill` can actually invoke a skill in this environment — the
+  grant is real and precedented in the predecessor repo, but no metis
+  reviewer has exercised it yet; the next dispatched review is the test.
+  (b) That the symlinked `skills/issue/` reaches local sessions through the
+  human's own `~/.claude` symlink as it does in the cloud — asserted by the
+  human in round 3, not observed by me. (c) That deleting
+  `tome_of_battle`'s template copy is the only migration any project needs —
+  true for the two projects that exist today, unchecked for any future one.
 
 ## Retro
