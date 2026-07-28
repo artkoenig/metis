@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/20
 ---
 
 # The harness never exercises the installer's curl branch
@@ -57,6 +57,22 @@ Acceptance criteria:
   checks files/settings/commit, not directories; consistent with the
   existing cases.
 
+- Review round 1 (fresh context): both criteria met, zero findings.
+  Facts — install 18 exit 0, core 7 exit 0, loader 5 exit 0, `bash -n`
+  exit 0, no shellcheck. Reviewer's own mutants on a repo copy: curl arm
+  → `false` fails the new suite (exit 1) while passing the OLD suite
+  (exit 0 — gap confirmed real); a fake fetch that fools the installer's
+  own sanity grep still fails on the harness's `cmp` against the
+  canonical asset. Loopback proven three ways: static (only 127.0.0.1 in
+  the harness), all proxy vars cleared (exit 0), and a network namespace
+  with only `lo` up (curl case succeeds there; unrelated case failures in
+  the namespace traced to this sandbox's git-commit signing server, also
+  reproduced with the cp branch — isolation artifact, not a finding).
+  Record note: the implementer's "no direct outbound network" claim was
+  wrong for the reviewer's sandbox, but the namespace run establishes the
+  criterion independently. No orphan server, no scratch leftovers, tree
+  clean. Trend: 0.
+
 ## Checkpoints
 
 ### Before implementation
@@ -72,8 +88,26 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the curl arm is under test, a
+  broken arm fails by exit code (proven by implementer and reviewer with
+  independent mutants), and the suite runs with only loopback up.
+- What surprised me? The harness is stricter than the installer: a
+  fetch that fools install.sh's own sanity grep still fails the suite's
+  byte-compare against the canonical asset.
+- What am I assuming without having verified it? That the OS-chosen-port
+  server pattern stays flake-free on other machines — the 5-second
+  startup wait is generous but unverified elsewhere; the suite would
+  fail loudly, not silently, if it ever flakes.
 
 ## Retro
+
+First zero-finding review round of the workflow — worth noting why: the
+intent was two narrow, testable criteria, the approach was already proven
+by hand in 0013's review, and the implementer verified with a mutation
+before the reviewer did. Nothing got in the way. One record lesson: the
+implementer justified the loopback claim with "this sandbox has no
+outbound network", which was false in the reviewer's sandbox — the claim
+held only because the reviewer proved it differently (network namespace).
+An environment fact used as evidence should name the command that
+established it, per invariant 4; the claims-success family again, fifth
+sighting, this time in a justification rather than a pass line.
