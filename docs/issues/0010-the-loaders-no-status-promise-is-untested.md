@@ -39,6 +39,21 @@ Acceptance criteria:
 
 ## Log
 
+- Implementer done (tests first): new sibling harness
+  `test-session-start-loader.sh`, 3 local-session cases in scratch dirs
+  (fake HOME, scratch project, scratch upstream, no network); takes an
+  alternative loader path for mutation proofs. Fail-first proven with a
+  mutated loader copy (`additionalContext` on the local path): 3 FAIL,
+  exit 1; pristine loader 3 cases exit 0. Core suite 5 cases exit 0,
+  `test-install.sh` 15 cases exit 0, `bash -n` all *.sh exit 0 (no
+  shellcheck on this machine). Bootstrap SKILL.md now names the new
+  harness (the only place enumerating suites). Loader itself untouched —
+  the promise holds. Implementer's defaults: the reviewer's exact 0009
+  mutation text is not on record, its described shape reproduced; the
+  `reloadSkills`-only JSON stays allowed ("no status" = no
+  `additionalContext`). Out-of-scope note filed by the implementer: no
+  runner invokes the three harnesses together.
+
 ## Checkpoints
 
 ### Before implementation
