@@ -128,8 +128,40 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes, with one deviation the human has
+  seen: zero-padded numbers instead of the old workflow's unpadded ones,
+  because unpadded defeats the ordering that was the point. Nothing else grew
+  beyond the six criteria.
+- **What surprised me?** That every one of the seven changed files is prose
+  read by agents, and not one of them is covered by anything that can fail.
+  Metis insists that facts come from exit codes — and its own artifacts
+  produce no facts at all. A rule here can contradict another rule
+  indefinitely; the only thing standing against that is a reader.
+- **What am I assuming without having verified it?** Two things. (a) That the
+  reworded rules contradict nothing elsewhere in the repository: I grepped
+  for each phrase I changed across every `.md` and `.sh`, which finds
+  restatements but not contradictions in different words. (b) That this diff
+  is sound at all — no fresh context has read it. Invariant 3 is unmet on
+  this change: I offered the review, the human answered "open the PR", and I
+  took that as the answer. It is the one invariant that has no substitute
+  here, since there is no suite to fall back on.
 
 ## Retro
+
+**A change to the rulebook is the case Metis cannot check itself.** No tests,
+no static analysis, no exit code — the entire apparatus of invariant 4 has
+nothing to bite on. That leaves invariant 3 carrying the whole load for this
+class of change, which makes skipping it more expensive here than anywhere
+else, not less. Worth a rule: for a change that produces no facts, the fresh
+context is not optional.
+
+**The section split was used by the file that introduced it.** `## Log`
+absorbed the run record and `## Decisions` stayed at what was settled and why.
+One favourable data point, from an unusually short run — the real test is a
+run with three review rounds.
+
+**The strongest of the six corrections came from outside the workflow.**
+Criterion 2 exists because the human refused a report the run had produced
+and its retro had not questioned. A retro is written by the context that did
+the work; it inherits that context's blind spots. Nothing in Metis currently
+puts a fresh reading on the retro itself.
