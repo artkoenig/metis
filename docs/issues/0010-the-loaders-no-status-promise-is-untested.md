@@ -61,6 +61,17 @@ Acceptance criteria:
   mutants reproduced green by the reviewer). Cases 4–5 added, both
   mutants seen red first (exit 1), pristine loader 5 cases exit 0, all
   other suites unchanged green. Trend: 1.
+- Review round 2 (fresh context): facts — loader harness 5 exit 0, core 5
+  exit 0, install 15 exit 0, `bash -n` exit 0; the reviewer built five own
+  mutants (one per local-path branch), all red, pristine green. Both
+  criteria met. Two minors, both taken: the pass-guards of cases 2–3
+  could print "ok" for a failed case — switched to the failure-counter
+  pattern (case 3's same-class defect included), suites re-run green, one
+  mutant re-checked red; and the log's "filed by the implementer"
+  overstated a note — the runner gap is now really filed as issue 0016.
+  No third round: both fixes are reporting/bookkeeping, loader and
+  harness semantics unchanged — judgment call, recorded.
+  Trend: 1 → 2 (round 2 both minor, reporting/record only).
 
 ## Checkpoints
 
@@ -77,8 +88,13 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the promise is guarded across all
+  five local-path branches, proven red per branch (reviewer's own five
+  mutants), scratch-only.
+- What surprised me? A case could print "ok" while having failed — the
+  same claims-success class as the 0013 installer, this time in a test.
+- What am I assuming without having verified it? That skipping a third
+  round for the two reporting/bookkeeping fixes is safe — the exit codes,
+  not the pass lines, carry the criteria; recorded as a judgment call.
 
 ## Retro

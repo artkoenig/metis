@@ -63,15 +63,17 @@ out=$(run_loader_local "$sc") || fail "no clone: loader exited non-zero"
 [ $failures -eq 0 ] && pass "no clone found: silent"
 
 # --- Case 2: clone up to date — fd 3 must stay silent -----------------------
+prior=$failures
 sc=$(new_scratch)
 make_local_clone "$sc"
 out=$(run_loader_local "$sc") || fail "up to date: loader exited non-zero"
 [ -z "$out" ] || fail "up to date: local session got hook output: $out"
 grep -q "already up to date" "$sc/proj/.claude/hooks/session-start.log" \
   || fail "up to date: loader did not reach the pull path (log)"
-if [ -z "$out" ]; then pass "clone up to date: silent"; fi
+[ $failures -eq $prior ] && pass "clone up to date: silent"
 
 # --- Case 3: clone behind upstream — reload allowed, but never a status -----
+prior=$failures
 sc=$(new_scratch)
 make_local_clone "$sc"
 echo "more" >> "$sc/upstream/metis/skills/demo/SKILL.md"
@@ -81,11 +83,9 @@ out=$(run_loader_local "$sc") || fail "behind: loader exited non-zero"
 [ "$(git -C "$sc/clone" rev-parse HEAD)" = "$(git -C "$sc/upstream/metis" rev-parse HEAD)" ] \
   || fail "behind: clone was not fast-forwarded"
 echo "$out" | grep -q '"reloadSkills": true' || fail "behind: reload signal lost: $out"
-if echo "$out" | grep -q 'additionalContext'; then
-  fail "behind: local session got a self-check status: $out"
-else
-  pass "clone updated: reload signal only, no status"
-fi
+echo "$out" | grep -q 'additionalContext' \
+  && fail "behind: local session got a self-check status: $out"
+[ $failures -eq $prior ] && pass "clone updated: reload signal only, no status"
 
 # --- Case 4: clone has uncommitted changes — fd 3 must stay silent ----------
 prior=$failures
