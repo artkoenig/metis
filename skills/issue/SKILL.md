@@ -10,9 +10,10 @@ One issue is one markdown file under `docs/issues/`. That file is the whole
 tracker: no database, no script.
 
 This skill owns the file: its name, its frontmatter, its sections, its states.
-A caller hands it **content** and names an **operation** — never a path, a
-filename, a frontmatter key or a heading. That way the file can change without
-any caller changing.
+What it owns is described here and nowhere else — two descriptions of one
+thing drift apart. A caller hands it **content** and names an **operation** —
+never a path, a filename, a frontmatter key or a heading. That way the file
+can change without any caller changing.
 
 Subagents follow the same rule: a subagent that needs the tracker gets the
 `Skill` tool and orients here, instead of being handed a path.
@@ -71,7 +72,7 @@ Read nothing else to get oriented.
 | --- | --- |
 | frontmatter | three lines, no more. `status` — one of the four states below. `branch` — the branch carrying this issue, set as soon as one exists. `pr` — its pull request, set when the PR is opened. |
 | `# <title>` | one H1, the issue in a phrase |
-| `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable |
+| `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable, "when X, then Y" |
 | `## Plan` | optional content, and the `plan` skill writes it — that skill says what belongs in it |
 | `## Tasks` | optional content, and the rulebook says when a change gets one |
 | `## Decisions` | what was settled and why, each with its source; questions to the human and their answers. Nothing else — a mid-run reader must find the decisions without wading through process |

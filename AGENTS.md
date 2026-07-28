@@ -80,7 +80,7 @@ a condition fired:
 
 A skill is like a class: use the interface its page declares and leave the
 inside alone. A caller that relies on a skill's internals breaks the first
-time they change.
+time those internals change.
 
 For facts about the codebase — before writing intent, deciding or planning —
 dispatch the `researcher` subagent instead of assuming.

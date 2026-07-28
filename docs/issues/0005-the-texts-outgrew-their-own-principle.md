@@ -82,6 +82,22 @@ Acceptance criteria:
   were reworded — criterion 2 protects the interface (operation names,
   states, issue-file sections, paths, tool lists, all verified unchanged),
   not the chapter headings of the texts.
+- Review round 2 (fresh context): criteria 2, 3, 5, 6 met. Three findings,
+  all fixed: the criterion form ("when X, then Y") restored to the issue
+  skill's shape table; the single-description boundary ("described here and
+  nowhere else") restored to the issue skill; the dangling "they" in the
+  rulebook's skill-as-class sentence replaced with "those internals". The
+  round also confirmed round 1's dismissal of the chapter-heading finding.
+- Perception signal: criterion 1 missed twice in a row, by different
+  defects — the pattern is load-bearing statements dropped during
+  compression. Changed approach: before round 3, every deleted normative
+  line of the whole diff was swept mechanically (grep over the diff's
+  deleted lines) and each checked against the new corpus; everything
+  remaining is rationale or survives elsewhere.
+- Stale word counts in an earlier Log entry, current after the round-2
+  fixes: AGENTS.md 946, README.md 1017, implementer 429, researcher 214,
+  reviewer 509, test-author 292, bootstrap 650, clean-room 287, grill 274,
+  issue 1119, plan 269 — still every changed file shorter than before.
 
 ## Checkpoints
 
