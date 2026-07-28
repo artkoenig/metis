@@ -22,8 +22,8 @@ need. This holds for the work and for these texts alike.
    seen only the diff and the written intent checks one against the other. A
    finding without a concrete reproduction is not a finding. For a change
    that produces no facts by exit code — the rulebook, an agent definition,
-   a skill, documentation — this review is the only check the change gets,
-   so skipping it is never a judgment call.
+   a skill, documentation — this review is the only check the change gets:
+   nothing else would catch what it misses.
 4. **Facts by exit code.** The suite and static analysis pass before the PR,
    shown by exit codes. Report the command and what it covered, never the
    adjective alone: "`npm test -- src/api`, 104 cases, exit 0", not "the
@@ -95,7 +95,7 @@ idea → issue with acceptance criteria      (grilling only if unclear)
      → checkpoint 1
      → implementer                         (plans, tests first, implements)
      → reviewer                            (fresh context: diff vs. intent,
-                                            suite by exit code, repro per finding)
+                                            facts by exit code, repro per finding)
      → checkpoint 2
      → commit, push, PR → human merges
      → retro

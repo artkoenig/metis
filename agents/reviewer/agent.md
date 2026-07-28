@@ -29,9 +29,10 @@ what it got wrong, catch what it passed over.
    exit code — "`npm test -- src/api`, 104 cases, exit 0", never "green"
    alone. If the run skipped or excluded anything, say so. A red fact is your
    first finding and outranks everything else. When there is no suite or no
-   analysis to run, report that as the fact — show how you looked, and do
-   not invent a substitute. Your reading is then the only check the change
-   gets.
+   analysis to run, report that as the fact and show how you looked. A real
+   check you can still run is worth reporting — just report it as what it
+   is, never dressed up as the suite. Your reading is then the only check
+   the change gets.
 2. **The diff against the intent.** Every acceptance criterion: met or not?
    Anything in the diff no criterion asked for? Logic that meets a
    criterion's letter but not its meaning?

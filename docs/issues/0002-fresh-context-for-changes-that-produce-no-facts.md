@@ -54,8 +54,25 @@ Acceptance criteria:
   of pure prose there is nothing to run, and an agent instructed to report a
   fact it cannot establish will invent a form of words for it. Whatever the
   fix, it has to leave the agent an honest way to say "nothing to run here".
+- Criterion 1's phrase "not a judgment call" is stated through the reason
+  alone ("this review is the only check the change gets: nothing else would
+  catch what it misses"), not as the literal sentence. The review showed the
+  literal sentence backfires: a guarantee scoped to one class reads as if
+  the other classes were up for judgment, which contradicts the invariant
+  frame. Invariant status already makes it non-optional. Source: review
+  round 1, finding 2, and the simplicity rule.
 
 ## Log
+- Review round 1 (fresh context, the only check this change gets — as the
+  change itself states): all three criteria met. Four findings, none a
+  criterion violation. Fixed now: the "never a judgment call" phrase
+  replaced by its reason (finding 2, see Decisions); the run diagram and
+  README now say "facts by exit code" where they promised a suite the
+  reviewer cannot always have (finding 3, the documentation-mirror rule);
+  the reviewer's "do not invent a substitute" reworded so a real ad-hoc
+  check is reported as what it is, not withheld (finding 4). Filed for
+  later: finding 1 — invariants 2 and 4 have nothing to bite on for a
+  change without a suite — as issue 0007.
 
 ## Checkpoints
 
