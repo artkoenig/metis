@@ -68,7 +68,7 @@ Identical → nothing to do. Missing or different → install.
    ```
 
    Create the file with just this content if it is absent; otherwise merge
-   the `SessionStart` entry in without disturbing existing settings.
+   the `SessionStart` entry in without disturbing existing hooks or settings.
 3. **Commit both files** — a cloud session only benefits from a hook that
    was committed before it started.
 

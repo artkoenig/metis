@@ -43,7 +43,8 @@ Record the observation, then decide: change approach, or ask.
 
 **Two checkpoints.** Once before implementation and once before the PR, record
 the answers to three questions: *Does this match what was asked? What
-surprised me? What am I assuming without having verified it?*
+surprised me? What am I assuming without having verified it?* Not a gate —
+a cheap moment to correct course.
 
 **Retro after every run.** After the PR, record what got in the way and what
 should change. If a rule on this page misfired, propose the fix in the
@@ -108,7 +109,8 @@ predecessor's list inherits its blind spots.
 
 ## Bookkeeping
 
-- One issue = one branch = one pull request.
+- One issue = one branch = one pull request. No child issues — a change too
+  big to land whole gets a task list instead.
 - The tracker is the `issue` skill. Hand it the content — a decision, an
   observation, a new state — and name the operation; where that lands is the
   skill's business. This holds for subagents too: one that needs the tracker

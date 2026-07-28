@@ -69,6 +69,16 @@ Acceptance criteria:
   bootstrap 648, clean-room 294, grill 274, issue 1101, plan 263 — every
   changed file shorter. The template (103 words) was already a bare skeleton
   and stays unchanged.
+- Review round 1 (fresh context): no suite and no static analysis exist in
+  this repo (reported with commands, exit codes); criteria 3 and 6 met. Five
+  findings fixed: "No child issues" restored to the rulebook; "not a gate"
+  restored to the checkpoint rule; bootstrap's "without disturbing existing
+  hooks" restored; the plan skill's garden-path sentence rewritten; the
+  clean-room trigger in the plan skill restated as "could be wrong in a way
+  you would not notice". One finding dismissed: document chapter headings
+  were reworded — criterion 2 protects the interface (operation names,
+  states, issue-file sections, paths, tool lists, all verified unchanged),
+  not the chapter headings of the texts.
 
 ## Checkpoints
 
