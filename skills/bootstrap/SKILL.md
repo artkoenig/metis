@@ -104,3 +104,7 @@ The loader has its own harness: `assets/test-session-start-loader.sh`. Same
 scratch-only rules; it guards the documented promise that a local session
 never receives a self-check status (`additionalContext`) from the loader.
 Run it before landing any change to the loader.
+
+`test.sh` at the repo root runs both harnesses together with the
+installer's suite (`test-install.sh`) and exits 0 only when every case in
+every suite passes — the one command behind "the suite is green".

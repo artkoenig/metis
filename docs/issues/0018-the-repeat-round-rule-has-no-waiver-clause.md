@@ -1,7 +1,7 @@
 ---
-status: backlog
-branch:
-pr:
+status: done
+branch: claude/offene-issues-3hysxf
+pr: https://github.com/artkoenig/metis/pull/21
 ---
 
 # The repeat-round rule has no waiver clause
@@ -47,18 +47,52 @@ Acceptance criteria:
 
 ## Log
 
+- One sentence added to the rulebook's repeat-round paragraph
+  (`AGENTS.md`, "The run"): the waiver, its boundary (no file the
+  criteria are about), and the duty to record its use (criteria 1 and 2).
+- `README.md` checked whole: it summarises the reviewer step but never
+  repeats the repeat-round rule, so criterion 3 needs no edit.
+- Nothing to run for this change — a rulebook edit produces no facts by
+  exit code; per invariant 3 the fresh-context review is the only check
+  it gets. (`bash test.sh` still exits 0, but that covers the harnesses,
+  not this text.)
+- Review round 1 (fresh context, diff b9894e5..HEAD): zero findings. The
+  reviewer verified independently that README repeats no repeat-round
+  rule, that the reviewer agent definition does not contradict the
+  waiver (it governs how a round runs, not whether), and that "the
+  tracker record" is anchored by the Bookkeeping section. Trend: round 1
+  = 0 findings — converged, no repeat round due.
+
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — one sentence in the rulebook's
+  repeat-round paragraph stating the waiver and the duty to record its
+  use. A fourth data point landed this very run: 0017's round-1 finding
+  was record-only and the repeat was skipped as a judgment call.
+- What surprised me? `README.md` does not repeat the repeat-round rule
+  anywhere (checked its whole text) — criterion 3 is satisfied by
+  showing nothing needs changing.
+- What am I assuming without having verified it? That "the tracker
+  record" is unambiguous enough — it means the issue file the `issue`
+  skill owns, and nothing else.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the waiver is one sentence in
+  the paragraph that owns the rule, states its boundary and the
+  recording duty; README needed no edit and the review confirmed that
+  independently.
+- What surprised me? Nothing; the fourth data point (0017, this run) fit
+  the recorded shape exactly.
+- What am I assuming without having verified it? That one sentence is
+  enough — if future runs stretch "record only" to cover more, the retro
+  loop is the correction path.
 
 ## Retro
+
+- Nothing got in the way; the change was one sentence and the review
+  confirmed the boundary reads as intended. Watch item for future runs:
+  if "touches only the tracker record" ever gets stretched, that is
+  retro material, not a reason for more rule text now.
