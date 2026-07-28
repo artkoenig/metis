@@ -36,6 +36,27 @@ Acceptance criteria:
 
 ## Log
 
+- Implementer done (tests first): three new cases (16–18) run install.sh's
+  real curl arm against a loopback-only HTTP server — a python one-liner
+  serving a scratch tree on 127.0.0.1, port 0 (OS-chosen, no flake),
+  killed by the existing EXIT trap. Case 16: successful fetch, full
+  install asserted; case 17: 404 → clean refusal, nothing installed;
+  case 18: 200 with wrong content → sanity grep refuses. Installer still
+  piped via stdin; pass-guards on the failure counter. install.sh
+  untouched (no defect found). Fail-first proven as a mutation: a mutant
+  with the curl arm replaced by garbage passed the OLD suite (15 cases,
+  exit 0 — the gap was real) and fails the new one (exit 1). Facts:
+  install 18 exit 0, also exit 0 with all six proxy vars cleared
+  (loopback proof — this sandbox has no direct outbound network), core 7
+  exit 0, loader 5 exit 0, `bash -n` exit 0, no shellcheck. Defaults:
+  the served tree is a byte-identical copy of the loader asset under the
+  scratch base; `run_install_http` clears the proxy vars for the
+  installer child so curl talks to 127.0.0.1 directly. Noted: after a
+  curl-arm refusal an empty `.claude/hooks/` dir remains (install.sh
+  mkdirs before fetching) — the suite's "nothing installed" contract
+  checks files/settings/commit, not directories; consistent with the
+  existing cases.
+
 ## Checkpoints
 
 ### Before implementation
