@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -44,9 +44,14 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — two narrow criteria with a recorded
+  reproduction from 0009 round 6; a core-script + harness change, dispatched
+  to the implementer.
+- What surprised me? Nothing yet.
+- What am I assuming without having verified it? That "why not" can be a
+  short reason in the status (e.g. "hooksPath skipped: project is not a git
+  repository") without breaking the status sanitizer or the JSON emit — the
+  implementer verifies against the harness.
 
 ### Before the PR
 
