@@ -1,7 +1,7 @@
 ---
-status: active
+status: waiting
 branch: retro-proposals
-pr:
+pr: https://github.com/artkoenig/metis/pull/6
 ---
 
 # Rulebook corrections from the first trial run
