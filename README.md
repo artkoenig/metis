@@ -140,6 +140,12 @@ Installing the loader over the predecessor repo's hook is the migration —
 same path, same settings entry, and the sync prunes the old symlinks itself.
 This repo dogfoods the same loader in its own `.claude/hooks/`.
 
+The sync also checks itself: it verifies that every skill and agent link
+resolves and hands a one-line status into the session's context. The
+rulebook has each session open by greeting the human and relaying that
+status — and a session that finds no status knows the hook did not finish,
+checks the links and the log itself, and says so.
+
 ## The name
 
 Zeus swallowed Metis because he could not control her cunning. This project

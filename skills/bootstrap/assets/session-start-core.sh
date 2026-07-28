@@ -34,10 +34,12 @@ for link in "$skills_dir"/*; do
     "${repo_dir}/skills/"*|"${legacy_dir}/skills/"*) rm -f "$link" ;;
   esac
 done
+skills_n=0
 for skill in "${repo_dir}/skills"/*/; do
   [ -f "${skill}SKILL.md" ] || continue
   ln -sfn "${skill%/}" "${skills_dir}/$(basename "$skill")"
   echo "Linked skill: $(basename "$skill")"
+  skills_n=$((skills_n + 1))
 done
 
 # 2. Same treatment for subagents (agents/<name>/agent.md; Claude Code scans
@@ -49,10 +51,12 @@ for link in "$agents_dir"/*; do
     "${repo_dir}/agents/"*|"${legacy_dir}/agents/"*) rm -f "$link" ;;
   esac
 done
+agents_n=0
 for agent in "${repo_dir}/agents"/*/; do
   [ -f "${agent}agent.md" ] || continue
   ln -sfn "${agent%/}" "${agents_dir}/$(basename "$agent")"
   echo "Linked agent: $(basename "$agent")"
+  agents_n=$((agents_n + 1))
 done
 
 # 3. The rulebook becomes the global instructions.
@@ -73,5 +77,22 @@ fi
 
 echo "✅ Metis core finished successfully."
 
-# 5. Tell Claude Code to reload skills now that they're in place.
-echo '{"hookSpecificOutput": {"hookEventName": "SessionStart", "reloadSkills": true}}' >&3
+# 5. Self-check: every link we created must resolve. The status line below
+#    reaches the session's context; a crashed run never gets here, so a
+#    missing status IS the failure signal — the rulebook says what a session
+#    does then. Keep the line free of quotes and backslashes: it is embedded
+#    in JSON unescaped.
+broken=""
+for link in "$skills_dir"/* "$agents_dir"/*; do
+  [ -L "$link" ] && [ ! -e "$link" ] && broken="${broken} $(basename "$link")"
+done
+commit=$(git -C "$repo_dir" rev-parse --short HEAD 2>/dev/null || echo unknown)
+if [ -z "$broken" ]; then
+  status="Metis self-check: ${skills_n} skills and ${agents_n} agents linked, all resolving; rulebook synced; commit ${commit}; no errors."
+else
+  status="Metis self-check FAILED: broken links:${broken}. See .claude/hooks/session-start.log."
+fi
+echo "$status"
+
+# 6. Tell Claude Code to reload skills, and hand the status to the session.
+printf '{"hookSpecificOutput": {"hookEventName": "SessionStart", "reloadSkills": true, "additionalContext": "%s"}}\n' "$status" >&3
