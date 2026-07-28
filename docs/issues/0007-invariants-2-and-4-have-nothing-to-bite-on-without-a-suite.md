@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/14
 ---
 
 # Invariants 2 and 4 have nothing to bite on without a suite
@@ -101,3 +101,10 @@ Acceptance criteria:
   no run has exercised the new path yet.
 
 ## Retro
+
+- What got in the way: my own first wording — while closing the "no honest
+  path" gap I re-created it one level down with a conjunction. The reviewer's
+  reproduction (suite exists, no linter) caught it in one round; the fresh
+  context earned its keep on a four-clause prose change.
+- What should change: nothing in the rules. The trend table (1 → 0) and the
+  two-round rhythm worked as designed; the fix landed without a third round.
