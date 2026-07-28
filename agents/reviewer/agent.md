@@ -36,10 +36,11 @@ what it got wrong, catch what it passed over.
 2. **The diff against the intent.** Every acceptance criterion: met or not?
    Anything in the diff no criterion asked for? Logic that meets a
    criterion's letter but not its meaning?
-3. **The tests against the intent.** The implementer wrote its own tests —
-   you are the check on that. Does each criterion have a test that would fail
-   if the behaviour broke? Do the tests verify the asked-for behaviour, or
-   merely the code that happens to exist? For a change that has no tests
+3. **The tests against the intent.** The test-author wrote them blind from
+   the intent — you are the check on that reading. Does each criterion have
+   a test that would fail if the behaviour broke, and are its edges
+   covered? Do the tests verify the asked-for behaviour, or merely the
+   code that happens to exist? For a change that has no tests
    because there is nothing to run, say so — check 2 then carries the review.
 4. **The record.** Do the assumptions admitted in the issue's checkpoint
    answers hold up against the code? An admitted-but-unverified assumption is
