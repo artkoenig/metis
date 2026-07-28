@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -40,9 +40,14 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — one narrow gap, two criteria, a
+  test-only change; the 0013 review already proved the approach (local
+  HTTP server on loopback) works by hand. Dispatched to the implementer.
+- What surprised me? Nothing yet.
+- What am I assuming without having verified it? That a loopback HTTP
+  server is available on this machine without new dependencies (python3
+  is already an installer precondition, so `python3 -m http.server` is
+  the obvious candidate) — the implementer verifies.
 
 ### Before the PR
 
