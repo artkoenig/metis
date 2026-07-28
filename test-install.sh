@@ -217,6 +217,8 @@ refuses_broken_state() {
 refuses_broken_state "settings.json a directory" 'mkdir -p "$1/.claude/settings.json"'
 refuses_broken_state "hook path a directory" 'mkdir -p "$1/.claude/hooks/session-start.sh"'
 refuses_broken_state ".claude/hooks a regular file" 'mkdir -p "$1/.claude" && touch "$1/.claude/hooks"'
+refuses_broken_state "settings.json a symlink" 'mkdir -p "$1/.claude" && echo "{}" > "$1/outside.json" && ln -s ../outside.json "$1/.claude/settings.json"'
+refuses_broken_state ".claude a symlink" 'mkdir -p "$1/elsewhere" && ln -s elsewhere "$1/.claude"'
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

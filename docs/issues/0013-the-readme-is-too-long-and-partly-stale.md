@@ -222,6 +222,18 @@ Acceptance criteria:
   the fix: 13 cases exit 0, core suite exit 0, `bash -n` exit 0. If round
   7 does not come back cleaner, the run stops and asks again.
 
+- Review round 7 (fresh context): facts — 13 cases exit 0, core suite exit
+  0, `bash -n` exit 0; curl branch proven against loopback again. One
+  finding, converging (trend 3 → 3 → 4 → 3 → 2 → 3 → 1): minor, fixed —
+  the round-6 vet used following tests (`-e`/`-f`), so a symlinked
+  settings.json passed as a regular file, the merge wrote outside the repo
+  and committed a dangling symlink claiming success. The vet now rejects
+  symlinks at installed paths and parent directories (lstat semantics,
+  `-L`). Cases 14–15 written first and seen failing (silent success /
+  pathspec-beyond-symlink error), then the fix: 15 cases exit 0. The
+  criterion-5 letter observation, sixth reading, concurs with the standing
+  dismissal — no action.
+
 ## Checkpoints
 
 ### Before implementation

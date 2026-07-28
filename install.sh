@@ -31,13 +31,13 @@ command -v python3 >/dev/null 2>&1 \
 # filesystem state: each installed path absent or a regular file, each parent
 # absent or a directory — a broken state is out of scope, check and abort.
 for p in "${installed_paths[@]}"; do
-  if [ -e "$p" ] && [ ! -f "$p" ]; then
+  if [ -L "$p" ] || { [ -e "$p" ] && [ ! -f "$p" ]; }; then
     die "$p exists but is not a regular file; fix it and re-run."
   fi
   d=$(dirname "$p")
   while [ "$d" != "." ]; do
-    if [ -e "$d" ] && [ ! -d "$d" ]; then
-      die "$d exists but is not a directory; fix it and re-run."
+    if [ -L "$d" ] || { [ -e "$d" ] && [ ! -d "$d" ]; }; then
+      die "$d exists but is not a plain directory; fix it and re-run."
     fi
     d=$(dirname "$d")
   done
