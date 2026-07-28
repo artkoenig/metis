@@ -52,11 +52,13 @@ Acceptance criteria:
    satisfies absence — which is how `branch` came to have no stated meaning at
    all.
 
-   `README.md` is out of scope for both halves. It is the repository's
-   description for a human reader and is loaded into no agent's context, so a
-   contradiction there misleads someone who can see it, not an agent who
-   cannot. Stated here rather than left to triage, because a scope decision
-   that lives only in a triage note is one a later round re-opens.
+   `README.md` and the rest of the documentation are out of scope for both
+   halves: they are written for a human reader, and a page of pointers serves
+   nobody. They repeat, they never define.
+8. The documentation matches the state this branch leaves the repository in.
+   That is the price of the exemption in criterion 2 — repetition is allowed
+   only because it is kept current, and documentation nobody updates is worth
+   less than none.
 3. `AGENTS.md` reaches the tracker only through operations, and restates
    nothing of what the file looks like or what the states mean — except the
    parts the skill hands it by name.
@@ -430,6 +432,24 @@ Acceptance criteria:
     exception the criterion had to be widened to permit.
   - Criteria 1 and 2 rewritten accordingly, and criterion 7 added for the
     false-sentence class that has now cost four rounds.
+- **Decided by the human: the documentation is a mirror, and it is kept
+  current.** The round-6 triage exempted `README.md` from criterion 2 because
+  no agent loads it — true, but only half the answer, and the half that lets
+  documentation rot. The human supplied the other half: it describes the
+  status quo, so a change that makes it wrong updates it in the same change.
+  Repetition is allowed *because* it is maintained, not instead of.
+  - Landed as a rule in `AGENTS.md`, which had no documentation rule at all,
+    and as criterion 8 rather than a note — an obligation that lives in a
+    triage note is one the next round drops.
+  - The check found drift immediately: `README.md` listed five invariants and
+    two were wrong. Invariant 2, *tests before code*, was missing entirely,
+    and "irreversible decisions go to the human" stood in its place — that is
+    a steering point, not an invariant, and the README lists it again nine
+    lines further down. Invariant 4 was missing the part `0001` added, that a
+    fact is reported as the command and its scope rather than as "green".
+  - Worth naming: this is the drift the whole issue is about, sitting in the
+    file I had just argued was safe to let drift. The exemption was right and
+    my reason for it was wrong.
 - **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
   against a design the human replaced mid-round. Re-arming it rather than
   spending it is the honest call — but it does not reset: if criterion 2

@@ -128,6 +128,11 @@ what the previous round got wrong and finds what it passed over.
   No child issues.
 - A new session orients itself with that skill and reads nothing else to "get
   oriented".
+- `README.md` and the rest of the documentation describe the current state,
+  and a change that makes one of them wrong updates it in the same change.
+  They may repeat what a rule or a skill says — they are read by humans, who
+  are not served by a page of pointers — but they never define it, and a
+  disagreement is always the documentation being out of date.
 - Issues build independently: branch each new one from the current default
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.

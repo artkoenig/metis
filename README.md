@@ -62,11 +62,14 @@ anchor points:
 Five things are always true, whatever process judgment picks:
 
 1. The intent (acceptance criteria) is written before implementation.
-2. A fresh context reviews the diff against that intent before the PR.
-3. The test suite is green, established by exit code, before the PR.
-4. Observations, decisions, and surprises are recorded in the issue —
-   they must survive the session that made them.
-5. Irreversible or outward-facing decisions go to the human.
+2. The tests that express those criteria are written before the code, and
+   seen to fail.
+3. A fresh context reviews the diff against that intent before the PR,
+   with a concrete reproduction per finding.
+4. The suite and static analysis pass, established by exit code and
+   reported as the command and what it covered — never as "it's green".
+5. Observations, decisions, surprises and checkpoint answers are recorded
+   as they happen — they must survive the session that made them.
 
 Everything else is a tool on the shelf, not a step in a pipeline.
 
