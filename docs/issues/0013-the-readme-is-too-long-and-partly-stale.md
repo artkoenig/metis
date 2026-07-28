@@ -96,9 +96,10 @@ Acceptance criteria:
   fetched loader before installing, harness pipes the script via stdin to
   enforce the curl|bash contract.
 - Task 2 done in the main context (prose): README rewritten to 440 words
-  (`wc -w`, was 1205) — preamble kept, then "How it works" (invariants,
-  run diagram with checkpoints and retro, retro-as-self-correction focus)
-  and "Installing it" (the one-liner plus the fork sentence).
+  (`wc -w`, was 1205; 455 after the round-1 invariant-3 fix) — preamble
+  kept, then "How it works" (invariants, run diagram with checkpoints and
+  retro, retro-as-self-correction focus) and "Installing it" (the one-liner
+  plus the fork sentence).
 
 - Review round 1 (fresh context): facts — `test-install.sh` 3 cases exit 0,
   core suite 5 cases exit 0, `bash -n` exit 0, no shellcheck here. Three
@@ -113,6 +114,23 @@ Acceptance criteria:
   cannot be exercised before merge; the pipe mechanism is what the harness
   proves. Trend: round 1 = 3 findings (criterion 3: 1, criterion 6: 1,
   no criterion: 1).
+
+- Review round 2 (fresh context): facts — `test-install.sh` 4 cases exit 0,
+  core suite 5 cases exit 0, `bash -n` exit 0; the reviewer additionally
+  proved the curl branch against a local HTTP server (exit 0, hook
+  byte-identical). Three findings, lighter in weight than round 1's
+  (moderate/minor/nit → minor/nit/trivial — converging by class): (1) minor,
+  criterion 3, fixed — a repo whose `.gitignore` ignores `.claude/` died
+  half-installed with git's raw hint; test case 5 written first and seen
+  failing, then an early precondition added that refuses cleanly before
+  writing anything, 5 cases exit 0. (2) nit, criterion 5, dismissed with
+  reason — the install part has one descriptive sentence beyond the
+  letter; the letter bound the fork option to one sentence and forbade a
+  step list, and the extra sentence says what the hook does. (3) trivial,
+  record, fixed — the log's word count updated (440 at rewrite, 455 after
+  the round-1 fix). Round 1's fixes held up under fresh reading.
+  Trend: 3 → 3, but strictly lighter (criterion 3: 1→1 lighter,
+  criterion 5: 0→1 nit, criterion 6: 1→0, record/none: 1→1 trivial).
 
 ## Checkpoints
 

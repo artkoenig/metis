@@ -124,5 +124,19 @@ else
 fi
 [ $failures -eq $prior ] && pass "re-run beside unrelated staged work: no failure, work stays staged"
 
+# --- Case 5: repo ignoring .claude/ — clean refusal, nothing installed ------
+prior=$failures
+repo=$(new_repo)
+echo ".claude/" >"$repo/.gitignore"
+if run_install "$repo"; then
+  fail "ignored: install succeeded in a repo that ignores .claude/"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "ignored: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "ignored: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "repo ignoring .claude/: clean refusal, nothing installed"
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

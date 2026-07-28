@@ -24,6 +24,9 @@ toplevel=$(git rev-parse --show-toplevel 2>/dev/null) \
   || die "run this from the repository root ($toplevel), not a subdirectory."
 command -v python3 >/dev/null 2>&1 \
   || die "python3 is required to merge .claude/settings.json; install it and re-run."
+if git check-ignore -q .claude/hooks/session-start.sh 2>/dev/null; then
+  die ".claude/ is git-ignored here, but the hook only works committed — unignore it and re-run."
+fi
 
 # 1. The loader — fetched from the canonical asset, never inlined here.
 mkdir -p .claude/hooks
