@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/19
 ---
 
 # A run starts without showing the human the issue
@@ -87,3 +87,14 @@ Acceptance criteria:
   judgment call.
 
 ## Retro
+
+Smallest run so far: one paragraph, one review round, one minor. Two
+recurring threads gained a data point each. The claims-success class
+showed up in pure bookkeeping (a Log line stating something false about
+the suites) — fourth sighting; the candidate countermeasure recorded in
+the 0011 retro (every factual record line must be checkable) still waits
+for a carrier issue. And the repeat-round waiver was used a third time,
+again for a record-only fix — the pattern is stable enough to propose a
+rule: a repeat round is waivable when the fix touches only the tracker
+record, never when it touches a file the criteria are about. Not filed
+yet; worth bundling with the waiver thread's other two data points.
