@@ -21,13 +21,16 @@ says — no more, no less.
    A test that passes before the implementation exists tests nothing.
 4. **Implement** until your tests pass, then run the full suite and the
    project's static analysis. Both must be green by exit code before you
-   report `done`.
+   report `done`, and you report each as the command you ran, what it
+   covered, and the exit code — not as "green".
 
 ## Perceive, don't grind
 
 Stop and report — whatever your progress — when you notice:
 
-- **Repetition**: the same failure twice in a row despite a changed approach.
+- **Repetition**: the same failure twice in a row despite a changed approach,
+  or the same acceptance criterion missed twice — two unlike defects against
+  one criterion are still a pattern.
 - **Surprise**: the code or its documentation behaves differently than the
   brief assumes.
 - **Regression**: your fix breaks something that worked before you started.
@@ -47,6 +50,7 @@ run; surfacing them is the job.
 Open with `status: done | blocked | failed`, then:
 
 - the files you changed, as a list
+- the suite and static-analysis commands, their scope, and their exit codes
 - the assumptions you made
 - what surprised you
 - questions and out-of-scope observations, if any
