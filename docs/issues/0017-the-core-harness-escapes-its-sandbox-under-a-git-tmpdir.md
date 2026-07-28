@@ -1,7 +1,7 @@
 ---
 status: done
 branch: claude/offene-issues-3hysxf
-pr:
+pr: https://github.com/artkoenig/metis/pull/21
 ---
 
 # The core harness escapes its sandbox under a git TMPDIR
@@ -122,3 +122,12 @@ Acceptance criteria:
   workflow — normal `/tmp` is repo-free everywhere this runs today.
 
 ## Retro
+
+- What got in the way: my own log entry stated a fact ("3 FAILs") from a
+  sloppy oracle (`grep -c FAIL` counts the summary line); the reviewer
+  caught it. Lesson, already covered by invariant 4's spirit: even log
+  prose should quote counts only from an oracle that counts the right
+  thing.
+- The waiver 0018 was about got its fourth use here, one run before it
+  became a written rule — the ordering (0017 before 0018) was lucky
+  evidence, not a problem.

@@ -1,7 +1,7 @@
 ---
 status: done
 branch: claude/offene-issues-3hysxf
-pr:
+pr: https://github.com/artkoenig/metis/pull/21
 ---
 
 # Nothing runs the three test harnesses together
@@ -97,3 +97,16 @@ Acceptance criteria:
   one PR for three issues (recorded as a default in Decisions).
 
 ## Retro
+
+- What got in the way: the metis `reviewer` is not a registered subagent
+  type in the cloud harness — `Agent(subagent_type: "reviewer")` fails.
+  Worked around by running a general-purpose agent with the reviewer
+  definition pasted verbatim; same fresh context, but the definition can
+  silently drift from the pasted copy. Worth a look: either the loader
+  registers the agents where the harness finds them, or the rulebook
+  names this fallback.
+- The branch-pinned cloud session cannot honour "one issue = one branch
+  = one PR" for a "fix all open issues" request. This run's default
+  (sequential runs, one commit pair each, one shared PR, `done` at
+  work-complete) worked; if bundled sessions recur, the rulebook could
+  say so in one line.

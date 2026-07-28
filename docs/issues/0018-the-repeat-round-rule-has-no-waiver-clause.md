@@ -1,7 +1,7 @@
 ---
 status: done
 branch: claude/offene-issues-3hysxf
-pr:
+pr: https://github.com/artkoenig/metis/pull/21
 ---
 
 # The repeat-round rule has no waiver clause
@@ -91,3 +91,8 @@ Acceptance criteria:
   loop is the correction path.
 
 ## Retro
+
+- Nothing got in the way; the change was one sentence and the review
+  confirmed the boundary reads as intended. Watch item for future runs:
+  if "touches only the tracker record" ever gets stretched, that is
+  retro material, not a reason for more rule text now.
