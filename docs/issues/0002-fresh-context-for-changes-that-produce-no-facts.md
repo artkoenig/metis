@@ -74,14 +74,22 @@ Acceptance criteria:
   later: finding 1 — invariants 2 and 4 have nothing to bite on for a
   change without a suite — as issue 0007.
 - Review round 2 (fresh context): criteria 1 and 2 met, criterion 3 met in
-  letter but incomplete in meaning. Three findings, all the same class -
-  places still demanding an unestablishable fact - and all fixed: the
+  letter but incomplete in meaning. Three findings, all the same class —
+  places still demanding an unestablishable fact — and all fixed: the
   reviewer's check 3 (tests against the intent) got the honest no-tests
   path; "a skill" in the rulebook's class list became "a skill's page" (the
   bootstrap skill ships shell scripts, and those do produce facts); the
   reviewer's frontmatter description now carries the rule its body states.
   The round independently confirmed round 1's triage, including the
   "not a judgment call" decision and the filing of 0007.
+- Review round 3 (fresh context): all three criteria met. Three findings,
+  none against a criterion, all fixed and verified directly instead of a
+  fourth round: issue 0007's copy of the class list updated to "a skill's
+  page" and its criterion 1 extended to keep README's invariant mirror in
+  step; the broken wrap in the rulebook's invariant 3 reflowed; the
+  hyphens-as-dashes in this Log replaced. The round also swept the whole
+  corpus for the class "demands an unestablishable fact": the two remaining
+  members are exactly the ones 0007 covers.
 
 ## Checkpoints
 
@@ -100,8 +108,18 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes. The rulebook names the no-facts
+  class and the reason the fresh review is its only check; the reviewer
+  definition can say "nothing to run" honestly in its description, its
+  checks and its report — and three review rounds exercised that path for
+  real.
+- What surprised me? The class kept turning up in places the criteria did
+  not name: the reviewer's check 3, its description, the run diagrams, and
+  the freshly filed 0007 itself. Closing a class one named place at a time
+  is how 0005 went too.
+- What am I assuming without having verified it? That invariants 2 and 4
+  can stay as they are until 0007 lands — this run declared nothing about
+  them because nothing true could be declared, and the rulebook does not
+  yet bless that silence.
 
 ## Retro

@@ -9,7 +9,7 @@ pr:
 ## Intent
 
 Invariant 3 now names the class of change that produces no facts by exit
-code — the rulebook, an agent definition, a skill, documentation. But
+code — the rulebook, an agent definition, a skill's page, documentation. But
 invariants 2 ("tests before code") and 4 ("the suite and static analysis
 pass before the PR") still speak as if every change had a suite. For that
 class an agent has no honest path: it must either declare the invariants met
@@ -30,7 +30,8 @@ Acceptance criteria:
 
 1. `AGENTS.md` invariants 2 and 4 account for a change with nothing to run:
    an agent landing such a change can state, truthfully, that every
-   invariant holds.
+   invariant holds. `README.md`'s restatement of the invariants stays in
+   step.
 2. The `implementer` definition gives the same honest path to `done` that
    the `reviewer` definition already has — reporting that nothing exists to
    run, with how it looked, instead of a green suite.
