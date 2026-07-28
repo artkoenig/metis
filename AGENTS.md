@@ -50,7 +50,7 @@ Record the observation, then decide: change approach, or ask. Review rounds
 add one hard rule: if the finding count has not decreased within three
 consecutive rounds, stop and ask the human instead of running another
 round. The signals above stay perception; this one is deliberately a
-number — judgment read flat trends too kindly (run 0013).
+number.
 
 **Two checkpoints.** Once before implementation and once before the PR, record
 the answers to three questions: *Does this match what was asked? What

@@ -57,6 +57,17 @@ Acceptance criteria:
 - Grep over `README.md` for stop/convergence/repetition/triage/dismiss:
   no hits — the rewritten README does not repeat the rules this issue
   changes.
+- Review round 1 (fresh context): no suite or analysis covers prose (the
+  two shell suites pass, exit 0, but touch nothing in this diff) — this
+  review is the change's only check. All three criteria met, reviewer
+  verified the README/agents/skills silence with an independent grep and
+  that the rule fires on the motivating 3 → 3 → 4 case at round 3. One
+  minor finding, no criterion violated: the rule cited "(run 0013)",
+  a tracker reference that dangles in foreign projects the rulebook is
+  installed into. Escalated per the new scope guard; the human had no
+  preference; default taken: clause deleted (the reviewer's own proposed
+  resolution). No second round for the pure deletion — recorded as a
+  judgment call. Trend: 1.
 
 ## Checkpoints
 
@@ -74,8 +85,13 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the 3-round rule verbatim, the
+  scope guard, README silent on both (reviewer verified all three).
+- What surprised me? The scope guard bit on its own review round: the one
+  finding was out of intent, so it went to the human per the new rule.
+- What am I assuming without having verified it? That skipping a second
+  review round for the clause deletion is safe: the fix is the reviewer's
+  own proposed resolution, pure deletion, all criteria already met —
+  recorded as a judgment call, not covered by a fresh round.
 
 ## Retro
