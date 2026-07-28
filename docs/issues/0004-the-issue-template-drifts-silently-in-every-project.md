@@ -246,6 +246,34 @@ Acceptance criteria:
     in its premise, and only the human could say which. A reviewer that names
     the precondition it could not verify is worth more than one that either
     swallows the finding or asserts it.
+- **Review round 4 — criterion 1 missed a third time, and the sweep is why.**
+  Four findings, all of them things the previous three rounds never looked at:
+  - *`skills/plan/SKILL.md` describes `## Plan` too*, differently — it wants
+    one sentence per non-obvious choice, the issue skill's table wants
+    boundaries, and neither cites the other. The old template had *delegated*
+    that row ("the `plan` skill writes it"); round 3 replaced a pointer with a
+    competing description. Fixed by delegating again: the table now hands
+    `## Plan` to the plan skill and describes nothing.
+  - *`branch` had no stated meaning anywhere.* The skill deferred the
+    frontmatter to the rulebook and the rulebook, after round 3's fix, no
+    longer mentions the field — while its own orientation protocol tells a
+    session to open "the one matching the current branch". Fixed: the skill
+    states all three fields, and defers only the *status semantics*, which is
+    the part the rulebook genuinely owns.
+  - *The `## Decisions` / `## Log` boundary was destroyed.* The old template
+    said "nothing else" of Decisions and "keeping it out of Decisions is what
+    keeps Decisions readable" of Log — the rule `0001` introduced for exactly
+    this file's benefit. Stripping the template to a skeleton took it with it.
+    Restored in the table.
+  - *The falsifiability form* `"when X, then Y"` survived only inside the
+    `grill` shelf skill, which the common path skips. Restored.
+- **The rule fired twice and did not converge, and that is the finding.** Each
+  round's leftover sat in a different file, and round 4 was the first review
+  briefed to sweep the whole repository — which is when three of these four
+  appeared. That points at the reviews, not at the design: a criterion of the
+  form "stated in exactly one place" cannot be checked by reading the diff,
+  only by reading everything. Nothing in the rulebook says a criterion can
+  demand a sweep rather than a diff.
 - **Second reversal on this issue, and it is worth naming as such.** Two
   designs, two refutations, both because the question *who actually needs this
   file?* was asked late. The perception rules do not fire on it — no failure

@@ -24,7 +24,9 @@ what the file *looks like*. Where the two touch, the rulebook wins.
 2. **Copy `assets/TEMPLATE.md`** to that path. Copy it — do not retype it from
    memory, and do not reorder or rename its sections. The template is a bare
    skeleton on purpose: the table below is the only description of what goes
-   in each section, so the two cannot drift apart.
+   in each section — except where it hands a section to another skill, which
+   then owns that one alone. Two descriptions of one section is the defect
+   this arrangement exists to prevent.
 3. **Delete the comment block** under the title. It is an instruction for
    filing, not part of an issue.
 4. **Write the `## Intent`** and nothing else. The problem and the wanted
@@ -37,13 +39,13 @@ what the file *looks like*. Where the two touch, the rulebook wins.
 
 | part | what belongs in it |
 | --- | --- |
-| frontmatter | `status`, `branch`, `pr` — three lines, no more. Meanings in the rulebook. |
+| frontmatter | three lines, no more. `status` — which of the four states the issue is in; the rulebook says what each one means and when it changes. `branch` — the branch carrying this issue, set as soon as one exists. `pr` — its pull request, set when the PR is opened. |
 | `# <title>` | one H1, the issue in a phrase — what a human sees in a listing |
-| `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria |
-| `## Plan` | optional content: modules touched, boundaries, shared contracts, when the change spans several |
+| `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable, "when X, then Y" |
+| `## Plan` | optional content, and the `plan` skill writes it — that skill says what belongs in it, this one does not |
 | `## Tasks` | optional content: only when the change is too big to land whole |
-| `## Decisions` | what was settled and why, each with the source it derives from; defaults marked as defaults; questions to the human and their answers |
-| `## Log` | the run as it happened, oldest first: observations, review rounds and how their findings were triaged, attempts that failed |
+| `## Decisions` | what was settled and why, each with the source it derives from; defaults marked as defaults; questions to the human and their answers. **Nothing else** — a reader arriving mid-run must reach the load-bearing decisions without wading through the run's process |
+| `## Log` | the run as it happened, oldest first: observations, review rounds and how their findings were triaged, attempts that failed. This is the section that grows, and keeping it out of Decisions is what keeps Decisions readable |
 | `## Checkpoints` | `### Before implementation` and `### Before the PR`, the three questions answered under each |
 | `## Retro` | after the pull request: what got in the way, what should change |
 
