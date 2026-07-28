@@ -1,5 +1,5 @@
 ---
-status: active
+status: waiting
 branch: 004-template-drift
 pr:
 ---
@@ -450,6 +450,31 @@ Acceptance criteria:
   - Worth naming: this is the drift the whole issue is about, sitting in the
     file I had just argued was safe to let drift. The exemption was right and
     my reason for it was wrong.
+- **Review round 7 — six findings, and the hard stop is spent.** Criteria 1,
+  3, 4, 5 and 6 met with the evidence named; 2, 7 and 8 not. The absence half
+  of criterion 2 is down to two violations from round 6's eight, and the
+  reviewer states it swept every one of the 20 tracked files whole and found
+  no other path, filename, key or heading outside `skills/issue/`. That is
+  convergence, not repetition — but the stop was promised unconditionally,
+  and a stop that is waived the first time it fires was never a stop.
+  - *F2 is the one that matters, and it is a defect in the design rather than
+    in a sentence.* `AGENTS.md` claims "there is no other way to read or
+    write an issue". No subagent in this repository can invoke a skill —
+    `agents/*/agent.md` grant `Read, Glob, Grep, Bash` and no Skill tool — so
+    the reviewer opens the issue by the path its caller hands it, which
+    `agents/reviewer/agent.md` prescribes in the same branch. The reviewer
+    reported itself as the reproduction.
+  - *F3:* `skills/issue/SKILL.md` says "Nothing else in the workflow describes
+    any of that" and delegates four parts twenty lines later.
+  - *F1:* `skills/bootstrap/SKILL.md` names `docs/issues/TEMPLATE.md` — a path
+    and a filename, in a document the skill delegates nothing to.
+  - *F4:* `skills/plan/` states the task-list condition, which is delegated to
+    the rulebook, not to it.
+  - *F5:* the `record a task list` row states the same condition it delegates
+    away two paragraphs below.
+  - *F6:* `README.md` says one skill in `skills/` is not optional; `bootstrap`
+    is a second. Round 6's finding, relocated rather than removed.
+- **Parked at `waiting` for the human.**
 - **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
   against a design the human replaced mid-round. Re-arming it rather than
   spending it is the honest call — but it does not reset: if criterion 2
