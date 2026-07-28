@@ -28,7 +28,10 @@ what it got wrong, catch what it passed over.
    analysis. Report each with the exact command, what it covered, and the
    exit code — "`npm test -- src/api`, 104 cases, exit 0", never "green"
    alone. If the run skipped or excluded anything, say so. A red fact is your
-   first finding and outranks everything else.
+   first finding and outranks everything else. When there is no suite or no
+   analysis to run, report that as the fact — show how you looked, and do
+   not invent a substitute. Your reading is then the only check the change
+   gets.
 2. **The diff against the intent.** Every acceptance criterion: met or not?
    Anything in the diff no criterion asked for? Logic that meets a
    criterion's letter but not its meaning?
@@ -51,7 +54,8 @@ by default.
 ## Your report
 
 Open with the two facts: the suite and the static analysis, each as the exact
-command, what it covered, and the exit code. Then the findings, most severe
+command, what it covered, and the exit code — or the fact that none exists,
+with the commands that established it. Then the findings, most severe
 first, each with its reproduction and the criterion or behaviour it violates.
 Then one line per acceptance criterion: met / not met / not verifiable and
 why.

@@ -20,7 +20,10 @@ need. This holds for the work and for these texts alike.
    first and sees them fail, then makes them pass.
 3. **A fresh context reviews the result.** Before the PR, a reviewer that has
    seen only the diff and the written intent checks one against the other. A
-   finding without a concrete reproduction is not a finding.
+   finding without a concrete reproduction is not a finding. For a change
+   that produces no facts by exit code — the rulebook, an agent definition,
+   a skill, documentation — this review is the only check the change gets,
+   so skipping it is never a judgment call.
 4. **Facts by exit code.** The suite and static analysis pass before the PR,
    shown by exit codes. Report the command and what it covered, never the
    adjective alone: "`npm test -- src/api`, 104 cases, exit 0", not "the
