@@ -72,8 +72,11 @@ fi
 #    .githooks so pre-push refuses a direct push to main/master. Nothing is
 #    copied into the project; the hook is shared from the clone.
 project_dir="${CLAUDE_PROJECT_DIR:-.}"
-if [ -d "${repo_dir}/.githooks" ] && \
-   git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+if ! git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Skipping hooksPath: project is not a git repo (${project_dir})"
+elif [ ! -d "${repo_dir}/.githooks" ]; then
+  echo "Skipping hooksPath: no .githooks in clone"
+else
   git -C "$project_dir" config core.hooksPath "${repo_dir}/.githooks"
   echo "Set core.hooksPath -> ${repo_dir}/.githooks"
 fi
@@ -119,10 +122,27 @@ done
 for link in "$skills_dir"/* "$agents_dir"/*; do
   [ -L "$link" ] && [ ! -e "$link" ] && errors="${errors} broken link: $(basename "$link");"
 done
+# The push guard, same principle — end state, not steps: what does the
+# project's core.hooksPath say now? A project that is no git repo cannot be
+# pushed from, so an absent guard there is a note, not an error; everywhere
+# else an absent guard means an unguarded push is possible — that is a
+# failure, and the status names the cause.
+if ! git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+  guard="push guard n/a (project not a git repo)"
+elif [ "$(git -C "$project_dir" config core.hooksPath 2>/dev/null)" = "${repo_dir}/.githooks" ]; then
+  guard="push guard set"
+else
+  if [ ! -d "${repo_dir}/.githooks" ]; then
+    guard="push guard not set (no .githooks in clone)"
+  else
+    guard="push guard not set (hooksPath mismatch)"
+  fi
+  errors="${errors} ${guard};"
+fi
 commit=$(git -C "$repo_dir" rev-parse --short HEAD 2>/dev/null || echo unknown)
 # The counts state what a session can rely on — links that resolve at their
 # expected path — not how many ln calls ran.
-status="Metis self-check: ${skills_ok} skills and ${agents_ok} agents reachable; commit ${commit};"
+status="Metis self-check: ${skills_ok} skills and ${agents_ok} agents reachable; ${guard}; commit ${commit};"
 if [ -z "$errors" ]; then
   status="${status} no errors."
 else

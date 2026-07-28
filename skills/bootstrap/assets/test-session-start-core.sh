@@ -49,6 +49,9 @@ echo "$ctx" | grep -Eq 'self-check: [1-9][0-9]* skills and [1-9][0-9]* agents re
 echo "$ctx" | grep -q 'no errors' || fail "happy path: not clean: $ctx"
 head=$(git -C "$repo_root" rev-parse --short HEAD)
 echo "$ctx" | grep -q "commit ${head};" || fail "happy path: status does not name HEAD ($head): $ctx"
+echo "$ctx" | grep -q 'push guard set' || fail "happy path: push guard state missing from status: $ctx"
+[ "$(git -C "$sc/proj" config core.hooksPath 2>/dev/null)" = "$repo_root/.githooks" ] \
+  || fail "happy path: core.hooksPath not pointing at the clone's .githooks"
 b=0
 for link in "$sc/home/.claude/skills"/* "$sc/home/.claude/agents"/*; do
   if [ -L "$link" ] && [ ! -e "$link" ]; then b=1; fi
@@ -100,19 +103,49 @@ else
 fi
 
 # --- Case 5: a real directory shadowing a link's path must be named ---------
+prior=$failures
 sc=$(new_scratch)
 mkdir -p "$sc/home/.claude/skills/plan" "$sc/home/.claude/agents/reviewer"
 out=$(run_core "$core" "$sc")
 ctx=$(echo "$out" | json_context) || { fail "shadowed path: JSON invalid: $out"; ctx=""; }
 echo "$ctx" | grep -q 'skill not reachable: plan' || fail "shadowed skill not named: $ctx"
 echo "$ctx" | grep -q 'agent not reachable: reviewer' || fail "shadowed agent not named: $ctx"
-echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents reachable; commit [0-9a-f]+; FAILED:' \
-  || fail "FAILED status lost counts or commit: $ctx"
+echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents reachable; push guard set; commit [0-9a-f]+; FAILED:' \
+  || fail "FAILED status lost counts, guard state or commit: $ctx"
 set -- "$repo_root"/skills/*/; skills_total=$#
 set -- "$repo_root"/agents/*/; agents_total=$#
 echo "$ctx" | grep -q "$((skills_total - 1)) skills and $((agents_total - 1)) agents reachable" \
   || fail "counts include the unreachable ones: $ctx"
-if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named, FAILED status keeps counts and commit"; fi
+[ $failures -eq $prior ] && pass "shadowed paths named, FAILED status keeps counts, guard state and commit"
+
+# --- Case 6: project dir is not a git repo — the reproduced skip. The guard
+# cannot be installed there (and nothing can be pushed from there either), so
+# the status must say why it is absent without turning it into an error ------
+prior=$failures
+sc=$(mktemp -d "$base/XXXXXX")
+mkdir -p "$sc/home" "$sc/proj"   # deliberately no `git init`
+out=$(run_core "$core" "$sc")
+ctx=$(echo "$out" | json_context) || { fail "non-git project: JSON invalid: $out"; ctx=""; }
+echo "$ctx" | grep -q 'push guard n/a (project not a git repo)' \
+  || fail "non-git project: guard state not in status: $ctx"
+echo "$ctx" | grep -q 'no errors' || fail "non-git project: wrongly flagged as error: $ctx"
+[ $failures -eq $prior ] && pass "non-git project: guard absence named, no error"
+
+# --- Case 7: clone without .githooks but a git project — pushes are possible
+# and unguarded, so the status must FAIL and name the cause ------------------
+prior=$failures
+noguard=$(mktemp -d "$base/XXXXXX")
+cp -r "$repo_root/skills" "$repo_root/agents" "$noguard/"
+cp "$repo_root/AGENTS.md" "$noguard/"          # complete clone, minus .githooks
+sc=$(new_scratch)
+out=$(run_core "$noguard/skills/bootstrap/assets/session-start-core.sh" "$sc")
+ctx=$(echo "$out" | json_context) || { fail "no .githooks: JSON invalid: $out"; ctx=""; }
+echo "$ctx" | grep -q 'push guard not set (no .githooks in clone)' \
+  || fail "no .githooks: guard state not in status: $ctx"
+echo "$ctx" | grep -q 'FAILED' || fail "no .githooks: not flagged: $ctx"
+[ -z "$(git -C "$sc/proj" config core.hooksPath 2>/dev/null)" ] \
+  || fail "no .githooks: hooksPath was set anyway"
+[ $failures -eq $prior ] && pass "missing .githooks: flagged, cause named"
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
