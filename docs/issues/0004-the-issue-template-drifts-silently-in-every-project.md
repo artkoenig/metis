@@ -55,10 +55,6 @@ Acceptance criteria:
    `README.md` and the rest of the documentation are out of scope for both
    halves: they are written for a human reader, and a page of pointers serves
    nobody. They repeat, they never define.
-8. The documentation matches the state this branch leaves the repository in.
-   That is the price of the exemption in criterion 2 — repetition is allowed
-   only because it is kept current, and documentation nobody updates is worth
-   less than none.
 3. `AGENTS.md` reaches the tracker only through operations, and restates
    nothing of what the file looks like or what the states mean — except the
    parts the skill hands it by name.
@@ -73,6 +69,10 @@ Acceptance criteria:
 7. No sentence this branch adds is contradicted by the rest of the
    repository. Four consecutive rounds lost to one, so it is a criterion now
    rather than a habit.
+8. The documentation matches the state this branch leaves the repository in.
+   That is the price of the exemption in criterion 2 — repetition is allowed
+   only because it is kept current, and documentation nobody updates is worth
+   less than none.
 
 ## Plan
 
