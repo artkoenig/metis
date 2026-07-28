@@ -22,9 +22,11 @@ what the file *looks like*. Where the two touch, the rulebook wins.
    The padding is what makes the directory listing the order the issues were
    opened; unpadded numbers sort as 10, 2, 80.
 2. **Copy `assets/TEMPLATE.md`** to that path. Copy it — do not retype it from
-   memory, and do not reorder or rename its sections.
-3. **Delete the HTML comments.** They are instructions for filing, not part of
-   an issue.
+   memory, and do not reorder or rename its sections. The template is a bare
+   skeleton on purpose: the table below is the only description of what goes
+   in each section, so the two cannot drift apart.
+3. **Delete the comment block** under the title. It is an instruction for
+   filing, not part of an issue.
 4. **Write the `## Intent`** and nothing else. The problem and the wanted
    observable behaviour, solution-free, then numbered acceptance criteria that
    can each be shown false. Everything below Intent fills in as the run

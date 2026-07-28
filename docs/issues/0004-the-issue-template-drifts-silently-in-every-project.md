@@ -214,6 +214,31 @@ Acceptance criteria:
 - **`6b2df81` reverted as `db1ea7c`.** The five findings were not fixed: four
   of them cease to exist under the skill design, and fixing them would have
   been work spent on an approach about to be replaced.
+- **Review round 3 — and the perception rule fired.** Criterion 1 was missed
+  in round 2 and again in round 3, each time with a different finding. Under
+  the rule as `0001` widened it — *the same acceptance criterion missed twice,
+  whatever the finding* — that is a stop signal, and the question it forces is
+  the right one: is the shape stated in too many places by construction? It
+  was. The answer was structural, not another patch: the template is now a
+  bare skeleton and the skill's table is the only description of what goes in
+  a section. Round 3's findings 2, 4 and 5 all dissolve in that one move.
+  This is the first time a perception rule has fired in anger, and it earned
+  its keep — two rounds of patching would each have looked reasonable.
+- **Round 3 triage.**
+  - *Fixed by the structural move:* the template shipped the status semantics
+    the skill disclaims (finding 2); the skill and the template each described
+    the sections (finding 5); "delete the HTML comments" missed the YAML ones
+    (finding 4).
+  - *Fixed:* `AGENTS.md` enumerated the frontmatter fields after delegating
+    them — it now states what the states mean without listing the shape
+    (finding 3); one sentence described filing without routing through the
+    skill (finding 6).
+  - *Accepted, filed as `0005`:* a newly added skill does not reach a local
+    session, because the loader exits before the core on that path. Pre-dates
+    this change, affects every future skill and subagent equally, and rests on
+    a precondition the reviewer could not verify from inside the repository.
+    `0004`'s criterion 1 is therefore not fully met, and that is stated rather
+    than argued away.
 - **Second reversal on this issue, and it is worth naming as such.** Two
   designs, two refutations, both because the question *who actually needs this
   file?* was asked late. The perception rules do not fire on it — no failure

@@ -117,13 +117,14 @@ what the previous round got wrong and finds what it passed over.
   skill that is not a shelf tool. The skill reaches every session the way the
   subagents do; nothing is copied into a project. No child issues; a large
   change gets a task list inside its file.
-- The frontmatter states the facts: `status` (`backlog | active | waiting |
-  done`), `branch`, `pr`. At most one issue is `active` at any moment; any
-  number may be `waiting`, parked on a question. `done` is set when the pull
-  request is opened, in the same breath as `pr`: the work is finished at the
-  handover, and the merge is the human's — it changes nothing in the file.
-  The retro is written afterwards, into an issue that is already `done`; the
-  status tracks the work, not the last section.
+- The frontmatter states the facts, and this is what they mean. An issue is
+  `backlog` until someone starts it and `active` while they are on it — at
+  most one is `active` at any moment. `waiting` means parked on a question.
+  `done` is set when the pull request is opened, in the same breath as the
+  `pr` field: the work is finished at the handover, and the merge is the
+  human's — it changes nothing in the file. The retro is written afterwards,
+  into an issue that is already `done`; the status tracks the work, not the
+  last section.
 - A new session orients itself from the tracker alone: scan the `status`
   lines under `docs/issues/`, open the `active` file (or the one matching
   the current branch), and read it whole — the filled sections are the
@@ -133,4 +134,4 @@ what the previous round got wrong and finds what it passed over.
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.
 - Work found mid-run that serves the current intent joins the task list.
-  Anything else becomes a new issue file and waits for its own run.
+  Anything else is filed through the `issue` skill and waits for its own run.
