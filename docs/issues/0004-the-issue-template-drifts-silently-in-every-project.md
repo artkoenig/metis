@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: 004-template-drift
-pr:
+pr: https://github.com/artkoenig/metis/pull/8
 ---
 
 # The issue template drifts silently in every project that uses it
