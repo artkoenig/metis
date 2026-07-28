@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -46,16 +46,31 @@ Acceptance criteria:
   consecutive rounds → escalate. This deliberately replaces the
   "perception, not arithmetic" wording from issue 0006 for this rule.
   Source: the human's proposal, verbatim, before this run started.
+- The change lands in `AGENTS.md` only: the stop-rule paragraph in
+  "Correcting course" and the triage paragraph in "The run". The rewritten
+  README repeats neither rule (grep over stop/convergence/triage terms,
+  zero hits), so criterion 3 is satisfied by that fact. Implemented in the
+  main context — prose only, fresh review still runs (precedent 0005/0006).
 
 ## Log
+
+- Grep over `README.md` for stop/convergence/repetition/triage/dismiss:
+  no hits — the rewritten README does not repeat the rules this issue
+  changes.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the human's 3-round rule verbatim,
+  the scope guard from their round-8 correction, README already silent on
+  both.
+- What surprised me? That the README needs no edit — the 0013 cut removed
+  every restatement of these rules.
+- What am I assuming without having verified it? That "finding count" means
+  the reviewer's reported findings per round as the trend table counts
+  them — the human's proposal did not define the counting unit; recorded
+  as a default.
 
 ### Before the PR
 

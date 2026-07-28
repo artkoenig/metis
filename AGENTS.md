@@ -46,12 +46,11 @@ need. This holds for the work and for these texts alike.
 - *Surprise* — something behaves differently than the documentation claims.
 - *Regression* — a fix breaks something that worked.
 
-Record the observation, then decide: change approach, or ask. Repetition
-across review rounds has a second tier: when even the changed approach does
-not converge — the next round's findings neither fewer nor smaller in weight
-or class — stop and ask the human instead of running another round. Both
-tiers are perception, not arithmetic: no numeric budget, no fixed round
-limit.
+Record the observation, then decide: change approach, or ask. Review rounds
+add one hard rule: if the finding count has not decreased within three
+consecutive rounds, stop and ask the human instead of running another
+round. The signals above stay perception; this one is deliberately a
+number — judgment read flat trends too kindly (run 0013).
 
 **Two checkpoints.** Once before implementation and once before the PR, record
 the answers to three questions: *Does this match what was asked? What
@@ -116,7 +115,8 @@ idea → issue with acceptance criteria      (grilling only if unclear)
 
 Triage the reviewer's findings by judgment: fix now, dismiss with a recorded
 reason, or file for later. A finding without a reproduction is dismissed by
-default.
+default. A finding outside the issue's intent — however reproducible — goes
+to the human instead of being fixed by default.
 
 After every review round, show the human the trend as a table: one row per
 acceptance criterion — plus one row for findings that violate no criterion —
