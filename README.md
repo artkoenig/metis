@@ -62,11 +62,14 @@ anchor points:
 Five things are always true, whatever process judgment picks:
 
 1. The intent (acceptance criteria) is written before implementation.
-2. A fresh context reviews the diff against that intent before the PR.
-3. The test suite is green, established by exit code, before the PR.
-4. Observations, decisions, and surprises are recorded in the issue —
-   they must survive the session that made them.
-5. Irreversible or outward-facing decisions go to the human.
+2. The tests that express those criteria are written before the code, and
+   seen to fail.
+3. A fresh context reviews the diff against that intent before the PR,
+   with a concrete reproduction per finding.
+4. The suite and static analysis pass, established by exit code and
+   reported as the command and what it covered — never as "it's green".
+5. Observations, decisions, surprises and checkpoint answers are recorded
+   as they happen — they must survive the session that made them.
 
 Everything else is a tool on the shelf, not a step in a pipeline.
 
@@ -100,9 +103,10 @@ corrects itself through lived feedback.
 
 Everything in between is the agent's call — including when to reach for
 the heavier tools: a full requirements-grilling session, an explicit
-architecture plan, a clean-room second opinion, a separate test author,
-slicing a large change into steps. They exist as skills invoked by
-judgment, never as conditions that fire automatically.
+architecture plan, a clean-room second opinion (skills), a separate test
+author (a subagent), slicing a large change into steps (a task list, no
+tooling at all). Each is reached for by judgment, never because a
+condition fired.
 
 ## The minimal run
 
@@ -123,14 +127,21 @@ constitution.
 into operation — for a workflow, the text *is* the product. The
 subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
-[`skills/`](skills/): `grill`, `plan`, and `clean-room`.
+[`skills/`](skills/): `grill`, `plan`, and `clean-room`. Two more skills live
+there and neither is a shelf tool. [`bootstrap`](skills/bootstrap/SKILL.md)
+wires a project up, described below. [`issue`](skills/issue/SKILL.md) is the
+tracker itself: every read and every write goes through one of its
+operations — you hand it a decision, an observation, a new state, and it knows
+where that belongs. Subagents included; the reviewer holds the `Skill` tool so
+it can orient there instead of being handed a path. Where the content lands is
+behind the interface, so it can move without a single other file changing.
 
 ## Wiring it in
 
 The [`bootstrap`](skills/bootstrap/SKILL.md) skill wires a project's
-cloud sessions to Metis. It installs only a thin, stable *loader* hook
-that clones or updates this repo and then runs the sync logic *from
-the clone*: symlinking `agents/` and `skills/` into `~/.claude`,
+cloud sessions to Metis. It installs a thin, stable *loader* hook (with
+its settings entry) that clones or updates this repo and then runs the
+sync logic *from the clone*: symlinking `agents/` and `skills/` into `~/.claude`,
 making `AGENTS.md` the global instructions, and pointing
 `core.hooksPath` at [`.githooks/`](.githooks/) so a direct push to the
 default branch is refused. Because the logic lives in the clone,

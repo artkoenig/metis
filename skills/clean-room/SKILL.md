@@ -26,9 +26,8 @@ answer is the signal.
 3. **Reconcile.** Compare the blind proposal with your own answer, knowing
    what the expert could not: the real codebase, its history, its
    constraints. Adopt what is genuinely better, and for each significant
-   divergence you keep, write one sentence into the issue file saying why
-   reality wins. A proposal you dismiss without a written reason was a wasted
-   dispatch.
+   divergence you keep, record a decision saying why reality wins. A proposal
+   you dismiss without a written reason was a wasted dispatch.
 
 ## What it is not
 
