@@ -140,12 +140,12 @@ Installing the loader over the predecessor repo's hook is the migration —
 same path, same settings entry, and the sync prunes the old symlinks itself.
 This repo dogfoods the same loader in its own `.claude/hooks/`.
 
-The sync also checks itself: it verifies its own outcome — something got
-linked, every link resolves, the rulebook is in place — and hands a
-one-line status into the session's context. (The sync logic has its own
-test harness next to it in `assets/`; the bootstrap skill's page says how
-to run it.) The rulebook has each session
-open by greeting the human and relaying that status. Local sessions never
+The sync also checks itself: it verifies its own outcome — every skill and
+agent from the clone is reachable at its expected path, the rulebook is in
+place — and hands a one-line status into the session's context. (The sync
+logic has its own test harness next to it in `assets/`; the bootstrap
+skill's page says how to run it.) The rulebook has each session open by
+greeting the human and relaying that status. Local sessions never
 receive one (the loader only updates the clone there); a cloud session
 missing one had a hook failure. In both cases the session checks the links
 and the log itself, and says so.

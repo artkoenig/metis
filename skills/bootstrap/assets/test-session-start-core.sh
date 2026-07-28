@@ -79,11 +79,23 @@ ln -s /nonexistent-target "$sc/home/.claude/skills/dead\"skill"
 ln -s /nonexistent-target "$sc/home/.claude/skills/$(printf 'dead\nskill')"
 out=$(run_core "$core" "$sc")
 if ctx=$(echo "$out" | json_context); then
-  echo "$ctx" | grep -q 'broken link' && pass "hostile names reported, JSON valid" \
-    || fail "hostile names: broken links not reported: $ctx"
+  if echo "$ctx" | grep -q 'broken link'; then
+    pass "hostile names reported, JSON valid"
+  else
+    fail "hostile names: broken links not reported: $ctx"
+  fi
 else
   fail "hostile names: JSON invalid: $out"
 fi
+
+# --- Case 5: a real directory shadowing a link's path must be named ---------
+sc=$(new_scratch)
+mkdir -p "$sc/home/.claude/skills/plan" "$sc/home/.claude/agents/reviewer"
+out=$(run_core "$core" "$sc")
+ctx=$(echo "$out" | json_context) || { fail "shadowed path: JSON invalid: $out"; ctx=""; }
+echo "$ctx" | grep -q 'skill not reachable: plan' || fail "shadowed skill not named: $ctx"
+echo "$ctx" | grep -q 'agent not reachable: reviewer' || fail "shadowed agent not named: $ctx"
+if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named"; fi
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

@@ -80,21 +80,35 @@ fi
 
 echo "✅ Metis core finished successfully."
 
-# 5. Self-check. Not just the links: an empty or half-cloned repo links
-#    nothing and would otherwise pass, so every outcome above is verified —
-#    something was linked, no clone directory was silently skipped, the
-#    rulebook really got synced, and every link resolves. A crashed run
-#    never reaches this line, so a missing status is itself a failure
-#    signal; the rulebook says what a session does then.
+# 5. Self-check. Verify the END STATE, not the steps: for every skill and
+#    agent in the clone, the link discovery needs must sit at its expected
+#    path and point at its expected target. Enumerating failure modes one
+#    by one (dangling links, empty clones, collisions with a real
+#    directory, ...) kept missing the next one; comparing expected against
+#    actual catches them all at once. A crashed run never reaches this
+#    line, so a missing status is itself a failure signal; the rulebook
+#    says what a session does then.
 errors=""
 [ "$skills_n" -gt 0 ] || errors="${errors} no skills linked;"
 [ "$agents_n" -gt 0 ] || errors="${errors} no agents linked;"
 [ "$rulebook" = synced ] || errors="${errors} rulebook missing from clone;"
 for dir in "${repo_dir}/skills"/*/; do
-  [ -d "$dir" ] && [ ! -f "${dir}SKILL.md" ] && errors="${errors} skill without SKILL.md: $(basename "$dir");"
+  [ -d "$dir" ] || continue
+  name=$(basename "$dir")
+  if [ ! -f "${dir}SKILL.md" ]; then
+    errors="${errors} skill without SKILL.md: ${name};"
+  elif [ "$(readlink "${skills_dir}/${name}" 2>/dev/null)" != "${dir%/}" ]; then
+    errors="${errors} skill not reachable: ${name};"
+  fi
 done
 for dir in "${repo_dir}/agents"/*/; do
-  [ -d "$dir" ] && [ ! -f "${dir}agent.md" ] && errors="${errors} agent without agent.md: $(basename "$dir");"
+  [ -d "$dir" ] || continue
+  name=$(basename "$dir")
+  if [ ! -f "${dir}agent.md" ]; then
+    errors="${errors} agent without agent.md: ${name};"
+  elif [ "$(readlink "${agents_dir}/${name}" 2>/dev/null)" != "${dir%/}" ]; then
+    errors="${errors} agent not reachable: ${name};"
+  fi
 done
 for link in "$skills_dir"/* "$agents_dir"/*; do
   [ -L "$link" ] && [ ! -e "$link" ] && errors="${errors} broken link: $(basename "$link");"

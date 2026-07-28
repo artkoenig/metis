@@ -105,6 +105,20 @@ Acceptance criteria:
   behaviour is unchanged, the wrong cause claim is gone from the criterion
   as well as from the documents.
 
+- Review round 3 (fresh context): 2 findings — 1 blocking, 1 cosmetic.
+  Both fixed. The blocking one was the third instance of the class both
+  earlier rounds hit — the self-check passing a broken outcome (this time a
+  real directory shadowing a link's path, so the link lands one level too
+  deep and resolves). Third firing of the repetition signal, so the fix
+  changed altitude, not just the instance: the check now compares expected
+  against actual end state — every skill and agent in the clone must be
+  reachable at its exact path with its exact target — instead of
+  enumerating failure modes. Harness case 5 plants the shadowing dirs and
+  asserts both names. Cosmetic: a stray hard wrap in the README paragraph,
+  refilled. The reviewer also ran five mutations of the core against the
+  harness — each caught with exit 1 — and shellcheck (clean at warning
+  level and above).
+
 ## Checkpoints
 
 ### Before implementation
