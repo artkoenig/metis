@@ -113,6 +113,10 @@ idea → issue with acceptance criteria      (grilling only if unclear)
      → retro
 ```
 
+A run opens with the issue in front of the human: its title and its
+numbered acceptance criteria, as a table. What "done" means is visible
+before implementation starts — not on request.
+
 Triage the reviewer's findings by judgment: fix now, dismiss with a recorded
 reason, or file for later. A finding without a reproduction is dismissed by
 default. A finding outside the issue's intent — however reproducible — goes
