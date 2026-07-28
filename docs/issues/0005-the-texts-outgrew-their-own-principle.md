@@ -59,6 +59,10 @@ Acceptance criteria:
 - The `clean-room` trigger is now "when you are stuck or want a second
   opinion", in every place that names it (rulebook, clean-room description,
   plan skill). Source: the human's answer during this run.
+- Accepted after round 4. The human chose to finish instead of a fifth
+  round: the two remaining fixes were one-sentence changes, verified
+  directly, and the corpus had been swept four times. Source: the human's
+  answer during this run.
 
 ## Log
 
@@ -137,8 +141,19 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes. Every text now states the same rules
+  in plainer, shorter language: every changed file is smaller, the two
+  named metaphors are gone, and the simplicity rule itself is in the
+  rulebook. Four review rounds confirmed criteria 2, 3, 5 and 6; the
+  criterion-1 misses were each fixed and the last two verified directly.
+- What surprised me? How reliably compression loses load-bearing sentences:
+  four rounds, four different ways for a statement to vanish — deleted,
+  weakened, rewritten too wide, rewritten too narrow. A deleted-line sweep
+  catches only the first class.
+- What am I assuming without having verified it? That no fifth class of
+  loss exists that all four fresh readings missed. And that the human's
+  reformulated clean-room trigger ("stuck or second opinion") is meant to
+  replace, not join, the old blind-spot wording everywhere — I applied it
+  in all three places that state a trigger.
 
 ## Retro
