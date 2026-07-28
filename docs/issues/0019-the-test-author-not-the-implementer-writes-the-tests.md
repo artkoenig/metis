@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/offene-issues-3hysxf
-pr:
+pr: https://github.com/artkoenig/metis/pull/22
 ---
 
 # The test-author, not the implementer, writes the tests
@@ -134,3 +134,13 @@ Acceptance criteria:
   texts fresh.
 
 ## Retro
+
+- What got in the way: almost nothing — the registered `reviewer`
+  subagent made this run smoother than yesterday's. My one slip was
+  leaving the suite fact out of the record while claiming "the review is
+  the only check"; round 1 caught it. The rule held; no rulebook change
+  proposed.
+- First run under the new invariant it lands: correctly no test-author
+  dispatch (nothing to run). The real proof comes with the next change
+  that has something to run — watch that run's record for how the
+  test-author brief works in practice.
