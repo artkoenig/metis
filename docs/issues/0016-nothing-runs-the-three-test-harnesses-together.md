@@ -110,3 +110,8 @@ Acceptance criteria:
   (sequential runs, one commit pair each, one shared PR, `done` at
   work-complete) worked; if bundled sessions recur, the rulebook could
   say so in one line.
+- Flagged by the human after the run: the runs opened without showing
+  the issues — title and numbered criteria as a table — before
+  implementation, which "The run" requires; the tables only appeared in
+  the closing summary. Agent error, not a rule gap; the rule stands.
+  This note applies to all three runs of this session (0016-0018).
