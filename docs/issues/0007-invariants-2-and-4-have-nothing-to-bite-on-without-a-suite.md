@@ -67,6 +67,13 @@ Acceptance criteria:
   gap one level down. All four places now speak per item, disjunctively.
   Trend: round 1 = 1 finding (criterion 1: 0, criterion 2: 1,
   criterion 3: 0).
+- Review round 2 (fresh context): all three criteria met, zero findings; the
+  round could not reconstruct round 1's counterexample against the new text
+  and confirmed the wording now mirrors the reviewer's verbatim. One
+  below-threshold observation dismissed with reason: the implementer's
+  description line names only the all-or-nothing case, but the steps and
+  report format govern behaviour and handle the mixed case — no input
+  without an honest path could be named. Trend: 1 → 0.
 
 ## Checkpoints
 
@@ -83,8 +90,14 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — all three criteria confirmed met by
+  two fresh-context rounds; the accommodation stayed clauses in existing
+  rules.
+- What surprised me? My first wording reproduced the issue's own gap one
+  level down ("and" where "or" was needed) — the exact failure mode the
+  intent describes is easy to re-create while fixing it.
+- What am I assuming without having verified it? That "show how you looked"
+  is enough guidance for an implementer to establish absence convincingly —
+  no run has exercised the new path yet.
 
 ## Retro
