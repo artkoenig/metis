@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/reviewer-questions-changes-v5rq3e
-pr:
+pr: https://github.com/artkoenig/metis/pull/23
 ---
 
 # The reviewer is not asked about blast radius or the record
@@ -89,3 +89,15 @@ Acceptance criteria:
   environment staleness, not a defect of this diff.
 
 ## Retro
+
+What got in the way: reviewing before the first commit forced spelling the
+diff range out as "working tree vs HEAD" — the reviewer's premise assumes a
+committed range; it coped, but only because the prompt overrode it. Round 3
+also reviewed with a stale deployed copy of its own definition (pre-0019
+symlink target), which cost it a paragraph of self-doubt.
+
+What should change: nothing in the rules — the run converged in three
+rounds and the round-2 cosmetic finding shows fresh contexts do read
+whole files, which is the point. If the "working tree vs HEAD" case
+recurs, widening the premise wording in the reviewer definition is a
+one-line follow-up; filed as not worth its own issue yet.
