@@ -120,8 +120,11 @@ what the previous round got wrong and finds what it passed over.
   list inside its file.
 - The frontmatter states the facts: `status` (`backlog | active | waiting |
   done`), `branch`, `pr`. At most one issue is `active` at any moment; any
-  number may be `waiting` — with `pr` set it awaits the human's merge,
-  without it is parked on a question. Merged means `done`.
+  number may be `waiting`, parked on a question. `done` is set when the pull
+  request is opened, in the same breath as `pr`: the work is finished at the
+  handover, and the merge is the human's — it changes nothing in the file.
+  The retro is written afterwards, into an issue that is already `done`; the
+  status tracks the work, not the last section.
 - A new session orients itself from the tracker alone: scan the `status`
   lines under `docs/issues/`, open the `active` file (or the one matching
   the current branch), and read it whole — the filled sections are the
