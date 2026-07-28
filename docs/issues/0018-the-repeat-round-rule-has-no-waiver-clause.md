@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 branch: claude/offene-issues-3hysxf
 pr:
 ---
@@ -56,6 +56,12 @@ Acceptance criteria:
   exit code; per invariant 3 the fresh-context review is the only check
   it gets. (`bash test.sh` still exits 0, but that covers the harnesses,
   not this text.)
+- Review round 1 (fresh context, diff b9894e5..HEAD): zero findings. The
+  reviewer verified independently that README repeats no repeat-round
+  rule, that the reviewer agent definition does not contradict the
+  waiver (it governs how a round runs, not whether), and that "the
+  tracker record" is anchored by the Bookkeeping section. Trend: round 1
+  = 0 findings — converged, no repeat round due.
 
 ## Checkpoints
 
@@ -74,8 +80,14 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the waiver is one sentence in
+  the paragraph that owns the rule, states its boundary and the
+  recording duty; README needed no edit and the review confirmed that
+  independently.
+- What surprised me? Nothing; the fourth data point (0017, this run) fit
+  the recorded shape exactly.
+- What am I assuming without having verified it? That one sentence is
+  enough — if future runs stretch "record only" to cover more, the retro
+  loop is the correction path.
 
 ## Retro
