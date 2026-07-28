@@ -6,30 +6,28 @@ user-invocable: true
 
 # Grill
 
-The idea is too vague to build. Close the gap the only way that works: ask the
-human, one question at a time, until the intent is concrete enough that a
+The idea is too vague to build. Close the gap the only way that works: ask
+the human, one question at a time, until the intent is concrete enough that a
 criterion could fail.
 
 ## How to run it
 
-1. **Ground yourself first.** Dispatch the `researcher` for the facts the idea
-   touches: what exists today, what the change would collide with. Question
-   from knowledge, not from a blank page.
+1. **Ground yourself first.** Dispatch the `researcher` for the facts the
+   idea touches: what exists today, what the change would collide with.
 2. **One question per turn.** Ask the single question whose answer most
    constrains the design. Offer the options you see and your recommendation —
-   the human picks faster than they draft. Never bundle questions; bundled
-   questions get half-answers.
-3. **Chase the observable.** Every answer must eventually land as an
-   acceptance criterion in the form the `issue` skill requires. Push politely
-   past "it should be better" until you have one.
+   picking is faster than drafting. Never bundle questions; bundled questions
+   get half-answers.
+3. **Chase the observable.** Push politely past "it should be better" until
+   every answer can land as an acceptance criterion.
 4. **Stop when criteria stop changing.** When two consecutive answers refine
-   wording but not substance, you are done — more grilling is ceremony.
+   wording but not substance, you are done.
 
 ## The output
 
 Two operations of the `issue` skill: **file an issue** with the problem and
-the criteria you arrived at, and **record a decision** for each answer the
-human gave, attributed to that answer. The skill knows where they go and what
-form a criterion takes — do not write into the tracker yourself. Show the
-criteria to the human for approval: this is the first of their three steering
-points, and the one place a run genuinely waits.
+the criteria, and **record a decision** for each answer the human gave. The
+skill knows where they go and what form a criterion takes — do not write into
+the tracker yourself. Then show the criteria to the human for approval: this
+is the first of their three steering points, and the one place a run
+genuinely waits.
