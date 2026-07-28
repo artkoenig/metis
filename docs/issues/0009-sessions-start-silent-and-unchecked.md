@@ -24,10 +24,11 @@ Acceptance criteria:
    into the session context: counts, the metis commit, and errors or their
    absence.
 2. `AGENTS.md` has the session open with a greeting and that status. When no
-   status is in the context, the rule treats that as the finding — the hook
-   did not finish — and has the agent establish the facts itself: do the
-   `~/.claude` skill and agent links resolve, how does the session-start log
-   end? Report what it finds, not silence.
+   status is in the context — local sessions never get one by design; in a
+   cloud session that means the hook did not finish — the rule has the agent
+   establish the facts itself: do the `~/.claude` skill and agent links
+   resolve, how does the session-start log end? Report what it finds, not
+   silence.
 3. The per-project loader (`session-start.sh`) stays untouched — the
    self-check must reach every bootstrapped project on its next session
    start, without re-running bootstrap anywhere.
@@ -87,6 +88,23 @@ Acceptance criteria:
   `skills/bootstrap/assets/test-session-start-core.sh` (4 cases, including
   the reviewer's reproductions; scratch dirs only) and exits 0.
 
+- Review round 2 (fresh context): 6 findings — 1 blocking, 1 docs drift,
+  2 test gaps, 2 minor. All fixed. The blocking one was the same class as
+  round 1 (a character breaking the JSON — now a control character instead
+  of a quote): the repetition signal. Approach changed accordingly — the
+  sanitizer now strips the whole class (`tr -d '\000-\037\\"'`) instead of
+  the individual offenders, and the harness plants a newline-named link.
+  Docs: the harness is now named in the bootstrap skill's page ("Keeping it
+  honest") and in README. Test gaps closed: the happy path asserts the
+  status names the actual `git rev-parse --short HEAD`; the empty-clone
+  case asserts all three causes; a renamed `agent.md` is asserted too.
+  Minor: harness is executable now and cleans its scratch dirs via a trap
+  (dir count in `/tmp` unchanged across a run).
+- Criterion 2 amended to carry the round-1 decision (local sessions never
+  get a status by design) instead of contradicting it — the wanted
+  behaviour is unchanged, the wrong cause claim is gone from the criterion
+  as well as from the documents.
+
 ## Checkpoints
 
 ### Before implementation
@@ -107,8 +125,20 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: greeting plus self-check, with
+  both named probes covered — skill reachability (links verified, silently
+  skipped dirs named) and hook errors (status carries them; a crashed hook
+  leaves no status, which the rulebook treats as the finding).
+- **What surprised me?** How weak the first self-check was: it passed an
+  empty clone. The reviewer's reproductions, not my design, forced the
+  check to verify each outcome. And the escaping defect came back in a
+  second shape — patching characters one by one was the wrong altitude.
+- **What am I assuming without having verified it?** That Claude Code
+  actually surfaces `additionalContext` from a SessionStart hook into the
+  session context. Nothing in this change can verify that by exit code;
+  the first cloud session on the merged state is the test. If the status
+  does not appear there, the fallback path (no status → check links and
+  log) is what runs, so the failure mode is honest — but the greeting rule
+  should then be revisited.
 
 ## Retro

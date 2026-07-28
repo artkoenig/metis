@@ -6,15 +6,17 @@ set -u
 
 core="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/session-start-core.sh"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+base=$(mktemp -d)
+trap 'rm -rf "$base"' EXIT
 failures=0
 
 fail() { echo "FAIL: $1"; failures=$((failures + 1)); }
 pass() { echo "ok:   $1"; }
 
-# Prepare a scratch HOME + project repo; prints the scratch path.
+# Prepare a scratch HOME + project repo under $base; prints the scratch path.
 new_scratch() {
   local scratch
-  scratch=$(mktemp -d)
+  scratch=$(mktemp -d "$base/XXXXXX")
   mkdir -p "$scratch/home" "$scratch/proj"
   git -C "$scratch/proj" init --quiet
   echo "$scratch"
@@ -36,43 +38,52 @@ ctx=$(echo "$out" | json_context) || { fail "happy path: JSON invalid: $out"; ct
 echo "$ctx" | grep -Eq 'self-check: [1-9][0-9]* skills and [1-9][0-9]* agents linked' \
   || fail "happy path: no counts in status: $ctx"
 echo "$ctx" | grep -q 'no errors' || fail "happy path: not clean: $ctx"
+head=$(git -C "$repo_root" rev-parse --short HEAD)
+echo "$ctx" | grep -q "commit ${head};" || fail "happy path: status does not name HEAD ($head): $ctx"
 b=0
 for link in "$sc/home/.claude/skills"/* "$sc/home/.claude/agents"/*; do
-  [ -L "$link" ] && [ ! -e "$link" ] && b=1
+  if [ -L "$link" ] && [ ! -e "$link" ]; then b=1; fi
 done
 [ $b -eq 0 ] || fail "happy path: broken link created"
 [ -f "$sc/home/.claude/CLAUDE.md" ] || fail "happy path: rulebook not synced"
 [ $failures -eq 0 ] && pass "happy path"
 
-# --- Case 2: empty clone must FAIL, not report no errors --------------------
-empty=$(mktemp -d)
+# --- Case 2: empty clone must FAIL and name each cause ----------------------
+empty=$(mktemp -d "$base/XXXXXX")
 mkdir -p "$empty/skills/bootstrap/assets" "$empty/agents"
 cp "$core" "$empty/skills/bootstrap/assets/"
 out=$(run_core "$empty/skills/bootstrap/assets/session-start-core.sh" "$(new_scratch)")
 ctx=$(echo "$out" | json_context) || { fail "empty clone: JSON invalid: $out"; ctx=""; }
 echo "$ctx" | grep -q 'FAILED' || fail "empty clone: not flagged: $ctx"
-echo "$ctx" | grep -q 'no skills linked' || fail "empty clone: cause not named: $ctx"
-echo "$ctx" | grep -q 'commit' || fail "empty clone: commit missing from status: $ctx"
-echo "$ctx" | grep -Fq 'FAILED' && pass "empty clone flagged"
+echo "$ctx" | grep -q 'no skills linked' || fail "empty clone: missing skills not named: $ctx"
+echo "$ctx" | grep -q 'no agents linked' || fail "empty clone: missing agents not named: $ctx"
+echo "$ctx" | grep -q 'rulebook missing from clone' || fail "empty clone: missing rulebook not named: $ctx"
+if echo "$ctx" | grep -q 'FAILED'; then pass "empty clone flagged"; fi
 
-# --- Case 3: a skill dir without SKILL.md must be named ---------------------
-maimed=$(mktemp -d)
-cp -r "$repo_root/skills" "$repo_root/agents" "$maimed/" 2>/dev/null
+# --- Case 3: a dir without its SKILL.md / agent.md must be named ------------
+maimed=$(mktemp -d "$base/XXXXXX")
+cp -r "$repo_root/skills" "$repo_root/agents" "$maimed/"
 cp "$repo_root/AGENTS.md" "$maimed/"
 mv "$maimed/skills/plan/SKILL.md" "$maimed/skills/plan/SKILL.md.off"
+mv "$maimed/agents/researcher/agent.md" "$maimed/agents/researcher/agent.md.off"
 out=$(run_core "$maimed/skills/bootstrap/assets/session-start-core.sh" "$(new_scratch)")
-ctx=$(echo "$out" | json_context) || { fail "maimed skill: JSON invalid: $out"; ctx=""; }
-echo "$ctx" | grep -q 'skill without SKILL.md: plan' \
-  && pass "silently skipped skill named" || fail "maimed skill not named: $ctx"
+ctx=$(echo "$out" | json_context) || { fail "maimed clone: JSON invalid: $out"; ctx=""; }
+echo "$ctx" | grep -q 'skill without SKILL.md: plan' || fail "skipped skill not named: $ctx"
+echo "$ctx" | grep -q 'agent without agent.md: researcher' || fail "skipped agent not named: $ctx"
+if echo "$ctx" | grep -q 'skill without SKILL.md: plan'; then pass "silently skipped dirs named"; fi
 
-# --- Case 4: broken link with a quote in its name — JSON stays valid --------
+# --- Case 4: hostile link names (quote, newline) — JSON stays valid ---------
 sc=$(new_scratch)
 mkdir -p "$sc/home/.claude/skills"
 ln -s /nonexistent-target "$sc/home/.claude/skills/dead\"skill"
+ln -s /nonexistent-target "$sc/home/.claude/skills/$(printf 'dead\nskill')"
 out=$(run_core "$core" "$sc")
-ctx=$(echo "$out" | json_context) || fail "quoted name: JSON invalid: $out"
-echo "$ctx" | grep -q 'broken link' && pass "broken link reported, JSON valid" \
-  || fail "quoted name: broken link not reported: $ctx"
+if ctx=$(echo "$out" | json_context); then
+  echo "$ctx" | grep -q 'broken link' && pass "hostile names reported, JSON valid" \
+    || fail "hostile names: broken links not reported: $ctx"
+else
+  fail "hostile names: JSON invalid: $out"
+fi
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
