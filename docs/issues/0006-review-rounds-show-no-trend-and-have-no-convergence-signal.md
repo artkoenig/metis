@@ -60,6 +60,18 @@ Acceptance criteria:
 
 ## Log
 
+- Review round 1 (fresh context): no static analysis exists; the only suite
+  (`test-session-start-core.sh`, 5 cases, exit 0) does not touch this change,
+  so the reading is the only check. All three criteria met. Two minor
+  findings, both fixed: (1) "The signal has a second tier" had no clear
+  antecedent after a list of three signals — now "Repetition across review
+  rounds has a second tier"; (2) the table had no cell for findings that
+  violate no criterion, so its totals could disagree with its rows — now one
+  extra row for those. Fix 2 goes beyond the intent's letter but serves its
+  stated point (convergence visible); recorded here rather than filed.
+  Trend: round 1 = 2 findings (criterion 1: 1, criterion 2: 1,
+  criterion 3: 0).
+
 ## Checkpoints
 
 ### Before implementation
