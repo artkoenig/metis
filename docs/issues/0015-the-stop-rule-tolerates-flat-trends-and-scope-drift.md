@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/16
 ---
 
 # The stop rule tolerates flat trends and scope drift
@@ -95,3 +95,13 @@ Acceptance criteria:
   recorded as a judgment call, not covered by a fresh round.
 
 ## Retro
+
+Nothing got in the way; the run was one edit, one review round, one
+escalation. Two things worth keeping: the scope guard proved itself on its
+own review (the one finding was out of intent and went to the human instead
+of being fixed by reflex), and the human's brevity instruction shaped the
+run — short criteria, short rule text, one-sentence answers. Open thread
+for a future rule change, not filed yet: "after a fix, the review repeats"
+has no floor — this run skipped the repeat for a pure deletion the reviewer
+itself proposed, recorded as a judgment call; if that happens again, the
+rule should say when a repeat is waivable.
