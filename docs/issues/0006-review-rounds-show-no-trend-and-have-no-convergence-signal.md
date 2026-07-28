@@ -71,6 +71,13 @@ Acceptance criteria:
   stated point (convergence visible); recorded here rather than filed.
   Trend: round 1 = 2 findings (criterion 1: 1, criterion 2: 1,
   criterion 3: 0).
+- Review round 2 (fresh context): all three criteria met, zero findings.
+  Two observations, both without a criterion: the README paragraph fold
+  (cosmetic, dismissed — README is the mirror, the definition in `AGENTS.md`
+  is properly separated) and the out-of-criteria row (already recorded in
+  round 1's triage). The round independently confirmed the checkpoint-1
+  assumption and the decision about the reviewer's report format.
+  Trend: 2 → 0.
 
 ## Checkpoints
 
@@ -87,8 +94,14 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — all three criteria confirmed met by
+  two fresh-context rounds; one addition beyond the letter (the
+  out-of-criteria row), recorded with its rationale.
+- What surprised me? The intent's own table spec had a gap — no cell for
+  findings that violate no criterion — exposed by a real precedent from
+  issue 0009's review.
+- What am I assuming without having verified it? That future runs will
+  actually render the table: the rule is prose, and only the review of
+  those runs enforces it.
 
 ## Retro
