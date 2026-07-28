@@ -55,6 +55,12 @@ Acceptance criteria:
 
 - The criteria were approved by the human after grilling ("Freigegeben —
   leg los"). Source: the human's answer.
+- Ship after round 4 instead of a fifth round: the surviving defect class
+  needs a hand-broken settings.json, leaves nothing irreversible, and a
+  re-run after the fix completes the install; a validate-everything-first
+  rework would be thoroughness against the simplicity rule. The edges are
+  filed as issue 0014. Source: default — the human was asked at the
+  second-tier stop and stated no preference.
 
 - Direct use is the installation's main path: the loader keeps the
   `artkoenig/metis` URL, every session pulls that repo's current state. A
@@ -169,6 +175,10 @@ Acceptance criteria:
   only the git preconditions — the class migrated to the merge step. Per
   the rulebook, the run stops here and asks the human instead of running
   another round.
+- Round 4 triage, after the stop: the remaining merge-step edges (findings
+  1 and 2) and the untested curl branch (nit 3) are filed as issue 0014 and
+  wait for their own run; the criterion-5 letter observation stays
+  dismissed (third independent reading, same conclusion).
 
 ## Checkpoints
 
@@ -187,8 +197,19 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — README at 457 words with preamble,
+  "How it works" (retro focus) and "Installing it" (one-liner + fork
+  sentence); installer with a 7-case harness, all criteria met in substance
+  per four fresh review rounds.
+- What surprised me? The second-tier stop rule, landed only this morning in
+  issue 0006, fired for real in this run — and weighing the surviving
+  defect class by user impact flipped my own recommendation from "rework"
+  to "ship": the review pattern was about code style, not about harm.
+- What am I assuming without having verified it? That the live raw-URL leg
+  works once install.sh exists on main — the mechanism is proven (stdin
+  pipe in every test case, curl branch against a local HTTP server, live
+  fetch of the asset), the literal URL only exists after the merge. And
+  that the shipped merge-step edges are as rare as judged — recorded as a
+  default, the human stated no preference.
 
 ## Retro
