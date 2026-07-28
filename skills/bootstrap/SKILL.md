@@ -29,12 +29,6 @@ what every bootstrapped project does on its next session start; the loader
 itself should almost never need to change again, and the core is never copied
 anywhere.
 
-The loader is also the **only** file metis puts into a project. In particular
-there is no issue template to install: `AGENTS.md` carries the section
-interface and reaches every session as `~/.claude/CLAUDE.md`, so a project
-needs no `docs/issues/TEMPLATE.md` and nothing keeps one in sync. A project
-that still has one from an earlier setup can delete it.
-
 ## When to run it
 
 At the start of a session in any git repository Artjom owns — no remote yet,

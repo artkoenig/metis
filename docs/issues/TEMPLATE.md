@@ -7,12 +7,7 @@ pr:                 # set when the PR is opened — set status: done with it
 # <title>
 
 <!--
-The long form of the section interface, for a human to read. AGENTS.md is the
-authority: it carries the same table, it reaches every session, and where the
-two disagree it wins. This file lives in the metis repository only — nothing
-copies it into a project, and a project needs no template of its own.
-
-File an issue as docs/issues/NNN-slug.md — three digits, zero-padded, the next
+File this as docs/issues/NNN-slug.md — three digits, zero-padded, the next
 number after the highest already filed, so the directory lists the issues in
 the order they were opened.
 
