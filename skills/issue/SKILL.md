@@ -1,6 +1,6 @@
 ---
 name: issue
-description: Open a new issue in the metis tracker, or check the shape of an existing one — the file's name, its frontmatter and its sections. Not a shelf tool: every issue is filed through this skill, because the sections are the interface between the agents that read and write the file. Trigger on "file an issue", "open an issue", "new issue", "put this in the backlog", or whenever you are about to write a file under docs/issues/.
+description: The metis tracker. Every read of and every write to an issue goes through this skill — file an issue, record a decision, an observation, a plan, checkpoint answers, a retro or a task list, set the state, or orient a session on the running issue. Hand it the content and name the operation; it knows where that content lands. Not a shelf tool. Trigger on "file an issue", "open an issue", "new issue", "put this in the backlog", "record this in the issue", "where did we leave off", or whenever you are about to read or write anything in the tracker.
 user-invocable: true
 ---
 
@@ -13,32 +13,39 @@ why the shape is fixed and this skill exists.
 
 This skill owns the file whole: its name, its frontmatter, its sections, and
 what the states mean. Nothing else in the workflow describes any of that.
-Other documents may *name* a field or a section — "record it in `## Decisions`"
-— and then point here; they never explain one. A second explanation is the
-defect this arrangement exists to prevent, and it fails in both directions:
-two descriptions drift apart, and moving a description out of one document
-without landing it in this one leaves the question unanswered anywhere.
 
 The rulebook (`AGENTS.md`) owns the run — what happens between the states,
 not what they are.
 
-## The interface, and what is behind it
+## The interface: operations, not fields
 
-Treat this skill as a class. Four things are public, and a caller outside
-`skills/issue/` may rely on exactly these:
+Treat this skill as a class. A caller hands it **content** and names the
+**operation**; where that content lands, and in what form, is this skill's
+business. A caller never states a path, a filename, a frontmatter key or a
+heading — a document that does has reached inside, and it will be wrong the
+first time this skill moves.
 
-- the directory `docs/issues/`, and that one issue is one file in it
-- the filename form `NNNN-slug.md`, so a listing is the order they were opened
-- the frontmatter keys `status`, `branch`, `pr`, and the four values `status`
-  takes
-- the heading names — an agent reads and writes them, so renaming one is a
-  breaking change
+| operation | what the caller hands it |
+| --- | --- |
+| **file an issue** | the problem and the observable behaviour it wants, plus the acceptance criteria |
+| **record a decision** | what was settled, and the source it derives from — a document, a human's answer, or "default, unanswered" |
+| **record an observation** | what happened in the run: a review round and its triage, an attempt that failed, a surprise |
+| **record a plan** | handed straight to the `plan` skill, which owns this one — see below |
+| **record checkpoint answers** | the rulebook's three answers, and which of the two checkpoints they belong to |
+| **record a retro** | what got in the way, what should change |
+| **record a task list** | the steps a change is being landed in, when it is too big to land whole |
+| **set the state** | which state the issue is now in, and the branch or the pull request if one now exists |
+| **orient a session** | nothing. Returns which issue is running and everything the previous session knew about it |
 
-Everything else is behind the interface: `assets/TEMPLATE.md` and that it
-exists at all, the filing steps, and above all *what belongs in each section*.
-Those change without anything outside this directory changing with them. A
-document that explains one of them has reached inside, and it will be wrong
-the first time this skill moves.
+Four of these are delegated whole, and the delegate is then the only document
+that says what the content is. `record a plan` belongs to the `plan` skill.
+Three belong to the rulebook, because each is a rule of the run and not a
+property of the file: the three questions behind `record checkpoint answers`,
+what a retro says, and when a change gets a task list at all.
+
+Everything below this line is behind the interface — the directory, the
+filenames, the template, the sections, and what belongs in each. It changes
+without anything outside `skills/issue/` changing with it.
 
 ## Filing one
 
@@ -60,6 +67,16 @@ the first time this skill moves.
    happens; an issue that arrives with its Decisions pre-written is a plan
    wearing a tracker's clothes.
 
+## Orienting a session
+
+Scan the `status:` lines of every file under `docs/issues/` and open the
+`active` one — or, if none is `active`, the one whose `branch:` matches the
+branch checked out. Read it whole. The filled sections *are* the progress
+(see below), and Decisions, Log and Checkpoints are everything the previous
+session knew. Read nothing else to get oriented: the tracker is the record,
+and a session that goes looking further is reconstructing what is already
+written down.
+
 ## The shape
 
 | part | what belongs in it |
@@ -68,11 +85,11 @@ the first time this skill moves.
 | `# <title>` | one H1, the issue in a phrase — what a human sees in a listing |
 | `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable, "when X, then Y" |
 | `## Plan` | optional content, and the `plan` skill writes it — that skill says what belongs in it, this one does not |
-| `## Tasks` | optional content: only when the change is too big to land whole |
-| `## Decisions` | what was settled and why, each with the source it derives from; defaults marked as defaults; questions to the human and their answers. **Nothing else** — a reader arriving mid-run must reach the load-bearing decisions without wading through the run's process |
+| `## Tasks` | optional content, and the rulebook says when a change gets one — this skill only holds the place |
+| `## Decisions` | what was settled and why, each with the source it derives from; questions to the human and their answers. **Nothing else** — a reader arriving mid-run must reach the load-bearing decisions without wading through the run's process |
 | `## Log` | the run as it happened, oldest first: observations, review rounds and how their findings were triaged, attempts that failed. This is the section that grows, and keeping it out of Decisions is what keeps Decisions readable |
 | `## Checkpoints` | `### Before implementation` and `### Before the PR`, with the rulebook's three questions answered under each — the rulebook owns those, this skill only holds the place |
-| `## Retro` | after the pull request: what got in the way, what should change |
+| `## Retro` | written after the pull request, and the rulebook says what goes in one — this skill only holds the place |
 
 **Every heading is always present, including the empty ones.** "Optional"
 above describes the content, never the heading — a reader who scrolls to

@@ -124,10 +124,11 @@ into operation — for a workflow, the text *is* the product. The
 subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
 [`skills/`](skills/): `grill`, `plan`, and `clean-room`. One skill there is
-not a shelf tool: [`issue`](skills/issue/SKILL.md) owns the issue file whole —
-its name, its frontmatter, its sections and what the states mean — because
-that file is the interface between the agents that read and write it, and an
-interface described in two places is described wrong in one of them.
+not optional: [`issue`](skills/issue/SKILL.md) is the tracker itself. Every
+read and every write goes through one of its operations — you hand it a
+decision, an observation, a new state, and it knows where that belongs. Where
+the content lands is behind the interface, so it can move without a single
+other file changing.
 
 ## Wiring it in
 

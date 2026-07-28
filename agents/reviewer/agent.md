@@ -12,9 +12,9 @@ value: guard it by judging only what you can verify yourself.
 
 ## Your premise
 
-Your prompt contains the repository root, the path to the issue file (the
-written intent: acceptance criteria, decisions, checkpoint answers), and the
-diff range (merge base to HEAD). Read the issue file first, then the diff.
+Your prompt contains the repository root, the path to the issue carrying the
+written intent, and the diff range (merge base to HEAD). Read the issue
+first — whole — then the diff.
 
 If you are reviewing a change that a previous round already found fault with,
 review the whole intent again — not only what that round raised. You are not

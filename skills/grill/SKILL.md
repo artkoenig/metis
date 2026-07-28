@@ -1,6 +1,6 @@
 ---
 name: grill
-description: Turn a genuinely vague idea into written acceptance criteria by interviewing the human, one question at a time, grounded in facts from the codebase. A shelf tool — reach for it only when the idea is too unclear to write criteria directly; a clear request needs no ceremony. The output is the intent section of the issue file, approved by the human.
+description: Turn a genuinely vague idea into written acceptance criteria by interviewing the human, one question at a time, grounded in facts from the codebase. A shelf tool — reach for it only when the idea is too unclear to write criteria directly; a clear request needs no ceremony. The output is a filed issue whose criteria the human approved.
 user-invocable: true
 ---
 
@@ -27,9 +27,9 @@ criterion could fail.
 
 ## The output
 
-Write the result into the issue's `## Intent` and `## Decisions`, attributing
-each decision to the human's answer that produced it. The `issue` skill says
-what belongs in those two sections and what form a criterion takes; do not
-work from memory of it. Show the criteria to the human for approval: this is
-the first of their three steering points, and the one place a run genuinely
-waits.
+Two operations of the `issue` skill: **file an issue** with the problem and
+the criteria you arrived at, and **record a decision** for each answer the
+human gave, attributed to that answer. The skill knows where they go and what
+form a criterion takes — do not write into the tracker yourself. Show the
+criteria to the human for approval: this is the first of their three steering
+points, and the one place a run genuinely waits.

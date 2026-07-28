@@ -76,8 +76,8 @@ Identical → nothing to do. Missing or different → install.
    started.
 
 Those two are everything. In particular there is no issue template to
-install: the `issue` skill carries the shape of an issue file and reaches the
-session through the same symlinks as the subagents. A project still holding a
+install: the `issue` skill *is* the tracker and reaches the session through
+the same symlinks as the subagents. A project still holding a
 `docs/issues/TEMPLATE.md` from an earlier setup can delete it — nothing keeps
 it current, which is exactly why it stopped being a copy.
 

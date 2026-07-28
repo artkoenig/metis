@@ -25,8 +25,9 @@ your impression.
    exit 0", not "the suite is green". Exit 0 is a fact about a command; it
    says nothing about what that command declined to assert.
 5. **The record survives the session.** Decisions, assumptions, surprises, and
-   checkpoint answers go into the issue file as they happen — the next session
-   resumes from the issue, not from a conversation that no longer exists.
+   checkpoint answers are recorded through the `issue` skill as they happen —
+   the next session resumes from the tracker, not from a conversation that no
+   longer exists.
 
 ## Correcting course
 
@@ -39,14 +40,14 @@ attempt count would say:
 - *Surprise* — something behaves differently than the documentation claims.
 - *Regression* — a fix breaks something that worked.
 
-Write the observation into the issue, then decide: change approach, or ask.
+Record the observation, then decide: change approach, or ask.
 
-**Two checkpoints.** Answer three questions in the issue, once before
+**Two checkpoints.** Answer three questions and record them, once before
 implementation starts and once before the PR: *Does this match what was asked?
 What surprised me? What am I assuming without having verified it?* Thirty
 seconds of honesty at the two points where correction is still cheap.
 
-**Retro after every run.** After the PR, write a few sentences into the issue:
+**Retro after every run.** After the PR, record a few sentences:
 what got in the way, what should change. If a rule on this page misfired,
 propose the fix in the `metis` repository — the workflow corrects itself
 through these, not through an eval suite.
@@ -63,8 +64,8 @@ Three steering points, nothing else:
 
 If the human is away: a material question — one that changes user-visible
 behaviour, a public contract, the data model, or the dependency footprint —
-parks the work. Anything else: pick a sensible default, record it in the issue
-*as a default*, and carry on.
+parks the work. Anything else: pick a sensible default, record it as a
+decision that says *it was a default*, and carry on.
 
 ## The shelf
 
@@ -81,7 +82,7 @@ because a condition fired:
   without exercising the behaviour — assertions about absence, about
   invariance, about something *not* happening
 - slicing into steps with intermediate commits, when the change is too big to
-  land whole — a task list in the issue file, no tooling needed
+  land whole — record a task list, no tooling needed
 
 A skill is a class, not a document: you call it through the interface its page
 declares, and what it does inside is its own. Never restate a skill's internals
@@ -116,18 +117,17 @@ what the previous round got wrong and finds what it passed over.
 
 ## Bookkeeping
 
-- One issue = one branch = one pull request. An issue is one markdown file
-  under `docs/issues/`, and the `issue` skill owns that file whole — its
-  name, its frontmatter, its sections, and what the states mean. Invoke the
-  skill; do not work from memory of the shape, and do not restate any of it
-  here or anywhere else. That is why it is the one skill that is not a shelf
-  tool. It reaches every session the way the subagents do, so nothing about
-  the issue file is ever copied into a project. No child issues; a large
-  change gets a task list inside its file.
-- A new session orients itself from the tracker alone: scan the `status`
-  lines under `docs/issues/`, open the `active` file (or the one matching the
-  current branch), and read it whole — what the previous session knew is in
-  it. Read nothing else to "get oriented".
+- One issue = one branch = one pull request. The tracker is the `issue`
+  skill: every read of and every write to an issue goes through one of its
+  operations. Hand it the content — a decision, an observation, a checkpoint
+  answer, a new state — and name the operation; it knows where that content
+  belongs. Never state a path, a filename or a field yourself, here or
+  anywhere else. Unlike the shelf tools it is not optional: there is no other
+  way to read or write an issue. It reaches every session the way the
+  subagents do, so nothing about the tracker is ever copied into a project.
+  No child issues.
+- A new session orients itself with that skill and reads nothing else to "get
+  oriented".
 - Issues build independently: branch each new one from the current default
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.

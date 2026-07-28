@@ -35,12 +35,15 @@ was posed; it only had to be recognised as the same problem.
 
 Acceptance criteria:
 
-1. Two properties, and they hold together:
-   - *Absence.* No file outside `skills/issue/` describes the name, the
-     frontmatter or the sections of an issue file. A mention names the `issue`
-     skill and stops. The one exception is a document the `issue` skill itself
-     names as the owner of one part — that document describes that part, and
-     nothing else about the file.
+1. The `issue` skill exposes **operations, not fields**. Its page lists each
+   operation a caller can ask for and what content the caller hands it. No
+   caller states where that content goes.
+2. Two properties, and they hold together:
+   - *Absence.* No file outside `skills/issue/` states a path, a filename, a
+     frontmatter key, a heading, or what belongs under one. A caller names an
+     operation and hands over content. The one exception is a document the
+     `issue` skill itself names as the owner of one part — that document says
+     what that part contains, and nothing else about the tracker.
    - *Presence.* `skills/issue/SKILL.md` covers every frontmatter field and
      every heading the template contains: it either describes the part itself,
      or names exactly one other document that owns it.
@@ -48,17 +51,26 @@ Acceptance criteria:
    Presence is not decoration. Without it, deleting the information everywhere
    satisfies absence — which is how `branch` came to have no stated meaning at
    all.
-2. `AGENTS.md` says an issue is filed through that skill and restates none of
-   it — not the shape, and not what the states mean. The skill owns the issue
-   file whole; the rulebook owns the run.
-3. Nothing writes a template into a project: no step in
+
+   `README.md` is out of scope for both halves. It is the repository's
+   description for a human reader and is loaded into no agent's context, so a
+   contradiction there misleads someone who can see it, not an agent who
+   cannot. Stated here rather than left to triage, because a scope decision
+   that lives only in a triage note is one a later round re-opens.
+3. `AGENTS.md` reaches the tracker only through operations, and restates
+   nothing of what the file looks like or what the states mean — except the
+   parts the skill hands it by name.
+4. Nothing writes a template into a project: no step in
    `skills/bootstrap/assets/session-start-core.sh` copies one, and
    `skills/bootstrap/SKILL.md` claims none.
-4. Issue files are named `NNNN-slug.md` — four digits — and the four already
+5. Issue files are named `NNNN-slug.md` — four digits — and the four already
    filed are renamed, so that a fifth cannot sort ahead of the first.
-5. An agent that has only the skill files a file matching the four that exist:
+6. An agent that has only the skill files a file matching the four that exist:
    the H1 title, all seven headings including the empty ones, and the Log's
    ordering are stated, not left to be inferred.
+7. No sentence this branch adds is contradicted by the rest of the
+   repository. Four consecutive rounds lost to one, so it is a criterion now
+   rather than a habit.
 
 ## Plan
 
@@ -387,13 +399,47 @@ Acceptance criteria:
     places. None outside the skill names the heading, so each is the permitted
     form — a reader still has to invoke the skill to learn where a task list
     goes.
-- **Hard stop set for round 6.** Criterion 1 has now failed four times. Each
-  round's cause has been genuinely different — a copy, a duplication, a hole,
-  and now two shelf skills nobody had swept plus a criterion that forbade its
-  own mechanism — so this is not one unsolved problem repeating. But four is
-  where the perception rule stops being a signal and starts being an excuse:
-  if round 6 finds criterion 1 unmet again, the run stops and the question
-  goes to the human, whatever the finding says.
+- **Review round 6, and the human redefined the interface underneath it.**
+  The round found four things, three of which survive the redefinition:
+  `## Retro`'s content stated verbatim in `AGENTS.md` while the skill did not
+  delegate it; `skills/plan/` describing `## Tasks`, which is not the part it
+  owns; and "the one skill that is not a shelf tool" being false, because
+  `bootstrap` is a second one. The fourth — `README.md` repeating the
+  checkpoint questions — the reviewer correctly refused to inherit as
+  *accepted*, on the ground that the criterion had been rewritten since that
+  triage. It was right: an acceptance recorded against old wording is not an
+  acceptance. `README.md` is now excluded in the criterion itself, with the
+  reason.
+- **Decided by the human: a skill exposes operations, not fields.** The
+  interface I had built listed *data* a caller may rely on — the directory,
+  the filename form, the frontmatter keys, the heading names. The human's
+  correction: a caller should hand over content and name an operation, and
+  the skill alone knows where it lands. "Nutze skill `issue` um die
+  Akzeptanzkriterien festzuhalten", with the criteria as input, instead of
+  "write them into `## Intent` as numbered, falsifiable statements".
+  - *Why it is better:* every finding in rounds 5 and 6 is a caller that
+    named a place. Under field-exposure they are violations to be found one
+    at a time by sweeping the repository; under operation-exposure there is
+    nothing for a caller to get wrong, because the caller never had the
+    information. It removes the failure mode instead of policing it.
+  - *What it cost:* nine operations replace four public data items, and four
+    of them are delegated back out — the plan to the `plan` skill, and the
+    checkpoint questions, the retro's content and the task-list condition to
+    the rulebook, because each is a rule of the run rather than a property of
+    the file. Delegation is now the explicit mechanism rather than an
+    exception the criterion had to be widened to permit.
+  - Criteria 1 and 2 rewritten accordingly, and criterion 7 added for the
+    false-sentence class that has now cost four rounds.
+- **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
+  against a design the human replaced mid-round. Re-arming it rather than
+  spending it is the honest call — but it does not reset: if criterion 2
+  fails again, the run stops and the question goes to the human, whatever the
+  finding says. Five rounds have now failed the same criterion, and each
+  cause was genuinely different — a copy, a duplication, a hole, two shelf
+  skills nobody had swept, a criterion that forbade its own mechanism. That is
+  not one unsolved problem repeating; it is a design being found wrong in a
+  new place each time, which is the more expensive kind and the reason the
+  stop exists.
 
 ## Checkpoints
 
