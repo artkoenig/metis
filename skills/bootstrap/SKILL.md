@@ -99,3 +99,8 @@ The core has a test harness: `assets/test-session-start-core.sh`. It runs
 the core against scratch directories only (never the real `~/.claude` or the
 real repo's git config) and exits 0 when all cases pass. Run it before
 landing any change to the core; it is the suite for this script.
+
+The loader has its own harness: `assets/test-session-start-loader.sh`. Same
+scratch-only rules; it guards the documented promise that a local session
+never receives a self-check status (`additionalContext`) from the loader.
+Run it before landing any change to the loader.
