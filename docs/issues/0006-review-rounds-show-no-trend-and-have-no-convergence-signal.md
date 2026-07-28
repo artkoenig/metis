@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -44,15 +44,34 @@ Acceptance criteria:
 
 ## Decisions
 
+- The change lands in `AGENTS.md` (the definition) and `README.md` (which
+  mirrors the correcting-course rules). The reviewer's report already names
+  the criterion each finding violates, so the per-round table needs no change
+  to the reviewer — the caller holds the cross-round tally. The implementer's
+  stop signals describe its own inner loop, not review rounds, and stay
+  untouched. Source: sweep of every text naming the stop signals
+  (`AGENTS.md`, `README.md`, `agents/implementer/agent.md`).
+- Implemented in the main context, not through the `implementer`: prose only,
+  no production code, no tests; the fresh-context review still runs. Source:
+  the precedent recorded in issue 0005.
+- Branch is `claude/new-session-xeyz5n`, the session's designated branch,
+  instead of the `NNNN-slug` convention. Default, unanswered — the session
+  may not push elsewhere.
+
 ## Log
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — a table rule for review-round
+  reports and a two-tier stop signal, both in perception style, exactly the
+  three criteria of the intent.
+- What surprised me? Nothing yet; the sweep confirmed the reviewer already
+  attributes findings to criteria, which the table needs.
+- What am I assuming without having verified it? That no text outside
+  `AGENTS.md`, `README.md` and the implementer repeats the stop-signal rule —
+  verified only by one grep over the repo (excluding past issue records).
 
 ### Before the PR
 

@@ -73,7 +73,11 @@ Everything else is a tool on the shelf, not a step in a pipeline.
 When the agent notices *repetition* (the same failure or missed criterion
 twice), *surprise* (something behaves differently than documented), or
 *regression* (a fix breaks something that worked) — it stops, records the
-observation, and decides: change approach, or ask.
+observation, and decides: change approach, or ask. And when even a changed
+approach does not converge — the findings neither fewer nor smaller round
+over round — it stops and asks the human instead of running another round.
+After every review round the human sees the trend as a table: findings per
+acceptance criterion per round, with totals.
 
 **Two checkpoints.** Before implementation and before the PR, the agent
 records answers to three questions: *Does this match what was asked? What
