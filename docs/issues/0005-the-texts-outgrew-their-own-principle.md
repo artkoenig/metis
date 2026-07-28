@@ -64,6 +64,12 @@ Acceptance criteria:
   bootstrap 713, clean-room 325, grill 305, issue 1535, plan 304,
   TEMPLATE.md 103 — total 7100.
 
+- Rewrite done in one pass. Word counts after: AGENTS.md 918, README.md 1017,
+  implementer 429, researcher 214, reviewer 509, test-author 292,
+  bootstrap 648, clean-room 294, grill 274, issue 1101, plan 263 — every
+  changed file shorter. The template (103 words) was already a bare skeleton
+  and stays unchanged.
+
 ## Checkpoints
 
 ### Before implementation
