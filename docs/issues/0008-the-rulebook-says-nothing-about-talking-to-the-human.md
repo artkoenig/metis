@@ -41,6 +41,16 @@ Acceptance criteria:
 
 ## Log
 
+- Review round 1 (fresh context): no findings. All three criteria met. No
+  suite and no static analysis exist — established by the reviewer with
+  commands and exit codes; its reading was the change's only check, per
+  invariant 3. One observation, not a finding: the closing list "the
+  finding, the decision, the change" is narrower than "the essentials" — a
+  direct answer to a factual question is none of the three. Read as
+  illustrative, kept as is: the criterion's own words stand verbatim before
+  the colon, and lengthening the list to make it exhaustive would work
+  against the rule it states.
+
 ## Checkpoints
 
 ### Before implementation
@@ -57,8 +67,14 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes — the three requested parts
+  (informal address, simple short wording, essentials only) are one
+  paragraph in the section about the human, nothing else changed.
+- **What surprised me?** A one-round review with zero findings — a first.
+  The change is four lines against a section that already fit it.
+- **What am I assuming without having verified it?** That the illustrative
+  reading of "the finding, the decision, the change" holds up in practice —
+  if a future session treats the list as exhaustive and refuses plain
+  answers, the list needs an explicit "or the answer asked for".
 
 ## Retro
