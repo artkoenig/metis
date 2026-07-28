@@ -63,6 +63,11 @@ Acceptance criteria:
   round: the two remaining fixes were one-sentence changes, verified
   directly, and the corpus had been swept four times. Source: the human's
   answer during this run.
+- Repository language rule, set by the human after the PR opened:
+  everything checked in — texts, commit messages — and every pull request
+  is written in English. Recorded in the rulebook's Bookkeeping section;
+  the open PR 9 was translated to comply. Source: the human's instruction
+  in this run. (Earlier commits on this branch are German; history stays.)
 
 ## Log
 

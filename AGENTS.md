@@ -122,6 +122,8 @@ predecessor's list inherits its blind spots.
   defined — when they disagree, the document is out of date.
 - Branch each new issue from the current default branch, never on top of an
   unmerged predecessor.
+- Everything checked in — texts, commit messages — and every pull request is
+  written in English.
 - Never push to the default branch; it advances only through a merged PR.
 - Work found mid-run that serves the current intent joins the task list.
   Anything else is filed through the `issue` skill and waits for its own run.
