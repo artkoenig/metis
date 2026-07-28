@@ -233,12 +233,19 @@ Acceptance criteria:
     them — it now states what the states mean without listing the shape
     (finding 3); one sentence described filing without routing through the
     skill (finding 6).
-  - *Accepted, filed as `0005`:* a newly added skill does not reach a local
-    session, because the loader exits before the core on that path. Pre-dates
-    this change, affects every future skill and subagent equally, and rests on
-    a precondition the reviewer could not verify from inside the repository.
-    `0004`'s criterion 1 is therefore not fully met, and that is stated rather
-    than argued away.
+  - *Refuted:* a newly added skill does not reach a local session. The
+    reviewer traced it correctly through the loader and the core, and named
+    the one precondition it could not check from inside the repository — the
+    layout of the human's own `~/.claude`. The human answered: `~/.claude` is
+    itself a symlink, so the whole directory hangs off the clone and a new
+    skill is present the moment it is in the clone. The per-item symlinks the
+    reviewer reasoned from are this container's, created by the predecessor's
+    hook, not the human's. Filed as `0005` and deleted again when the answer
+    came; criterion 1 is met.
+  - Worth keeping from it: the finding was correct in its reasoning and wrong
+    in its premise, and only the human could say which. A reviewer that names
+    the precondition it could not verify is worth more than one that either
+    swallows the finding or asserts it.
 - **Second reversal on this issue, and it is worth naming as such.** Two
   designs, two refutations, both because the question *who actually needs this
   file?* was asked late. The perception rules do not fire on it — no failure
