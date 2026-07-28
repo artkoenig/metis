@@ -1,6 +1,6 @@
 ---
 name: clean-room
-description: Get an independent solution proposal from a fresh agent that has seen NO code, NO docs, and NO preferred answer — then reconcile the blind proposal with reality. A shelf tool — reach for it when a design could be wrong in a way you would not notice from inside it: an architecture choice, a "are we overcomplicating this?" doubt, a plan worth stress-testing before implementation.
+description: Get an independent solution proposal from a fresh agent that has seen NO code, NO docs, and NO preferred answer — then reconcile the blind proposal with reality. A shelf tool — reach for it when you are stuck or want a second opinion: an architecture choice, a "are we overcomplicating this?" doubt, a plan worth stress-testing before implementation.
 user-invocable: true
 ---
 

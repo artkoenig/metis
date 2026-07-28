@@ -56,6 +56,9 @@ Acceptance criteria:
 - The simplicity rule goes into `AGENTS.md` as part of this change. Source:
   the human's instruction "Einfachheit ist das oberste Gebot in diesem
   Projekt" — a rule that only lives in a conversation dies with it.
+- The `clean-room` trigger is now "when you are stuck or want a second
+  opinion", in every place that names it (rulebook, clean-room description,
+  plan skill). Source: the human's answer during this run.
 
 ## Log
 

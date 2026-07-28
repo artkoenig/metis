@@ -25,8 +25,8 @@ implementer commits to one mid-edit. A page at most, recorded in the tracker.
 
 ## What it is not
 
-Not a design review (put the plan through `clean-room` when it could be
-wrong in a way you would not notice), not a work breakdown (that is a task
+Not a design review (put the plan through `clean-room` when you are stuck
+or want a second opinion), not a work breakdown (that is a task
 list — its own operation on the `issue` skill), and not a cage: when the
 implementer reports that the plan does not survive contact with the code,
 update the plan — do not defend it.

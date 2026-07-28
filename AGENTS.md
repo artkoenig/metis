@@ -72,8 +72,7 @@ a condition fired:
 
 - the `grill` skill, when the idea is too vague to write criteria
 - the `plan` skill, when the change spans modules
-- the `clean-room` skill, when the design could be wrong in a way you would
-  not notice
+- the `clean-room` skill, when you are stuck or want a second opinion
 - the `test-author` subagent, when a test could pass without exercising the
   behaviour — criteria about absence, invariance, something *not* happening
 - a task list with intermediate commits, when the change is too big to land
