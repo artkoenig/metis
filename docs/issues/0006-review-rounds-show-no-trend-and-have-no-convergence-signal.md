@@ -1,7 +1,7 @@
 ---
-status: backlog
-branch:
-pr:
+status: done
+branch: claude/new-session-xeyz5n
+pr: https://github.com/artkoenig/metis/pull/13
 ---
 
 # Review rounds show no trend and have no convergence signal
@@ -44,20 +44,73 @@ Acceptance criteria:
 
 ## Decisions
 
+- The change lands in `AGENTS.md` (the definition) and `README.md` (which
+  mirrors the correcting-course rules). The reviewer's report already names
+  the criterion each finding violates, so the per-round table needs no change
+  to the reviewer — the caller holds the cross-round tally. The implementer's
+  stop signals describe its own inner loop, not review rounds, and stay
+  untouched. Source: sweep of every text naming the stop signals
+  (`AGENTS.md`, `README.md`, `agents/implementer/agent.md`).
+- Implemented in the main context, not through the `implementer`: prose only,
+  no production code, no tests; the fresh-context review still runs. Source:
+  the precedent recorded in issue 0005.
+- Branch is `claude/new-session-xeyz5n`, the session's designated branch,
+  instead of the `NNNN-slug` convention. Default, unanswered — the session
+  may not push elsewhere.
+
 ## Log
+
+- Review round 1 (fresh context): no static analysis exists; the only suite
+  (`test-session-start-core.sh`, 5 cases, exit 0) does not touch this change,
+  so the reading is the only check. All three criteria met. Two minor
+  findings, both fixed: (1) "The signal has a second tier" had no clear
+  antecedent after a list of three signals — now "Repetition across review
+  rounds has a second tier"; (2) the table had no cell for findings that
+  violate no criterion, so its totals could disagree with its rows — now one
+  extra row for those. Fix 2 goes beyond the intent's letter but serves its
+  stated point (convergence visible); recorded here rather than filed.
+  Trend: round 1 = 2 findings (criterion 1: 1, criterion 2: 1,
+  criterion 3: 0).
+- Review round 2 (fresh context): all three criteria met, zero findings.
+  Two observations, both without a criterion: the README paragraph fold
+  (cosmetic, dismissed — README is the mirror, the definition in `AGENTS.md`
+  is properly separated) and the out-of-criteria row (already recorded in
+  round 1's triage). The round independently confirmed the checkpoint-1
+  assumption and the decision about the reviewer's report format.
+  Trend: 2 → 0.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — a table rule for review-round
+  reports and a two-tier stop signal, both in perception style, exactly the
+  three criteria of the intent.
+- What surprised me? Nothing yet; the sweep confirmed the reviewer already
+  attributes findings to criteria, which the table needs.
+- What am I assuming without having verified it? That no text outside
+  `AGENTS.md`, `README.md` and the implementer repeats the stop-signal rule —
+  verified only by one grep over the repo (excluding past issue records).
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — all three criteria confirmed met by
+  two fresh-context rounds; one addition beyond the letter (the
+  out-of-criteria row), recorded with its rationale.
+- What surprised me? The intent's own table spec had a gap — no cell for
+  findings that violate no criterion — exposed by a real precedent from
+  issue 0009's review.
+- What am I assuming without having verified it? That future runs will
+  actually render the table: the rule is prose, and only the review of
+  those runs enforces it.
 
 ## Retro
+
+- What got in the way: little. The one real defect source was the intent
+  itself — its table spec had no cell for out-of-criteria findings, which a
+  glance at the reviewer's report format (or the researcher) at filing time
+  would have caught. Minor friction: the first commit tripped the committer-
+  identity hook and needed an amend.
+- What should change: nothing in the rules. The new table rule got its first
+  use in this very run (trend 2 → 0 reported after each round) and cost one
+  line per round — no proposal.
