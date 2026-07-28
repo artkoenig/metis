@@ -119,6 +119,20 @@ Acceptance criteria:
   harness — each caught with exit 1 — and shellcheck (clean at warning
   level and above).
 
+- Review round 4 (fresh context): 3 findings — 1 blocking, 1 test gap,
+  1 cosmetic. All fixed. The blocking one was the fourth shape of the
+  escaping class: bytes above 0x7f are not valid UTF-8, and the round-2 fix
+  was still a blacklist. Now a whitelist — the status keeps only printable
+  ASCII minus quote and backslash; every byte not on the list is dropped,
+  which closes the class by construction. Test gaps: the harness oracle
+  decoded stdin leniently (surrogateescape) and would have passed the bad
+  bytes — it now decodes raw bytes strictly, and a mutation check confirmed
+  the old blacklist sanitizer fails it (UnicodeDecodeError, as intended);
+  case 5 additionally asserts a FAILED status keeps counts and commit,
+  which no case had pinned. Cosmetic: the README paragraph refilled. The
+  reviewer also ran six mutations — five caught; the sixth (FAILED loses
+  counts) is the gap case 5 now covers.
+
 ## Checkpoints
 
 ### Before implementation

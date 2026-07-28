@@ -120,10 +120,11 @@ if [ -z "$errors" ]; then
 else
   status="${status} FAILED:${errors} see .claude/hooks/session-start.log."
 fi
-# Filenames can carry anything; strip the whole class of characters that
-# can break the JSON embedding — backslash, quote, and every control
-# character — not the individual offenders as they are discovered.
-status=$(printf '%s' "$status" | tr -d '\000-\037\\"')
+# Filenames can carry anything; the status may not. Whitelist, don't
+# blacklist: keep only printable ASCII minus the two JSON delimiters —
+# every byte not on the list is dropped, including the ones nobody
+# thought of yet.
+status=$(printf '%s' "$status" | LC_ALL=C tr -dc '\040-\176' | tr -d '\\"')
 echo "$status"
 
 # 6. Tell Claude Code to reload skills, and hand the status to the session.

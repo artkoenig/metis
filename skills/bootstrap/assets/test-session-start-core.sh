@@ -29,7 +29,9 @@ run_core() {
     bash -c 'exec 3>&1 1>"$0/core.log" 2>&1; bash "$1"' "$2" "$1")
 }
 
-json_context() { python3 -c 'import json,sys; print(json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])'; }
+# Strict oracle: read raw bytes and decode as UTF-8 ourselves — stdin's
+# default surrogateescape handler would wave invalid bytes through.
+json_context() { python3 -c 'import json,sys; print(json.loads(sys.stdin.buffer.read().decode("utf-8"))["hookSpecificOutput"]["additionalContext"])'; }
 
 # --- Case 1: happy path against the real repo -------------------------------
 sc=$(new_scratch)
@@ -72,11 +74,13 @@ echo "$ctx" | grep -q 'skill without SKILL.md: plan' || fail "skipped skill not 
 echo "$ctx" | grep -q 'agent without agent.md: researcher' || fail "skipped agent not named: $ctx"
 if echo "$ctx" | grep -q 'skill without SKILL.md: plan'; then pass "silently skipped dirs named"; fi
 
-# --- Case 4: hostile link names (quote, newline) — JSON stays valid ---------
+# --- Case 4: hostile link names (quote, newline, non-UTF-8 byte) — JSON
+# stays valid under a strict parser ------------------------------------------
 sc=$(new_scratch)
 mkdir -p "$sc/home/.claude/skills"
 ln -s /nonexistent-target "$sc/home/.claude/skills/dead\"skill"
 ln -s /nonexistent-target "$sc/home/.claude/skills/$(printf 'dead\nskill')"
+ln -s /nonexistent-target "$sc/home/.claude/skills/$(printf 'dead\xffskill')"
 out=$(run_core "$core" "$sc")
 if ctx=$(echo "$out" | json_context); then
   if echo "$ctx" | grep -q 'broken link'; then
@@ -95,7 +99,9 @@ out=$(run_core "$core" "$sc")
 ctx=$(echo "$out" | json_context) || { fail "shadowed path: JSON invalid: $out"; ctx=""; }
 echo "$ctx" | grep -q 'skill not reachable: plan' || fail "shadowed skill not named: $ctx"
 echo "$ctx" | grep -q 'agent not reachable: reviewer' || fail "shadowed agent not named: $ctx"
-if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named"; fi
+echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents linked; commit [0-9a-f]+; FAILED:' \
+  || fail "FAILED status lost counts or commit: $ctx"
+if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named, FAILED status keeps counts and commit"; fi
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
