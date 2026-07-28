@@ -205,6 +205,23 @@ Acceptance criteria:
   letter observation, fourth independent reading, agrees with the standing
   dismissal; stays dismissed. Round 6 pending on the fix.
 
+- Review round 6 (fresh context): facts — 11 cases exit 0, core suite exit
+  0, `bash -n` exit 0; reviewer additionally proved the curl branch and an
+  unborn-HEAD install. Three findings (trend 3 → 3 → 4 → 3 → 2 → 3): (1)
+  minor, fixed — a directory at the hook path made the installer copy the
+  loader into it and commit the mess with exit 0, claiming success; the
+  symmetric twin of round 5's settings guard. (2) nit, fixed by the same
+  rework — `.claude/hooks` as a regular file died with a raw mkdir error.
+  (3) the criterion-5 letter observation, fifth reading, concurs with the
+  standing dismissal. Triage decision: findings 1 and 2 fall under the
+  human's recorded out-of-scope instruction, applied structurally instead
+  of per path — every installed path must be absent or a regular file and
+  every parent absent or a directory, checked up front; the
+  settings-specific guard from round 5 folded into that loop. Cases 12–13
+  written first and seen failing (silent success / raw mkdir error), then
+  the fix: 13 cases exit 0, core suite exit 0, `bash -n` exit 0. If round
+  7 does not come back cleaner, the run stops and asks again.
+
 ## Checkpoints
 
 ### Before implementation

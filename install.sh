@@ -27,8 +27,23 @@ toplevel=$(git rev-parse --show-toplevel 2>/dev/null) \
   || die "run this from the repository root ($toplevel), not a subdirectory."
 command -v python3 >/dev/null 2>&1 \
   || die "python3 is required to merge .claude/settings.json; install it and re-run."
-# The git step must be able to succeed before anything is written: every
-# installed path committable, and a committer identity in place.
+# Every step must be able to succeed before anything is written. First the
+# filesystem state: each installed path absent or a regular file, each parent
+# absent or a directory — a broken state is out of scope, check and abort.
+for p in "${installed_paths[@]}"; do
+  if [ -e "$p" ] && [ ! -f "$p" ]; then
+    die "$p exists but is not a regular file; fix it and re-run."
+  fi
+  d=$(dirname "$p")
+  while [ "$d" != "." ]; do
+    if [ -e "$d" ] && [ ! -d "$d" ]; then
+      die "$d exists but is not a directory; fix it and re-run."
+    fi
+    d=$(dirname "$d")
+  done
+done
+# Then the git step: every installed path committable, and a committer
+# identity in place.
 for p in "${installed_paths[@]}"; do
   if git check-ignore -q "$p" 2>/dev/null; then
     die "$p is git-ignored here, but the hook only works committed — unignore it and re-run."
@@ -38,9 +53,7 @@ git var GIT_COMMITTER_IDENT >/dev/null 2>&1 \
   || die "git has no committer identity here; set user.name and user.email, then re-run."
 # A broken settings.json is out of scope: check it up front and abort before
 # anything is written, instead of dying mid-merge with a file half-installed.
-if [ -e .claude/settings.json ]; then
-  [ -f .claude/settings.json ] \
-    || die ".claude/settings.json exists but is not a regular file; fix it and re-run."
+if [ -f .claude/settings.json ]; then
   python3 - .claude/settings.json <<'PYEOF' || exit 1
 import json, sys
 

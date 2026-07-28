@@ -194,19 +194,29 @@ refuses_broken_settings "invalid JSON" 'not json'
 refuses_broken_settings "hooks not an object" '{"hooks": []}'
 refuses_broken_settings "SessionStart entry not an object" '{"hooks": {"SessionStart": ["x"]}}'
 
-# --- Case 11: settings.json is not a regular file — same clean refusal ------
-prior=$failures
-repo=$(new_repo)
-mkdir -p "$repo/.claude/settings.json"
-if run_install "$repo"; then
-  fail "settings-dir: install succeeded despite settings.json being a directory"
-else
-  grep -q "install.sh:" "$repo.log" \
-    || fail "settings-dir: no clear refusal message: $(cat "$repo.log")"
-  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
-    || fail "settings-dir: hook written despite refusal"
-fi
-[ $failures -eq $prior ] && pass "settings.json a directory: clean refusal, nothing installed"
+# A repo whose filesystem state at the installed paths is broken: clean
+# refusal before any write, no commit. $1 = case label, $2 = a command that
+# breaks the state, run with the repo as its argument.
+refuses_broken_state() {
+  local label=$1 break_cmd=$2 repo
+  prior=$failures
+  repo=$(new_repo)
+  bash -c "$break_cmd" _ "$repo"
+  if run_install "$repo"; then
+    fail "$label: install succeeded despite broken state"
+  else
+    grep -q "install.sh:" "$repo.log" \
+      || fail "$label: no clear refusal message: $(cat "$repo.log")"
+    [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+      || fail "$label: a commit was made despite refusal"
+  fi
+  [ $failures -eq $prior ] && pass "$label: clean refusal, nothing committed"
+}
+
+# --- Cases 11-13: broken state at the installed paths — check and abort -----
+refuses_broken_state "settings.json a directory" 'mkdir -p "$1/.claude/settings.json"'
+refuses_broken_state "hook path a directory" 'mkdir -p "$1/.claude/hooks/session-start.sh"'
+refuses_broken_state ".claude/hooks a regular file" 'mkdir -p "$1/.claude" && touch "$1/.claude/hooks"'
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
