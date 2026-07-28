@@ -243,6 +243,18 @@ Acceptance criteria:
   criterion-5 letter observation, sixth reading, concurs with the standing
   dismissal — no action.
 
+- Review round 8 (fresh context): facts — 15 cases exit 0, core suite exit
+  0, `bash -n` exit 0; the reviewer probed three further symlink states by
+  hand (all refuse up front) and the curl branch against loopback. No
+  minor findings — two trivials and the standing letter nit. Triage under
+  the human's course correction: the stale case-range comment in the
+  harness fixed (record correctness, one line, no behaviour — no ninth
+  round for it); the empty-`.claude/hooks`-after-failed-fetch residue
+  dismissed (transient failure, nothing committed, re-run completes —
+  exactly the class the human stopped); the criterion-5 letter nit stays
+  dismissed, seventh concurring reading. All seven criteria met per the
+  reviewer; the run closes here.
+
 ## Checkpoints
 
 ### Before implementation
@@ -276,3 +288,30 @@ Acceptance criteria:
   default, the human stated no preference.
 
 ## Retro
+
+What got in the way:
+
+- Point-fixes instead of class closure. One defect class — the installer
+  failing or lying on broken pre-existing state — was fixed per instance
+  for most of eight rounds; the structural vet (one path list, lstat
+  semantics, all preconditions before any write) came in pieces and late.
+  The class should have been closed the first time it repeated, in round 3.
+- The stop rule read too leniently. "Findings neither fewer nor smaller in
+  weight or class" let me call 3 → 3 → 4 "converging by class" and keep
+  going; the human's correction: a flat count already is non-convergence,
+  escalate by then. The rule as written invites exactly this
+  self-serving reading.
+- Scope drift through review. Fresh reviewers kept probing ever-unlikelier
+  pre-existing states (directories as files, symlinks); each fix invited
+  the next probe. The "is this worth the run's time?" question belongs to
+  the human at the first exotic finding, not after four of them.
+
+What went well: the grilling turned a vague "README too long" into an
+installer with criteria; tests-first held for every fix (each new case seen
+failing first); the trend table and the two-tier stop rule — both landed
+this same day in issue 0006 — did fire in practice, just later than the
+human wanted.
+
+What should change: filed as issue 0015 — sharpen the stop rule (flat
+trend = non-convergence) and add the scope guard (out-of-scope findings
+escalate instead of being fixed).

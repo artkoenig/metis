@@ -213,7 +213,7 @@ refuses_broken_state() {
   [ $failures -eq $prior ] && pass "$label: clean refusal, nothing committed"
 }
 
-# --- Cases 11-13: broken state at the installed paths — check and abort -----
+# --- Cases 11-15: broken state at the installed paths — check and abort -----
 refuses_broken_state "settings.json a directory" 'mkdir -p "$1/.claude/settings.json"'
 refuses_broken_state "hook path a directory" 'mkdir -p "$1/.claude/hooks/session-start.sh"'
 refuses_broken_state ".claude/hooks a regular file" 'mkdir -p "$1/.claude" && touch "$1/.claude/hooks"'
