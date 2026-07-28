@@ -30,8 +30,15 @@ run_core() {
 }
 
 # Strict oracle: read raw bytes and decode as UTF-8 ourselves — stdin's
-# default surrogateescape handler would wave invalid bytes through.
-json_context() { python3 -c 'import json,sys; print(json.loads(sys.stdin.buffer.read().decode("utf-8"))["hookSpecificOutput"]["additionalContext"])'; }
+# default surrogateescape handler would wave invalid bytes through. Also
+# pin the envelope: without the event name and reloadSkills the injection
+# never arrives, whatever the status says.
+json_context() { python3 -c '
+import json, sys
+h = json.loads(sys.stdin.buffer.read().decode("utf-8"))["hookSpecificOutput"]
+assert h["hookEventName"] == "SessionStart", h
+assert h["reloadSkills"] is True, h
+print(h["additionalContext"])'; }
 
 # --- Case 1: happy path against the real repo -------------------------------
 sc=$(new_scratch)
@@ -101,8 +108,8 @@ echo "$ctx" | grep -q 'skill not reachable: plan' || fail "shadowed skill not na
 echo "$ctx" | grep -q 'agent not reachable: reviewer' || fail "shadowed agent not named: $ctx"
 echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents reachable; commit [0-9a-f]+; FAILED:' \
   || fail "FAILED status lost counts or commit: $ctx"
-skills_total=$(ls -d "$repo_root"/skills/*/ | wc -l)
-agents_total=$(ls -d "$repo_root"/agents/*/ | wc -l)
+set -- "$repo_root"/skills/*/; skills_total=$#
+set -- "$repo_root"/agents/*/; agents_total=$#
 echo "$ctx" | grep -q "$((skills_total - 1)) skills and $((agents_total - 1)) agents reachable" \
   || fail "counts include the unreachable ones: $ctx"
 if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named, FAILED status keeps counts and commit"; fi

@@ -148,6 +148,24 @@ Acceptance criteria:
   visible in the status, and deleting a user's real directory would be
   worse than the debris.
 
+- Review round 6 (fresh context): 0 blocking findings, all four criteria
+  met — the second clean round in a row. 18 of 20 reviewer mutations
+  caught; a 60-run byte fuzz of link names produced 0 JSON failures.
+  Triage of the non-blocking rest: (1, test gap, fixed) the harness never
+  asserted the JSON envelope — the oracle now pins `hookEventName` and
+  `reloadSkills`, and the reviewer's envelope mutation is verified caught;
+  (2, filed) the silently skipped hooksPath step still reports "no errors"
+  — outside this issue's criteria as written, filed as issue 0011;
+  (3, fixed) the harness's `ls | wc -l` counting replaced with glob
+  arithmetic, shellcheck now exit 0 at default severity; (4, recorded) the
+  checkpoint-1 escaping assumption is falsified by the shipped code and
+  stays in the record as history — checkpoint 2 already corrects it.
+- Deviation, recorded: the round-6 fixes touch only the test harness's
+  assertions, not the core script, so no seventh fresh round was run —
+  the fixes were verified mechanically (suite exit 0, envelope mutation
+  caught, shellcheck exit 0). If a rule change comes of this, it belongs
+  in the metis repo, not in this run.
+
 ## Checkpoints
 
 ### Before implementation
