@@ -156,6 +156,20 @@ Acceptance criteria:
   record/wording, not behaviour; the behaviour class itself is now closed
   structurally, not per path.
 
+- Review round 4 (fresh context): facts — 7 cases exit 0, core suite exit 0,
+  `bash -n` exit 0; curl branch proven against a local HTTP server. One
+  minor finding plus two nits: the half-install class survives in the
+  settings-merge step (valid-but-unexpected JSON shapes like
+  `{"hooks": []}` traceback after the hook is written; invalid JSON refuses
+  cleanly but also after the hook write), and the harness never exercises
+  the curl branch. The criterion-5 letter observation was re-examined and
+  re-dismissed a third time, independently. Criteria all met in substance.
+- Second-tier stop signal: criterion 3 hit four rounds in a row by
+  different defects of one class, and the round-3 approach change closed
+  only the git preconditions — the class migrated to the merge step. Per
+  the rulebook, the run stops here and asks the human instead of running
+  another round.
+
 ## Checkpoints
 
 ### Before implementation
