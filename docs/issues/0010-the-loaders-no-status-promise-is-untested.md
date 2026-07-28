@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/17
 ---
 
 # The loader's no-status promise is untested
@@ -98,3 +98,14 @@ Acceptance criteria:
   not the pass lines, carry the criteria; recorded as a judgment call.
 
 ## Retro
+
+Smooth run: implementer, two review rounds, done. Worth keeping: round 1
+caught real branch coverage gaps because the intent's wording ("the
+local-session path", universal) was stronger than the implementer's
+reading (the reviewer's one mutation shape) — precise intent wording paid
+off. The claims-success defect class from 0013 reappeared inside a test
+(a pass line not resting on the failure counter); worth watching whether
+it shows up a third time — that would make it a candidate for a rule or a
+harness convention. The 0015 open thread recurred: a review round was
+again skipped for reporting-only fixes by judgment call; two data points
+now for a "when is the repeat waivable" rule.
