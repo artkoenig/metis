@@ -7,7 +7,8 @@ user-invocable: true
 # Plan
 
 The change spans modules, so the structure deserves a decision before the
-implementer commits to one mid-edit. A page at most, recorded in the tracker.
+implementer commits to one mid-edit. A page at most, recorded in the
+tracker — never a document of its own.
 
 ## How to run it
 
@@ -26,7 +27,7 @@ implementer commits to one mid-edit. A page at most, recorded in the tracker.
 ## What it is not
 
 Not a design review (put the plan through `clean-room` when you are stuck
-or want a second opinion), not a work breakdown (that is a task
-list — its own operation on the `issue` skill), and not a cage: when the
-implementer reports that the plan does not survive contact with the code,
-update the plan — do not defend it.
+or want a second opinion), not a work breakdown (that is a task list — its
+own operation on the `issue` skill), and not a cage: when the implementer
+reports that the plan does not survive contact with the code, update the
+plan — do not defend it.

@@ -107,6 +107,18 @@ Acceptance criteria:
   wider scope, only ones that vanished. The other rewritten boundary
   sentences (no child issues, not a gate, Skill tool not a path, verbatim
   copy) were re-checked for the same class: each keeps its old scope.
+- Review round 4 (fresh context): criteria 2, 3, 6 met. Two findings, both
+  fixed: the plan skill's prohibition "never a document of its own" restored
+  (criterion 1, fourth miss — the class round 3 named, a statement rewritten
+  with reduced scope); the overlong welded line from the round-3 fix in the
+  issue skill split into two plain paragraphs with the pronoun resolved, and
+  the ragged wrap in the plan skill smoothed (criteria 4/5). The round also
+  cleared four other rewrites of the scope-change class and re-traced every
+  earlier removal as surviving elsewhere.
+- Perception: criterion 1 is now missed four rounds in a row, each time by a
+  smaller defect. Per the rulebook the next step is decided with the human:
+  a fifth fresh round, or accept with direct verification of these two
+  one-sentence fixes.
 
 ## Checkpoints
 

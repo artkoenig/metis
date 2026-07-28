@@ -11,9 +11,11 @@ tracker: no database, no script.
 
 This skill owns the file: its name, its frontmatter, its sections, its states.
 Four parts are handed to other owners (listed below); everything else is
-described here and nowhere else — two descriptions of one thing drift apart. A caller hands it **content** and names an **operation** —
-never a path, a filename, a frontmatter key or a heading. That way the file
-can change without any caller changing.
+described here and nowhere else — two descriptions of one thing drift apart.
+
+A caller hands this skill **content** and names an **operation** — never a
+path, a filename, a frontmatter key or a heading. That way the file can
+change without any caller changing.
 
 Subagents follow the same rule: a subagent that needs the tracker gets the
 `Skill` tool and orients here, instead of being handed a path.
