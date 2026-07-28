@@ -29,21 +29,6 @@ what every bootstrapped project does on its next session start; the loader
 itself should almost never need to change again, and the core is never copied
 anywhere.
 
-## The issue template is generated, not copied once
-
-`docs/issues/TEMPLATE.md` is the one file metis writes *into* a project rather
-than linking. The core refreshes it from the clone on every session start, so
-the clone stays authoritative and a project's copy cannot quietly drift — which
-it did, within a day, the one time it was merely copied at tracker setup. It is
-a real file, not a symlink, because it is versioned in the project and read on
-GitHub; a symlink into `~/.claude/metis/…` would be committed and dangle for
-everyone else. The template carries a notice saying so, inside the comment
-block that filing deletes, so it never lands inside an actual issue.
-
-The refresh writes only into an **existing** `docs/issues/` — it never creates
-one. A project without that directory has not opted into the tracker, and
-bootstrapping should not opt it in behind the user's back.
-
 ## When to run it
 
 At the start of a session in any git repository Artjom owns — no remote yet,
