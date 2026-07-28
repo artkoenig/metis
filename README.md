@@ -123,7 +123,10 @@ constitution.
 into operation — for a workflow, the text *is* the product. The
 subagents live in [`agents/`](agents/): `implementer`, `reviewer`,
 `researcher`, and `test-author` (a shelf tool). The shelf skills live in
-[`skills/`](skills/): `grill`, `plan`, and `clean-room`.
+[`skills/`](skills/): `grill`, `plan`, and `clean-room`. One skill there is
+not a shelf tool: [`issue`](skills/issue/SKILL.md) carries the shape of an
+issue file, because that shape is the interface between the agents that read
+and write it.
 
 ## Wiring it in
 

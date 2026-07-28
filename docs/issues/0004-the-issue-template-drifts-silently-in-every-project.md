@@ -27,25 +27,28 @@ per-project hook copy, so a workflow change never reached an already-wired
 project. The template is that bug, surviving in the one file the split does
 not cover.
 
-Wanted: no project has an issue template at all. The rulebook already reaches
-every session; it can carry the section interface itself, and then there is
-nothing to keep in sync. The drift is removed by removing the copy, not by
-maintaining it.
+Wanted: no project has an issue template at all, and the shape is stated in
+exactly one place. Filing an issue is a procedure, not an invariant, and
+procedures in this workflow are skills — which the core already symlinks into
+`~/.claude` alongside the subagents. The delivery problem was solved before it
+was posed; it only had to be recognised as the same problem.
 
 Acceptance criteria:
 
-1. `AGENTS.md` carries the section interface itself — every section name, in
-   order, and what belongs in each — so an agent holding only the rulebook can
-   file a correctly shaped issue.
-2. Nothing writes a template into a project: no step in
+1. The shape of an issue file — its name, its frontmatter, its sections and
+   what belongs in each — is stated in exactly one place, and that place
+   reaches every session without anything being copied into a project.
+2. `AGENTS.md` says an issue is filed through that skill and does not restate
+   the shape. It keeps what the states *mean*; the skill keeps what the file
+   *looks like*.
+3. Nothing writes a template into a project: no step in
    `skills/bootstrap/assets/session-start-core.sh` copies one, and
    `skills/bootstrap/SKILL.md` claims none.
-3. `AGENTS.md` no longer says an issue is shaped by `docs/issues/TEMPLATE.md`.
-   That path names a file inside metis; from a project it resolves to
-   whatever stale copy happens to sit there, or to nothing.
-4. `docs/issues/TEMPLATE.md` stays in metis as the long form for a human
-   reader, and says on its face that the rulebook is the authority — so the
-   two cannot be read as competing sources.
+4. Issue files are named `NNNN-slug.md` — four digits — and the four already
+   filed are renamed, so that a fifth cannot sort ahead of the first.
+5. An agent that has only the skill files a file matching the four that exist:
+   the H1 title, all seven headings including the empty ones, and the Log's
+   ordering are stated, not left to be inferred.
 
 ## Plan
 
@@ -117,6 +120,39 @@ Acceptance criteria:
 - **Projects that already carry a copy** — `tome_of_battle` has one — are not
   touched from here. Removing it is a change in that repository, on its own
   branch.
+- **Superseded again — the rulebook-carries-the-table decision is withdrawn.**
+  It removed the copy but kept the duplication: `AGENTS.md` restated the
+  template instead of replacing it, and the review found the two levels of
+  detail already disagreeing on the day they were created.
+- **Decided: the shape moves into a skill, `skills/issue/`, with the template
+  as its asset.** The human proposed it, and it is better than what it
+  replaces on every count that mattered:
+  - *The delivery mechanism already exists.* The core symlinks `skills/` into
+    `~/.claude` exactly as it does `agents/`. No copy, no refresh step, no
+    cloud/local asymmetry — the failure that killed the first design.
+  - *One source instead of two.* Four of the five findings from review round 2
+    exist only because `AGENTS.md` retold the template; they disappear rather
+    than getting fixed.
+  - *The rulebook gets shorter.* A one-page rulebook that had grown a
+    seven-row table loses it again.
+  - *It is the honest classification.* Filing an issue is a procedure. The
+    invariants are what always holds; a procedure with steps is a skill.
+  - The one thing it costs: skills are invoked, not read. So the bookkeeping
+    rule has to say an issue is filed *through* the skill — this is the one
+    skill that is not a shelf tool.
+- **Rejected: a version field in the template, for migrations.** The human
+  raised it; the argument against is that an issue file is prose read by a
+  language model, not a record parsed by a schema. A schema needs migrations
+  because a missing field breaks it; prose does not — an issue without
+  `## Log` is one filed before `## Log` existed, and the file says so by not
+  having it. A version would duplicate what is already visible and would need
+  its own migration path to maintain. There are nine issue files in existence;
+  a shape change is one pass, not a pipeline. Recorded in the skill together
+  with what would change it: a section that keeps its name and changes its
+  meaning, which an old file does not reveal.
+- **Four digits instead of three**, on the human's instruction: more headroom.
+  The four existing files are renamed in the same change, because `0005` sorts
+  before `001` and a mixed directory loses the ordering the padding is for.
 
 ## Log
 
@@ -165,6 +201,26 @@ Acceptance criteria:
   findings. It is *surprise* in the rulebook's sense: the mechanism behaved
   differently than the decision assumed, and the decision was the thing that
   had to change.
+- **Round 2 built the rulebook-carries-the-table design (`6b2df81`), and the
+  review found five things.** One — `SKILL.md` claiming the loader is the only
+  file metis puts into a project, two sections above a step that installs a
+  second — was a false sentence the change itself added, the same defect class
+  as round 1. Four were consequences of the duplication: the `## Log` ordering
+  rule existed only in the template, the H1 title line was never mentioned in
+  the rulebook, the template pointed at "the same table" while containing no
+  table, and whether an empty optional heading stays was left ambiguous. The
+  reviewer proved the divergence was already present rather than merely
+  possible, on the day it was introduced.
+- **`6b2df81` reverted as `db1ea7c`.** The five findings were not fixed: four
+  of them cease to exist under the skill design, and fixing them would have
+  been work spent on an approach about to be replaced.
+- **Second reversal on this issue, and it is worth naming as such.** Two
+  designs, two refutations, both because the question *who actually needs this
+  file?* was asked late. The perception rules do not fire on it — no failure
+  repeated, nothing regressed — which is itself the observation: neither
+  *repetition* nor *surprise* catches "the problem was framed wrong", and
+  what caught it both times was the human asking a question rather than any
+  rule.
 
 ## Checkpoints
 

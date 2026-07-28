@@ -7,15 +7,17 @@ pr:                 # set when the PR is opened — set status: done with it
 # <title>
 
 <!--
-File this as docs/issues/NNN-slug.md — three digits, zero-padded, the next
-number after the highest already filed, so the directory lists the issues in
-the order they were opened.
+Copied from the `issue` skill. Delete every comment in this file when filing —
+they are instructions for filing, not part of an issue.
 
-The sections below are the interface between the agents that read and write
-this file — their names and order are fixed, their content is free. They fill
-in run order, so the filled sections ARE the progress: Intent only = not
-started; Checkpoint 1 answered = implementing; Checkpoint 2 answered = in
-review; Retro written = finished. Delete these comments when filing.
+Name the file docs/issues/NNNN-slug.md: four digits, zero-padded, the next
+number after the highest already filed, never reused.
+
+Keep every heading below, including the ones you leave empty. Their names and
+order are the interface between the agents that read and write this file; the
+content is yours. They fill in run order, so the filled sections ARE the
+progress: Intent only = not started; Checkpoint 1 answered = implementing;
+Checkpoint 2 answered = in review; Retro written = finished.
 -->
 
 ## Intent
@@ -28,13 +30,14 @@ Acceptance criteria:
 
 ## Plan
 
-<!-- Optional; the `plan` skill writes it when the change spans modules. -->
+<!-- Optional content; the `plan` skill writes it when the change spans
+     modules. Keep the heading either way. -->
 
 ## Tasks
 
-<!-- Optional; only when the change is too big to land whole. Mid-run work
-     that serves the intent joins this list; anything else becomes a new
-     issue file. -->
+<!-- Optional content; only when the change is too big to land whole. Mid-run
+     work that serves the intent joins this list; anything else becomes a new
+     issue file. Keep the heading either way. -->
 
 ## Decisions
 
@@ -45,7 +48,7 @@ Acceptance criteria:
 
 ## Log
 
-<!-- The run as it happened, newest last: observations (repetition / surprise
+<!-- The run as it happened, oldest first: observations (repetition / surprise
      / regression), review rounds and how their findings were triaged,
      attempts that failed and why. This is the section that grows; keeping it
      out of Decisions is what keeps Decisions readable. -->

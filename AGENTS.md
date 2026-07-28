@@ -111,13 +111,12 @@ what the previous round got wrong and finds what it passed over.
 ## Bookkeeping
 
 - One issue = one branch = one pull request. An issue is one markdown file
-  under `docs/issues/`, named `NNN-slug.md` — three digits, zero-padded, the
-  next number after the highest already filed, never reused — so the
-  directory lists the issues in the order they were opened. It is shaped by
-  `docs/issues/TEMPLATE.md`: the sections are the interface between the
-  agents that read and write the file, so their names and order are fixed
-  while their content stays free. No child issues; a large change gets a task
-  list inside its file.
+  under `docs/issues/`, filed through the `issue` skill, which carries its
+  name, its frontmatter and its sections — that shape is the interface
+  between the agents that read and write the file, which is why it is the one
+  skill that is not a shelf tool. The skill reaches every session the way the
+  subagents do; nothing is copied into a project. No child issues; a large
+  change gets a task list inside its file.
 - The frontmatter states the facts: `status` (`backlog | active | waiting |
   done`), `branch`, `pr`. At most one issue is `active` at any moment; any
   number may be `waiting`, parked on a question. `done` is set when the pull
