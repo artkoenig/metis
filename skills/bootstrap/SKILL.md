@@ -75,8 +75,8 @@ Identical → nothing to do. Missing or different → install.
    cloud session only benefits from a hook that was committed before it
    started.
 
-Those two are everything. In particular there is no issue template to
-install: the `issue` skill *is* the tracker and reaches the session through
+The loader and its settings entry are the whole installation. In particular
+there is no issue template to install: the `issue` skill *is* the tracker and reaches the session through
 the same symlinks as the subagents. A project still holding a template from an
 earlier setup can delete it — invoke the `issue` skill to find out which file
 that is. Nothing kept it current, which is exactly why it stopped being a copy.

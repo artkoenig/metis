@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Metis loader — the ONLY file installed per project, kept deliberately thin
-# and stable: its single responsibility is keeping metis current. In a cloud
+# Metis loader — the only script installed per project (plus its settings
+# entry), kept deliberately thin and stable: its single responsibility is
+# keeping metis current. In a cloud
 # session it clones or updates ~/.claude/metis and hands over to the sync
 # logic INSIDE the clone (session-start-core.sh); in a local session it
 # fast-forwards the user's own metis clone (found via the ~/.claude symlinks)

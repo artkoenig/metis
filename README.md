@@ -138,9 +138,9 @@ behind the interface, so it can move without a single other file changing.
 ## Wiring it in
 
 The [`bootstrap`](skills/bootstrap/SKILL.md) skill wires a project's
-cloud sessions to Metis. It installs only a thin, stable *loader* hook
-that clones or updates this repo and then runs the sync logic *from
-the clone*: symlinking `agents/` and `skills/` into `~/.claude`,
+cloud sessions to Metis. It installs a thin, stable *loader* hook (with
+its settings entry) that clones or updates this repo and then runs the
+sync logic *from the clone*: symlinking `agents/` and `skills/` into `~/.claude`,
 making `AGENTS.md` the global instructions, and pointing
 `core.hooksPath` at [`.githooks/`](.githooks/) so a direct push to the
 default branch is refused. Because the logic lives in the clone,

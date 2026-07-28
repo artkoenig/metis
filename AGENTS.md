@@ -84,11 +84,9 @@ because a condition fired:
 - slicing into steps with intermediate commits, when the change is too big to
   land whole — record a task list, no tooling needed
 
-A skill is a class, not a document: you call it through the interface its page
-declares, and what it does inside is its own. Never restate a skill's internals
-anywhere else — a caller that depends on how a skill works instead of on what
-it promises turns every change inside that skill into a search through the
-repository.
+A skill is a class, not a document: call it through the interface its page
+declares and leave the inside to it. A caller that leans on a skill's
+internals turns every change inside that skill into a repository-wide search.
 
 For facts about the codebase — before writing intent, deciding, or planning —
 dispatch the `researcher` subagent rather than assuming.
@@ -118,22 +116,20 @@ what the previous round got wrong and finds what it passed over.
 ## Bookkeeping
 
 - One issue = one branch = one pull request. The tracker is the `issue`
-  skill: every read of and every write to an issue goes through one of its
-  operations. Hand it the content — a decision, an observation, a checkpoint
-  answer, a new state — and name the operation; it knows where that content
-  belongs. Never state a path, a filename or a field yourself, here or
-  anywhere else. Unlike the shelf tools it is not optional: there is no other
-  way to read or write an issue, and that binds subagents too — dispatch one
-  that needs the tracker with the `Skill` tool and let it orient there, never
-  with a path. It reaches every session the way the subagents do, so nothing
-  about the tracker is ever copied into a project. No child issues.
+  skill: reads and writes go through its operations. Hand it the content — a
+  decision, an observation, a checkpoint answer, a new state — and name the
+  operation; it knows where that content belongs, which is knowledge a caller
+  is better off not having. That holds for subagents too: one that needs the
+  tracker gets the `Skill` tool and orients there, rather than a path in its
+  brief. The skill reaches every session the way the subagents do, so nothing
+  about the tracker needs copying into a project. No child issues.
 - A new session orients itself with that skill and reads nothing else to "get
   oriented".
 - `README.md` and the rest of the documentation describe the current state,
   and a change that makes one of them wrong updates it in the same change.
-  They may repeat what a rule or a skill says — they are read by humans, who
-  are not served by a page of pointers — but they never define it, and a
-  disagreement is always the documentation being out of date.
+  Written for humans, they may repeat what a rule or a skill says — a page of
+  pointers serves nobody — but the rule or the skill is where it is defined,
+  so when they disagree, it is the documentation that is out of date.
 - Issues build independently: branch each new one from the current default
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.

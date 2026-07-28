@@ -28,8 +28,8 @@ a document of its own — a page at most.
 ## What it is not
 
 Not a design review (put the plan through `clean-room` if it could be wrong in
-a way you would not notice), not a work breakdown (a large change gets a task
-list, which is its own operation on the `issue` skill), and not a cage — an
-implementer that reports the plan
+a way you would not notice), not a work breakdown (that is a task list — its
+own operation on the `issue` skill, due when the rulebook says so), and not a
+cage — an implementer that reports the plan
 does not survive contact with the code has found something; update the plan,
 do not defend it.

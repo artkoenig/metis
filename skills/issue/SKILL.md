@@ -12,13 +12,14 @@ sections are the interface between the agents that read and write it, which is
 why the shape is fixed and this skill exists.
 
 This skill owns the file whole: its name, its frontmatter, its sections, and
-what the states mean. Nothing else in the workflow describes any of that,
-except the four parts this page hands to a named owner below.
+what the states mean. Where a part is better explained elsewhere, this page
+hands it to one named owner — those four handovers are listed below — and
+everything not handed over is described here and nowhere else.
 
-Subagents are bound by this too, which is why the `reviewer` is granted the
-`Skill` tool: it orients here rather than being handed a path. A caller that
-passes a path has told a subagent where issues live, and that is the leak
-this arrangement exists to close.
+Subagents work the same way, which is why the `reviewer` carries the `Skill`
+tool: it orients here rather than being handed a path. A caller that passes a
+path has told a subagent where issues live, and that is the leak this
+arrangement exists to close.
 
 The rulebook (`AGENTS.md`) owns the run — what happens between the states,
 not what they are.
@@ -27,9 +28,9 @@ not what they are.
 
 Treat this skill as a class. A caller hands it **content** and names the
 **operation**; where that content lands, and in what form, is this skill's
-business. A caller never states a path, a filename, a frontmatter key or a
-heading — a document that does has reached inside, and it will be wrong the
-first time this skill moves.
+business. A caller has no reason to state a path, a filename, a frontmatter
+key or a heading — a document that does has reached inside, and it will be
+wrong the first time this skill moves.
 
 | operation | what the caller hands it |
 | --- | --- |
@@ -43,15 +44,15 @@ first time this skill moves.
 | **set the state** | which state the issue is now in, and the branch or the pull request if one now exists |
 | **orient a session** | nothing. Returns which issue is running and everything the previous session knew about it |
 
-Four of these are delegated whole, and the delegate is then the only document
-that says what the content is. `record a plan` belongs to the `plan` skill.
-Three belong to the rulebook, because each is a rule of the run and not a
-property of the file: the three questions behind `record checkpoint answers`,
-what a retro says, and when a change gets a task list at all.
+Four parts are handed over whole, each to one owner. `record a plan` belongs
+to the `plan` skill. Three belong to the rulebook, because each is a rule of
+the run and not a property of the file: the three questions behind `record
+checkpoint answers`, what a retro says, and when a change gets a task list at
+all. What the delegate says about its part, this page does not repeat.
 
-Everything below this line is behind the interface — the directory, the
-filenames, the template, the sections, and what belongs in each. It changes
-without anything outside `skills/issue/` changing with it.
+Everything else below this line is behind the interface — the directory, the
+filenames, the template, the sections and their contents. It changes without
+anything outside `skills/issue/` changing with it.
 
 ## Filing one
 
@@ -61,10 +62,9 @@ without anything outside `skills/issue/` changing with it.
    opened; unpadded numbers sort as 10, 2, 80.
 2. **Copy `assets/TEMPLATE.md`** to that path. Copy it — do not retype it from
    memory, and do not reorder or rename its sections. The template is a bare
-   skeleton on purpose: the table below is the only description of what goes
-   in each section — except where it hands a section to another skill, which
-   then owns that one alone. Two descriptions of one section is the defect
-   this arrangement exists to prevent.
+   skeleton on purpose: what goes in each section lives in the table below, or
+   with the one owner the table names for it. Two descriptions of one section
+   is the defect this arrangement exists to prevent.
 3. **Delete the comment block** under the title. It is an instruction for
    filing, not part of an issue.
 4. **Write the `## Intent`** and nothing else. The problem and the wanted

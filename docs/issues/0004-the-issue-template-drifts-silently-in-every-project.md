@@ -488,6 +488,37 @@ Acceptance criteria:
   `skills/bootstrap/`, the exclusivity claim in the skill's own opening, the
   task-list condition in `skills/plan/` and in the operation row, and the
   skill count in `README.md`.
+- **Directed by the human, mid-round-8: minimise the rules and leave room
+  for judgment — hold back on hard phrasings.** The original goal of metis,
+  restated at the right moment: this branch had added eight absolute
+  sentences ("never", "nothing else", "the only", "there is no other way"),
+  and rounds 5 through 8 each caught at least one of them being false. An
+  absolute is a claim about the whole repository, and eight rounds show I
+  cannot keep such claims true. Rewritten as intent plus reason — "hand over
+  content, not places; the skill knows where it belongs" — which guides the
+  same behaviour and survives the edge case a prohibition trips over.
+- **Review round 8 — five findings, all of them absolute sentences
+  contradicted somewhere.** Criteria 1, 3, 4, 5, 6 met. The reviewer also
+  confirmed the round-7 repairs held: the reviewer's `Skill` grant is real
+  and reachable, and "nothing about the tracker is copied into a project"
+  holds against the scripts. Triage:
+  - *"Everything below this line is behind the interface … what belongs in
+    each"* contradicted the four delegations six lines above. Fixed: the
+    handover paragraph and the interface paragraph now state one model.
+  - *`skills/plan/` still stated the task-list condition* — round 7's fix had
+    removed the location and left the condition, which was the finding.
+    Fixed: it now defers the condition to the rulebook.
+  - *The filing step's exception said "to another skill"* — three of the four
+    delegates are the rulebook, which is not a skill. Fixed: names no kind,
+    just "the one owner the table names".
+  - *"Those two are everything"* pinned the installed-file count at two while
+    the loader's own header said "the ONLY file" and the README said "only a
+    loader". Fixed in all three: loader script plus settings entry, stated
+    the same way everywhere. The loader edit is the one script change on
+    this branch; `bash -n` exit 0, and the dogfooded copy re-synced verbatim.
+  - *"Never restate a skill's internals anywhere else"* collided with the
+    documentation rule that allows the README to repeat. Fixed by scoping it
+    to callers, which is what it meant.
 - **Hard stop, moved to round 7.** It was set for round 6, and round 6 ran
   against a design the human replaced mid-round. Re-arming it rather than
   spending it is the honest call — but it does not reset: if criterion 2
