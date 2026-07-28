@@ -40,6 +40,24 @@ Acceptance criteria:
 
 ## Log
 
+- Implementer done (tests first): step 4 no longer skips silently — each
+  skip reason logs a line, and the self-check verifies the push guard's
+  END STATE (what `core.hooksPath` in the project says, not whether the
+  step ran). The status always carries a guard segment: `push guard set`,
+  `push guard n/a (project not a git repo)` (non-error — nothing can be
+  pushed from there), or `push guard not set (...)` which joins the errors
+  and makes the status FAILED. Harness: happy path asserts the guard
+  segment and the actual config value; new case 6 (non-git project — the
+  reproduced skip) and case 7 (clone without `.githooks`: FAILED,
+  hooksPath untouched); case 5's pass guard converted to the
+  failure-counter pattern. Fail-first proven: 5 fails against the
+  unmodified core, including the reproduced "no guard line + no errors".
+  Facts: core suite 7 cases exit 0, install 15 exit 0, loader 5 exit 0,
+  `bash -n` exit 0, no shellcheck on this machine. Implementer's defaults:
+  non-git project = non-error `n/a`, missing `.githooks` in a git project
+  = FAILED, plus a `hooksPath mismatch` end-state branch. Noted out of
+  scope: cases 2–4 still use the weaker grep-style pass guard.
+
 ## Checkpoints
 
 ### Before implementation
