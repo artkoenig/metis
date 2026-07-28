@@ -94,3 +94,8 @@ genuinely unclear.
 This repo dogfoods the same hook in its own `.claude/hooks/`, copied from
 `assets/`. When the asset changes, update every copy by re-running this
 skill — don't hand-edit.
+
+The core has a test harness: `assets/test-session-start-core.sh`. It runs
+the core against scratch directories only (never the real `~/.claude` or the
+real repo's git config) and exits 0 when all cases pass. Run it before
+landing any change to the core; it is the suite for this script.
