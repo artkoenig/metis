@@ -37,7 +37,7 @@ json_context() { python3 -c 'import json,sys; print(json.loads(sys.stdin.buffer.
 sc=$(new_scratch)
 out=$(run_core "$core" "$sc")
 ctx=$(echo "$out" | json_context) || { fail "happy path: JSON invalid: $out"; ctx=""; }
-echo "$ctx" | grep -Eq 'self-check: [1-9][0-9]* skills and [1-9][0-9]* agents linked' \
+echo "$ctx" | grep -Eq 'self-check: [1-9][0-9]* skills and [1-9][0-9]* agents reachable' \
   || fail "happy path: no counts in status: $ctx"
 echo "$ctx" | grep -q 'no errors' || fail "happy path: not clean: $ctx"
 head=$(git -C "$repo_root" rev-parse --short HEAD)
@@ -99,8 +99,12 @@ out=$(run_core "$core" "$sc")
 ctx=$(echo "$out" | json_context) || { fail "shadowed path: JSON invalid: $out"; ctx=""; }
 echo "$ctx" | grep -q 'skill not reachable: plan' || fail "shadowed skill not named: $ctx"
 echo "$ctx" | grep -q 'agent not reachable: reviewer' || fail "shadowed agent not named: $ctx"
-echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents linked; commit [0-9a-f]+; FAILED:' \
+echo "$ctx" | grep -Eq '^Metis self-check: [0-9]+ skills and [0-9]+ agents reachable; commit [0-9a-f]+; FAILED:' \
   || fail "FAILED status lost counts or commit: $ctx"
+skills_total=$(ls -d "$repo_root"/skills/*/ | wc -l)
+agents_total=$(ls -d "$repo_root"/agents/*/ | wc -l)
+echo "$ctx" | grep -q "$((skills_total - 1)) skills and $((agents_total - 1)) agents reachable" \
+  || fail "counts include the unreachable ones: $ctx"
 if echo "$ctx" | grep -q 'skill not reachable: plan'; then pass "shadowed paths named, FAILED status keeps counts and commit"; fi
 
 echo

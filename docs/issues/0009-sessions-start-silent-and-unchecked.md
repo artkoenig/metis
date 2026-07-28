@@ -133,6 +133,21 @@ Acceptance criteria:
   reviewer also ran six mutations — five caught; the sixth (FAILED loses
   counts) is the gap case 5 now covers.
 
+- Review round 5 (fresh context): 0 blocking findings, all four criteria
+  met. The reviewer ran 10 mutations of the core (all caught by the
+  harness) and a 40-run fuzz of the escaping class over random link-name
+  bytes (0 failures) — the whitelist closes the class by construction.
+  Three non-blocking findings, triaged: (1, low, fixed) the status counted
+  link attempts, not reachable links — the counts now come from the
+  end-state check itself ("N skills and M agents reachable"), and harness
+  case 5 pins the exact arithmetic (totals minus the shadowed ones).
+  (2, low, filed) the loader's no-status promise is untested — a future
+  loader edit could falsify AGENTS.md and README silently; filed as issue
+  0010, backlog. (3, informational, accepted) a shadowing directory leaves
+  a stray nested link behind; no criterion covers cleanup, the failure is
+  visible in the status, and deleting a user's real directory would be
+  worse than the debris.
+
 ## Checkpoints
 
 ### Before implementation

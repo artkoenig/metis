@@ -92,6 +92,7 @@ errors=""
 [ "$skills_n" -gt 0 ] || errors="${errors} no skills linked;"
 [ "$agents_n" -gt 0 ] || errors="${errors} no agents linked;"
 [ "$rulebook" = synced ] || errors="${errors} rulebook missing from clone;"
+skills_ok=0
 for dir in "${repo_dir}/skills"/*/; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
@@ -99,8 +100,11 @@ for dir in "${repo_dir}/skills"/*/; do
     errors="${errors} skill without SKILL.md: ${name};"
   elif [ "$(readlink "${skills_dir}/${name}" 2>/dev/null)" != "${dir%/}" ]; then
     errors="${errors} skill not reachable: ${name};"
+  else
+    skills_ok=$((skills_ok + 1))
   fi
 done
+agents_ok=0
 for dir in "${repo_dir}/agents"/*/; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
@@ -108,13 +112,17 @@ for dir in "${repo_dir}/agents"/*/; do
     errors="${errors} agent without agent.md: ${name};"
   elif [ "$(readlink "${agents_dir}/${name}" 2>/dev/null)" != "${dir%/}" ]; then
     errors="${errors} agent not reachable: ${name};"
+  else
+    agents_ok=$((agents_ok + 1))
   fi
 done
 for link in "$skills_dir"/* "$agents_dir"/*; do
   [ -L "$link" ] && [ ! -e "$link" ] && errors="${errors} broken link: $(basename "$link");"
 done
 commit=$(git -C "$repo_dir" rev-parse --short HEAD 2>/dev/null || echo unknown)
-status="Metis self-check: ${skills_n} skills and ${agents_n} agents linked; commit ${commit};"
+# The counts state what a session can rely on — links that resolve at their
+# expected path — not how many ln calls ran.
+status="Metis self-check: ${skills_ok} skills and ${agents_ok} agents reachable; commit ${commit};"
 if [ -z "$errors" ]; then
   status="${status} no errors."
 else
