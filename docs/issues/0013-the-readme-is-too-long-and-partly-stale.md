@@ -67,6 +67,15 @@ Acceptance criteria:
   Done in this run; issue 0014 narrows to the untested curl branch.
   Source: the human's instruction ("kaputte json ist out of scope, prüfen
   und abbrechen").
+- Course correction from the human, during round 8: a flat trend
+  (3 → 3 → 4) already is non-convergence — the stop should have come by
+  round 3, not after round 4; and the broken-state chase (unlikely
+  filesystem states) went beyond the issue's original scope — such
+  findings warrant early escalation, not rounds of fixes. Consequence for
+  this run: round 8 findings about unlikely pre-existing state are
+  dismissed or filed, not fixed; only a finding in the original scope
+  (README wrong, happy path broken) still gets a fix. The rule-change
+  proposal goes into the retro. Source: the human's instruction.
 
 - Direct use is the installation's main path: the loader keeps the
   `artkoenig/metis` URL, every session pulls that repo's current state. A
