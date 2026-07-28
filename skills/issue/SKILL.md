@@ -10,8 +10,8 @@ One issue is one markdown file under `docs/issues/`. That file is the whole
 tracker: no database, no script.
 
 This skill owns the file: its name, its frontmatter, its sections, its states.
-What it owns is described here and nowhere else — two descriptions of one
-thing drift apart. A caller hands it **content** and names an **operation** —
+Four parts are handed to other owners (listed below); everything else is
+described here and nowhere else — two descriptions of one thing drift apart. A caller hands it **content** and names an **operation** —
 never a path, a filename, a frontmatter key or a heading. That way the file
 can change without any caller changing.
 

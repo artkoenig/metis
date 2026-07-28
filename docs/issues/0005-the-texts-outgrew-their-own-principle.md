@@ -98,6 +98,15 @@ Acceptance criteria:
   fixes: AGENTS.md 939, README.md 1017, implementer 429, researcher 214,
   reviewer 509, test-author 292, bootstrap 650, clean-room 287, grill 274,
   issue 1121, plan 269 — still every changed file shorter than before.
+- Review round 3 (fresh context): criteria 2-6 met, one finding on
+  criterion 1: the boundary restored in round 2 was rewritten too wide —
+  "what it owns is described here and nowhere else" claimed the delegated
+  parts too, contradicting the plan skill. Fixed: the sentence now excepts
+  the four handed-over parts. The reviewer also named the method gap — the
+  deleted-line sweep cannot catch statements that were rewritten with a
+  wider scope, only ones that vanished. The other rewritten boundary
+  sentences (no child issues, not a gate, Skill tool not a path, verbatim
+  copy) were re-checked for the same class: each keeps its old scope.
 
 ## Checkpoints
 
