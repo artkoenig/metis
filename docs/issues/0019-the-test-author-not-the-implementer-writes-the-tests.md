@@ -79,6 +79,19 @@ Acceptance criteria:
 - The branch also carries one cherry-picked bookkeeping commit from the
   merged predecessor (62690a0, a 0016 retro correction that had missed
   PR 21) — no file this issue's criteria are about.
+- Suite fact for the record (ran before the commit, now recorded per
+  review finding 1): `bash test.sh`, 30 cases across the three suites,
+  exit 0 — regression check only; no case covers these prose files.
+- Review round 1 (fresh context, real `reviewer` subagent — registered
+  in this session, unlike yesterday —, diff 535087a..HEAD): all four
+  criteria met; 3 findings, none violating a criterion. Triage:
+  (1) suite pass missing from the record → recorded above, record-only;
+  (2) implementer description self-contradictory on the nothing-to-run
+  path ("and the tests exist") → fixed: "and the test-author's tests
+  exist — or the change has nothing to run"; (3) informational, the
+  cherry-picked 0016 retro commit, disclosed to the human as a note.
+  Fix 2 touches a file the criteria are about → repeat round due, no
+  waiver. Trend: AC1-4 each 0, no-criterion 3 → total 3.
 
 ## Checkpoints
 

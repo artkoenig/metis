@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Implements exactly ONE change from a written intent — goal, acceptance criteria, scope. It plans, then implements until the test-author's failing tests pass and the whole suite is green — or, for a change with nothing to run, reports that fact instead. Dispatch it once the intent is recorded in the tracker and the tests exist. Do NOT use it to decide what to build, to review its own result, to edit the tests it was handed, or to write to the tracker.
+description: Implements exactly ONE change from a written intent — goal, acceptance criteria, scope. It plans, then implements until the test-author's failing tests pass and the whole suite is green — or, for a change with nothing to run, reports that fact instead. Dispatch it once the intent is recorded in the tracker and the test-author's tests exist — or the change has nothing to run. Do NOT use it to decide what to build, to review its own result, to edit the tests it was handed, or to write to the tracker.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch
 color: blue
 ---
