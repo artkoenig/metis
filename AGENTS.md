@@ -130,7 +130,10 @@ visible, not asked for.
 
 After a fix, the review repeats from a fresh context, against the whole
 intent — not only against the findings it fixed. A round that re-checks its
-predecessor's list inherits its blind spots.
+predecessor's list inherits its blind spots. One waiver: when the fix
+touches only the tracker record — no file the criteria are about — the
+repeat may be skipped; record the waiver in the issue like any judgment
+call.
 
 ## Bookkeeping
 

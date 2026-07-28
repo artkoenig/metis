@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/offene-issues-3hysxf
 pr:
 ---
 
@@ -47,13 +47,30 @@ Acceptance criteria:
 
 ## Log
 
+- One sentence added to the rulebook's repeat-round paragraph
+  (`AGENTS.md`, "The run"): the waiver, its boundary (no file the
+  criteria are about), and the duty to record its use (criteria 1 and 2).
+- `README.md` checked whole: it summarises the reviewer step but never
+  repeats the repeat-round rule, so criterion 3 needs no edit.
+- Nothing to run for this change — a rulebook edit produces no facts by
+  exit code; per invariant 3 the fresh-context review is the only check
+  it gets. (`bash test.sh` still exits 0, but that covers the harnesses,
+  not this text.)
+
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — one sentence in the rulebook's
+  repeat-round paragraph stating the waiver and the duty to record its
+  use. A fourth data point landed this very run: 0017's round-1 finding
+  was record-only and the repeat was skipped as a judgment call.
+- What surprised me? `README.md` does not repeat the repeat-round rule
+  anywhere (checked its whole text) — criterion 3 is satisfied by
+  showing nothing needs changing.
+- What am I assuming without having verified it? That "the tracker
+  record" is unambiguous enough — it means the issue file the `issue`
+  skill owns, and nothing else.
 
 ### Before the PR
 
