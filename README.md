@@ -57,11 +57,12 @@ Five things are always true, whatever process judgment picks:
 
 1. The intent (acceptance criteria) is written before implementation.
 2. The tests for those criteria are written before the code, and seen to
-   fail.
+   fail — a change with nothing to run has none to write, and says so.
 3. A fresh context reviews the diff against the intent before the PR, with a
    concrete reproduction per finding.
 4. The suite and static analysis pass, shown by exit code and reported as
-   the command and what it covered — never as "it's green".
+   the command and what it covered — never as "it's green". When a suite
+   or an analysis does not exist, that absence is the reported fact.
 5. Observations, decisions, surprises and checkpoint answers are recorded as
    they happen — they must survive the session that made them.
 

@@ -17,7 +17,9 @@ need. This holds for the work and for these texts alike.
 1. **Intent first.** Acceptance criteria are recorded in the issue before any
    production code is written.
 2. **Tests before code.** The implementer writes the tests for the criteria
-   first and sees them fail, then makes them pass.
+   first and sees them fail, then makes them pass. A change with nothing to
+   run — the class invariant 3 names — has no tests to write; saying so is
+   how this invariant holds for it.
 3. **A fresh context reviews the result.** Before the PR, a reviewer that has
    seen only the diff and the written intent checks one against the other. A
    finding without a concrete reproduction is not a finding. For a change
@@ -27,7 +29,9 @@ need. This holds for the work and for these texts alike.
 4. **Facts by exit code.** The suite and static analysis pass before the PR,
    shown by exit codes. Report the command and what it covered, never the
    adjective alone: "`npm test -- src/api`, 104 cases, exit 0", not "the
-   suite is green". An exit code says only what that command checked.
+   suite is green". An exit code says only what that command checked. When
+   no suite or no analysis exists, that absence is the fact: report it with
+   the commands that established it.
 5. **The record survives the session.** Record decisions, assumptions,
    surprises and checkpoint answers through the `issue` skill as they happen.
    The next session resumes from the tracker, not from a conversation that no

@@ -1,7 +1,7 @@
 ---
-status: backlog
-branch:
-pr:
+status: done
+branch: claude/new-session-xeyz5n
+pr: https://github.com/artkoenig/metis/pull/14
 ---
 
 # Invariants 2 and 4 have nothing to bite on without a suite
@@ -44,20 +44,67 @@ Acceptance criteria:
 
 ## Decisions
 
+- The change touches `AGENTS.md` (invariants 2 and 4), `README.md` (its
+  invariants list) and `agents/implementer/agent.md` (description, steps 3
+  and 4, report format). The reviewer already has the honest path and is the
+  wording model; the `test-author` is a shelf tool dispatched only when tests
+  exist to write, so it stays untouched. Source: grep over the repo for
+  suite/exit-code language (excluding past issue records).
+- Implemented in the main context, not through the `implementer`: prose
+  only, no production code, no tests; the fresh-context review still runs.
+  Source: the precedent recorded in issues 0005 and 0006.
+- Branch is `claude/new-session-xeyz5n`, restarted from `origin/main` after
+  PR 13 merged. Default, unanswered — the session may not push elsewhere.
+
 ## Log
+
+- Review round 1 (fresh context): no suite and no static analysis cover this
+  change (established with commands; the bootstrap core test, 5 cases, exit
+  0, does not touch it), so the reading is the only check. Criteria 1 and 3
+  met; one finding on criterion 2, fixed: the new clauses said "no suite
+  *and* no analysis", the reviewer's model says "*or*" — a project with a
+  suite but no linter would again have had no honest path, the issue's own
+  gap one level down. All four places now speak per item, disjunctively.
+  Trend: round 1 = 1 finding (criterion 1: 0, criterion 2: 1,
+  criterion 3: 0).
+- Review round 2 (fresh context): all three criteria met, zero findings; the
+  round could not reconstruct round 1's counterexample against the new text
+  and confirmed the wording now mirrors the reviewer's verbatim. One
+  below-threshold observation dismissed with reason: the implementer's
+  description line names only the all-or-nothing case, but the steps and
+  report format govern behaviour and handle the mixed case — no input
+  without an honest path could be named. Trend: 1 → 0.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — a clause in invariants 2 and 4, the
+  README kept in step, and the implementer given the reviewer's honest path;
+  no new machinery.
+- What surprised me? Nothing; the grep matched the intent's own list of
+  gaps exactly.
+- What am I assuming without having verified it? That the reviewer's wording
+  ("report that as the fact and show how you looked") is the right model to
+  mirror — chosen for consistency, not confirmed with the human.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — all three criteria confirmed met by
+  two fresh-context rounds; the accommodation stayed clauses in existing
+  rules.
+- What surprised me? My first wording reproduced the issue's own gap one
+  level down ("and" where "or" was needed) — the exact failure mode the
+  intent describes is easy to re-create while fixing it.
+- What am I assuming without having verified it? That "show how you looked"
+  is enough guidance for an implementer to establish absence convincingly —
+  no run has exercised the new path yet.
 
 ## Retro
+
+- What got in the way: my own first wording — while closing the "no honest
+  path" gap I re-created it one level down with a conjunction. The reviewer's
+  reproduction (suite exists, no linter) caught it in one round; the fresh
+  context earned its keep on a four-clause prose change.
+- What should change: nothing in the rules. The trend table (1 → 0) and the
+  two-round rhythm worked as designed; the fix landed without a third round.
