@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: 0009-greet-and-self-check
-pr:
+pr: https://github.com/artkoenig/metis/pull/12
 ---
 
 # Sessions start silent and unchecked
@@ -203,3 +203,28 @@ Acceptance criteria:
   should then be revisited.
 
 ## Retro
+
+**One defect class carried the whole run.** Six rounds, and every blocking
+finding was the same class in a new shape: the self-check passing a broken
+outcome (empty clone, quote, shadowing directory, non-UTF-8 byte). The class
+died only when the fix changed altitude twice — verify the end state instead
+of enumerating failure modes, whitelist instead of blacklist. Worth carrying
+forward: when a check keeps failing in new shapes, the check's *form* is
+wrong, not its coverage; patching instances converges never.
+
+**The harness earned its place the moment it existed.** Metis had no suite
+by design; this change created the first one because the change itself was
+executable. Reviewers then used it as a mutation target — 30+ mutants across
+three rounds, and each escaped mutant pointed at a missing assertion. A test
+suite that reviewers attack is worth far more than one that only runs.
+
+**A committed test's oracle is part of the test.** Two round-6 escapes were
+not missing cases but a lenient oracle (surrogateescape decoding, unpinned
+envelope). Asserting through the same parser the consumer uses is the
+lesson.
+
+**The one thing no exit code can reach is recorded, not hidden.** Whether
+`additionalContext` actually arrives is decided by the first cloud session
+on the merged state. If the greeting carries a status, the loop closes; if
+not, the fallback path is the honest failure mode and the rule needs a
+revisit.
