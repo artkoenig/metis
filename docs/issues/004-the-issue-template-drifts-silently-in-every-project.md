@@ -27,22 +27,25 @@ per-project hook copy, so a workflow change never reached an already-wired
 project. The template is that bug, surviving in the one file the split does
 not cover.
 
-Wanted: a project's issue template cannot silently disagree with the metis
-one. Whether that means it stops being a copy, or the copy is compared and
-reported on, is open.
+Wanted: no project has an issue template at all. The rulebook already reaches
+every session; it can carry the section interface itself, and then there is
+nothing to keep in sync. The drift is removed by removing the copy, not by
+maintaining it.
 
 Acceptance criteria:
 
-1. A project whose template has diverged from metis's cannot go unnoticed:
-   either the copy is eliminated, or the divergence is surfaced at session
-   start.
-2. A project that was bootstrapped earlier and never runs the bootstrap skill
-   again still ends up with the current template — the fix reaches projects
-   that nobody touches.
-3. `AGENTS.md` still describes an issue as shaped by
-   `docs/issues/TEMPLATE.md`, or says accurately what replaced that path.
-4. `skills/bootstrap/SKILL.md` states how the template is kept current, next
-   to what it already says about the loader and the core.
+1. `AGENTS.md` carries the section interface itself — every section name, in
+   order, and what belongs in each — so an agent holding only the rulebook can
+   file a correctly shaped issue.
+2. Nothing writes a template into a project: no step in
+   `skills/bootstrap/assets/session-start-core.sh` copies one, and
+   `skills/bootstrap/SKILL.md` claims none.
+3. `AGENTS.md` no longer says an issue is shaped by `docs/issues/TEMPLATE.md`.
+   That path names a file inside metis; from a project it resolves to
+   whatever stale copy happens to sit there, or to nothing.
+4. `docs/issues/TEMPLATE.md` stays in metis as the long form for a human
+   reader, and says on its face that the rulebook is the authority — so the
+   two cannot be read as competing sources.
 
 ## Plan
 
@@ -84,6 +87,36 @@ Acceptance criteria:
 - **Only for projects that already use the tracker.** The refresh writes into
   an existing `docs/issues/`; it never creates one. A project without a
   tracker has not opted in, and metis does not conjure a directory into it.
+- **Superseded — the refresh decision above is withdrawn, and with it the
+  criteria it was built against.** Kept in the record because the reasoning
+  is what got refuted, and a decision log that only shows what survived
+  teaches nothing. What refuted it:
+  - *The human's question:* why is the template copied at all? Nothing in the
+    original reasoning answers it. It weighed symlink against compare-and-warn
+    and never asked whether a project needs the file.
+  - *The grep:* `TEMPLATE.md` is named by the core script, by `SKILL.md`, by
+    `AGENTS.md` and by itself. No agent definition and no skill reads it. Its
+    only reader is the caller, which already holds the rulebook.
+  - *The review:* the mechanism did not even work. The core runs only in cloud
+    sessions — the loader exits before `exec bash "$core"` on every local path
+    — so a project opened only locally never gets the refresh and is never
+    told it drifted. Criteria 1 and 2 were unmet, and two sentences the change
+    added to `AGENTS.md` and `SKILL.md` were false.
+  - *The argument I gave for keeping it in the project* was that a human reads
+    it on GitHub. The rulebook is not in the project either, and nobody has
+    missed it.
+- **Decided instead: `AGENTS.md` carries the section interface, and nothing is
+  delivered anywhere.** The interface is seven section names with a line each
+  — a table in a page that already reaches every session. `TEMPLATE.md` stays
+  in metis as the long form and names the rulebook as the authority.
+- **The residual risk, stated rather than denied:** the interface now exists
+  in two levels of detail, and they can diverge. The difference from what was
+  reverted is that both live in this repository, one diff shows both, and a
+  reviewer reads both. It is the same failure mode one storey up and far
+  cheaper.
+- **Projects that already carry a copy** — `tome_of_battle` has one — are not
+  touched from here. Removing it is a change in that repository, on its own
+  branch.
 
 ## Log
 
@@ -102,6 +135,36 @@ Acceptance criteria:
 - Both corrected and the same agent re-briefed rather than re-dispatched, so
   what it had already established about the predecessor repo is not paid for
   twice.
+- **Implementation landed as `8c2e230`.** The implementer reported `done` and
+  flagged one thing rather than fixing it: in a metis cloud session the
+  refresh overwrites the checkout's template from the clone of pushed `main`.
+  It also caught a defect of its own making before shipping it — a self-copy
+  would have aborted the core under `set -euo pipefail` before it emits the
+  hook JSON, costing the session `reloadSkills` — and it refused to let a
+  vacuous assertion pass, building the naive `mkdir -p` variant to watch its
+  own check go red first.
+- **Review round 1, triage.** Four findings; the reviewer re-ran the harness
+  itself, and additionally verified against the pre-change baseline and
+  against the naive variant instead of trusting the implementer's account.
+  - *Blocking:* the core never runs in a local session, so the refresh reaches
+    cloud sessions only. Criteria 1 and 2 unmet, and two sentences the change
+    added were false. Reproduced with a drifted template: loader exit 0, no
+    core in the log, template unchanged.
+  - *Confirmed, no criterion violated:* the metis self-overwrite. The
+    reviewer's verdict — outside the criteria, but it inverts the premise the
+    decision rests on, because in metis the clone is the older thing.
+  - *Confirmed:* the `-ef` guard is dead on every path where the core runs.
+  - *Low:* `SKILL.md` misdescribed which comment block holds the notice.
+  - The harness itself had the blind spot that let the first finding through:
+    it invokes the core directly and never the loader, so nothing in it
+    asserts that a session ever reaches the refresh.
+- **`8c2e230` reverted as `5a47ad5`** — the four implementation files back to
+  `cc315b5`, this issue file kept. Three of the four findings exist only
+  because a copy exists; the fix is to stop copying, not to patch the copier.
+- **Perception rule note:** this is not *repetition* — one attempt, one set of
+  findings. It is *surprise* in the rulebook's sense: the mechanism behaved
+  differently than the decision assumed, and the decision was the thing that
+  had to change.
 
 ## Checkpoints
 

@@ -113,11 +113,25 @@ what the previous round got wrong and finds what it passed over.
 - One issue = one branch = one pull request. An issue is one markdown file
   under `docs/issues/`, named `NNN-slug.md` — three digits, zero-padded, the
   next number after the highest already filed, never reused — so the
-  directory lists the issues in the order they were opened. It is shaped by
-  `docs/issues/TEMPLATE.md`: the sections are the interface between the
-  agents that read and write the file, so their names and order are fixed
-  while their content stays free. No child issues; a large change gets a task
-  list inside its file.
+  directory lists the issues in the order they were opened. No child issues;
+  a large change gets a task list inside its file.
+- Its sections are the interface between the agents that read and write it:
+  names and order fixed, content free. They fill in run order, so the filled
+  sections are the progress.
+
+  | section | what belongs in it |
+  | --- | --- |
+  | `## Intent` | the problem and the wanted observable behaviour, solution-free — then the numbered acceptance criteria, each one falsifiable |
+  | `## Plan` | optional: modules touched, boundaries, shared contracts, when the change spans several |
+  | `## Tasks` | optional: only when the change is too big to land whole |
+  | `## Decisions` | what was settled and why, each with the source it derives from; defaults marked as defaults; questions to the human and their answers |
+  | `## Log` | the run as it happened: observations, review rounds and how their findings were triaged, attempts that failed |
+  | `## Checkpoints` | `### Before implementation` and `### Before the PR`, the three questions answered under each |
+  | `## Retro` | after the PR: what got in the way, what should change |
+
+  This page is the authority. `docs/issues/TEMPLATE.md` in the metis
+  repository says the same at length, for a human to read — nothing copies it
+  into a project, and a project needs no template of its own.
 - The frontmatter states the facts: `status` (`backlog | active | waiting |
   done`), `branch`, `pr`. At most one issue is `active` at any moment; any
   number may be `waiting`, parked on a question. `done` is set when the pull
