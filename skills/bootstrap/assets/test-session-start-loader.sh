@@ -87,5 +87,32 @@ else
   pass "clone updated: reload signal only, no status"
 fi
 
+# --- Case 4: clone has uncommitted changes — fd 3 must stay silent ----------
+prior=$failures
+sc=$(new_scratch)
+make_local_clone "$sc"
+echo "dirty" >> "$sc/clone/skills/demo/SKILL.md"
+out=$(run_loader_local "$sc") || fail "dirty: loader exited non-zero"
+[ -z "$out" ] || fail "dirty: local session got hook output: $out"
+grep -q "uncommitted changes" "$sc/proj/.claude/hooks/session-start.log" \
+  || fail "dirty: loader did not reach the dirty-clone branch (log)"
+[ $failures -eq $prior ] && pass "dirty clone: silent"
+
+# --- Case 5: pull fails (diverged) — fd 3 must stay silent ------------------
+prior=$failures
+sc=$(new_scratch)
+make_local_clone "$sc"
+echo "theirs" >> "$sc/upstream/metis/skills/demo/SKILL.md"
+git -C "$sc/upstream/metis" add -A
+git_commit "$sc/upstream/metis" -m "theirs"
+echo "ours" > "$sc/clone/skills/demo/local.md"
+git -C "$sc/clone" add -A
+git_commit "$sc/clone" -m "ours"
+out=$(run_loader_local "$sc") || fail "diverged: loader exited non-zero"
+[ -z "$out" ] || fail "diverged: local session got hook output: $out"
+grep -q "Pull failed" "$sc/proj/.claude/hooks/session-start.log" \
+  || fail "diverged: loader did not reach the pull-failed branch (log)"
+[ $failures -eq $prior ] && pass "pull failed (diverged): silent"
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

@@ -54,6 +54,14 @@ Acceptance criteria:
   `additionalContext`). Out-of-scope note filed by the implementer: no
   runner invokes the three harnesses together.
 
+- Review round 1 (fresh context): facts — loader harness 3 cases exit 0,
+  core 5 exit 0, install 15 exit 0, `bash -n` exit 0, no shellcheck. One
+  finding, in scope, fixed: the dirty-clone and pull-failed branches of
+  the local path could emit `additionalContext` and stay green (both
+  mutants reproduced green by the reviewer). Cases 4–5 added, both
+  mutants seen red first (exit 1), pristine loader 5 cases exit 0, all
+  other suites unchanged green. Trend: 1.
+
 ## Checkpoints
 
 ### Before implementation
