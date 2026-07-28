@@ -95,9 +95,9 @@ Acceptance criteria:
   deleted lines) and each checked against the new corpus; everything
   remaining is rationale or survives elsewhere.
 - Stale word counts in an earlier Log entry, current after the round-2
-  fixes: AGENTS.md 946, README.md 1017, implementer 429, researcher 214,
+  fixes: AGENTS.md 939, README.md 1017, implementer 429, researcher 214,
   reviewer 509, test-author 292, bootstrap 650, clean-room 287, grill 274,
-  issue 1119, plan 269 — still every changed file shorter than before.
+  issue 1121, plan 269 — still every changed file shorter than before.
 
 ## Checkpoints
 
