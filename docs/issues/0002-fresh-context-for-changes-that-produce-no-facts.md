@@ -73,6 +73,15 @@ Acceptance criteria:
   check is reported as what it is, not withheld (finding 4). Filed for
   later: finding 1 — invariants 2 and 4 have nothing to bite on for a
   change without a suite — as issue 0007.
+- Review round 2 (fresh context): criteria 1 and 2 met, criterion 3 met in
+  letter but incomplete in meaning. Three findings, all the same class -
+  places still demanding an unestablishable fact - and all fixed: the
+  reviewer's check 3 (tests against the intent) got the honest no-tests
+  path; "a skill" in the rulebook's class list became "a skill's page" (the
+  bootstrap skill ships shell scripts, and those do produce facts); the
+  reviewer's frontmatter description now carries the rule its body states.
+  The round independently confirmed round 1's triage, including the
+  "not a judgment call" decision and the filing of 0007.
 
 ## Checkpoints
 
