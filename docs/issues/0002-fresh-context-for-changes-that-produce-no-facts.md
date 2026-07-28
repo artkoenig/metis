@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: 0002-fresh-context-no-facts
-pr:
+pr: https://github.com/artkoenig/metis/pull/10
 ---
 
 # The fresh context is not optional for a change that produces no facts
@@ -123,3 +123,12 @@ Acceptance criteria:
   yet bless that silence.
 
 ## Retro
+
+The run confirmed 0005's lesson from the other side: a rule about a class
+has to be checked everywhere the class occurs, not only where the criteria
+point. Three of the criteria's three targets were met in round 1, yet the
+class survived in four unnamed places. Worth considering for the review
+habit: when a change introduces or names a class, the first round should
+sweep the corpus for the class, not only the named files. The
+round-findings table (issue 0006) would have shown the convergence shape
+here clearly: 4 → 3 → 3 by count, but strictly shrinking in weight.
