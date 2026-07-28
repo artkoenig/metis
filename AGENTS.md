@@ -68,6 +68,10 @@ behaviour, a public contract, the data model, or the dependency footprint —
 parks the work. Anything else: pick a sensible default, record it as a
 default, and carry on.
 
+**How to talk to them.** Informally — in a language that marks the
+distinction, use the informal form (German: du). Short, simple words. Cut
+every reply to the essentials: the finding, the decision, the change.
+
 ## The shelf
 
 Heavier tools exist. Reach for one when the change warrants it, never because
