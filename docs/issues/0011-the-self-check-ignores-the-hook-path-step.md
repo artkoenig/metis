@@ -58,6 +58,25 @@ Acceptance criteria:
   = FAILED, plus a `hooksPath mismatch` end-state branch. Noted out of
   scope: cases 2–4 still use the weaker grep-style pass guard.
 
+- Review round 1 (fresh context): facts — install 15 exit 0, core 7 exit
+  0, loader 5 exit 0, `bash -n` exit 0, no shellcheck; real repo config
+  verified untouched after the harness runs. Both criteria met: mutants
+  for the reverted core (5 red, incl. the recorded reproduction), for a
+  lying "set" without the config write (3 red — the tests check end
+  state), and for wrong non-git semantics (1 red). Two minors:
+  1. The `hooksPath mismatch` branch is unverified (a mutant making it
+     lie stays green). Dismissed with reason: the branch is
+     defense-in-depth for a state unreachable in a real run — a failed
+     `git config` write aborts under `set -e` before the self-check —
+     and a test would need to fake git's config reads (env injection).
+     Exactly the exotic-state class run 0013 taught us not to chase.
+  2. No criterion: the core harness inherits TMPDIR — with TMPDIR inside
+     a git repo, case 6 false-fails and the core writes `core.hooksPath`
+     into the enclosing repo, contradicting the harness header.
+     Pre-existing pattern, outside this intent — filed as issue 0017
+     (default recorded; the human can redirect).
+  No fix applied, so no repeat round is owed. Trend: 2.
+
 ## Checkpoints
 
 ### Before implementation
@@ -73,8 +92,15 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the status names the push guard's
+  state in every branch, the reproduced skip is a harness case, and the
+  reviewer's mutants confirm the tests check the end state.
+- What surprised me? The reviewer found the harness sandbox leaks under a
+  git TMPDIR — a hermeticity hole the scratch-dir convention was meant to
+  close (filed as 0017).
+- What am I assuming without having verified it? That dismissing the
+  untested `hooksPath mismatch` branch is safe: it is unreachable without
+  faking git, and the run-0013 lesson says not to chase such states —
+  recorded as the dismissal reason, not verified by a test.
 
 ## Retro
