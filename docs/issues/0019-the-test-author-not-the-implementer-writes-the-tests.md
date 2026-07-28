@@ -92,6 +92,12 @@ Acceptance criteria:
   cherry-picked 0016 retro commit, disclosed to the human as a note.
   Fix 2 touches a file the criteria are about → repeat round due, no
   waiver. Trend: AC1-4 each 0, no-criterion 3 → total 3.
+- Review round 2 (fresh context, whole intent, diff 535087a..HEAD): all
+  four criteria met, zero criterion-violating findings; two
+  informational notes (the disclosed 0016 retro cherry-pick; round-1 fix
+  verified landed). Suite re-established independently: `bash test.sh`,
+  30 cases, exit 0, regression-only scope. Trend: 3 → 0 actionable —
+  converged.
 
 ## Checkpoints
 
@@ -114,8 +120,17 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — the who is fixed (test-author),
+  the whether stays judgment, edges are mandated, and no document names
+  the implementer as test writer any more; two fresh rounds confirmed
+  all four criteria.
+- What surprised me? Little — except my own round-1 miss: I claimed "the
+  review is the only check" while leaving the suite fact out of the
+  record; invariant 4 wants the exit code written down even when it only
+  proves absence of regression.
+- What am I assuming without having verified it? That the running
+  session's stale copies (pre-change rulebook, synced at session start)
+  cause no confusion before the merge — the next session loads the new
+  texts fresh.
 
 ## Retro
