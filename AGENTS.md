@@ -1,95 +1,89 @@
 # Metis
 
-You run the work. Your judgment picks the process; this page states the few
-things that always hold. When judgment and this page conflict, this page wins —
-and the retro is where you say so.
+You run the work. Your judgment picks the process; this page lists the few
+rules that always hold. When the two conflict, this page wins — and the retro
+is where you say so.
 
-**The principle: judgment for process, mechanics for facts.** How much
-specification a change needs, whether to plan first, whether to slice the work,
-which tools to reach for — your call, every time. A fact — "the suite is
-green", "the linter passes" — comes from a tool's exit code, never from
-your impression.
+**Judgment for process, mechanics for facts.** How much specification a change
+needs, whether to plan first, whether to slice the work, which tools to use —
+your call, every time. A fact — "the suite is green", "the linter passes" —
+comes from a tool's exit code, never from your impression.
+
+**Simplicity is the top rule.** Few rules, plain words, no machinery without a
+need. This holds for the work and for these texts alike.
 
 ## The invariants
 
-1. **Intent before implementation.** Acceptance criteria are written in the
-   issue before any production code is written. No recorded intent, no build.
-2. **Tests before code.** The implementer writes the tests that express the
-   acceptance criteria first, and sees them fail, before making them pass.
+1. **Intent first.** Acceptance criteria are recorded in the issue before any
+   production code is written.
+2. **Tests before code.** The implementer writes the tests for the criteria
+   first and sees them fail, then makes them pass.
 3. **A fresh context reviews the result.** Before the PR, a reviewer that has
-   seen only the diff and the written intent checks one against the other.
-   Every finding carries a concrete reproduction, or it is not a finding.
-4. **Facts by exit code.** The suite is green and static analysis passes,
-   established by tools, before the PR. Report the command and what it
-   covered, never the adjective alone: "`npm test -- src/api`, 104 cases,
-   exit 0", not "the suite is green". Exit 0 is a fact about a command; it
-   says nothing about what that command declined to assert.
-5. **The record survives the session.** Decisions, assumptions, surprises, and
-   checkpoint answers are recorded through the `issue` skill as they happen —
-   the next session resumes from the tracker, not from a conversation that no
+   seen only the diff and the written intent checks one against the other. A
+   finding without a concrete reproduction is not a finding.
+4. **Facts by exit code.** The suite and static analysis pass before the PR,
+   shown by exit codes. Report the command and what it covered, never the
+   adjective alone: "`npm test -- src/api`, 104 cases, exit 0", not "the
+   suite is green". An exit code says only what that command checked.
+5. **The record survives the session.** Record decisions, assumptions,
+   surprises and checkpoint answers through the `issue` skill as they happen.
+   The next session resumes from the tracker, not from a conversation that no
    longer exists.
 
 ## Correcting course
 
-**Perception, not budgets.** Stop when you notice any of these, whatever an
-attempt count would say:
+**Stop on these signals, whatever a counter would say:**
 
 - *Repetition* — the same failure twice in a row, or the same acceptance
-  criterion missed twice, whatever the finding. Identity of the finding is
-  not the test: two unlike defects against one criterion are still a pattern.
+  criterion missed twice, even by two different defects.
 - *Surprise* — something behaves differently than the documentation claims.
 - *Regression* — a fix breaks something that worked.
 
 Record the observation, then decide: change approach, or ask.
 
-**Two checkpoints.** Answer three questions and record them, once before
-implementation starts and once before the PR: *Does this match what was asked?
-What surprised me? What am I assuming without having verified it?* Thirty
-seconds of honesty at the two points where correction is still cheap.
+**Two checkpoints.** Once before implementation and once before the PR, record
+the answers to three questions: *Does this match what was asked? What
+surprised me? What am I assuming without having verified it?* Not a gate —
+a cheap moment to correct course.
 
-**Retro after every run.** After the PR, record a few sentences:
-what got in the way, what should change. If a rule on this page misfired,
-propose the fix in the `metis` repository — the workflow corrects itself
-through these, not through an eval suite.
+**Retro after every run.** After the PR, record what got in the way and what
+should change. If a rule on this page misfired, propose the fix in the
+`metis` repository — this is how the workflow corrects itself.
 
 ## The human
 
 Three steering points, nothing else:
 
-1. They approve the acceptance criteria — but only when you find the idea
+1. They approve the acceptance criteria — only when you find the idea
    genuinely unclear. A clear request needs no ceremony.
-2. They decide anything irreversible or outward-facing: data migrations, cost,
-   public contracts, licences, anything touching production.
+2. They decide anything irreversible or outward-facing: data migrations,
+   cost, public contracts, licences, anything touching production.
 3. They merge the pull request.
 
 If the human is away: a material question — one that changes user-visible
 behaviour, a public contract, the data model, or the dependency footprint —
 parks the work. Anything else: pick a sensible default, record it as a
-decision that says *it was a default*, and carry on.
+default, and carry on.
 
 ## The shelf
 
-Heavier tools exist and you reach for them when the change warrants it — never
-because a condition fired:
+Heavier tools exist. Reach for one when the change warrants it, never because
+a condition fired:
 
-- a full requirements-grilling session (the `grill` skill), when the idea is
-  genuinely vague
-- an explicit architecture plan (the `plan` skill), when the change spans
-  modules
-- a clean-room second opinion (the `clean-room` skill), when the design could
-  be wrong in a way you would not notice
-- a separate test author (the `test-author` subagent), when a test could pass
-  without exercising the behaviour — assertions about absence, about
-  invariance, about something *not* happening
-- slicing into steps with intermediate commits, when the change is too big to
-  land whole — record a task list, no tooling needed
+- the `grill` skill, when the idea is too vague to write criteria
+- the `plan` skill, when the change spans modules
+- the `clean-room` skill, when you are stuck or want a second opinion
+- the `test-author` subagent, when a test could pass without exercising the
+  behaviour — criteria about absence, invariance, something *not* happening
+- a task list with intermediate commits, when the change is too big to land
+  whole
 
-A skill is a class, not a document: call it through the interface its page
-declares and leave the inside to it. A caller that leans on a skill's
-internals turns every change inside that skill into a repository-wide search.
+A skill is like a class: use the interface its page declares and leave the
+inside alone. A caller that relies on a skill's internals breaks the first
+time those internals change.
 
-For facts about the codebase — before writing intent, deciding, or planning —
-dispatch the `researcher` subagent rather than assuming.
+For facts about the codebase — before writing intent, deciding or planning —
+dispatch the `researcher` subagent instead of assuming.
 
 ## The run
 
@@ -109,29 +103,27 @@ reason, or file for later. A finding without a reproduction is dismissed by
 default.
 
 After a fix, the review repeats from a fresh context, against the whole
-intent — not against the finding it fixed. A round that only re-checks its
-predecessor's findings inherits its blind spots; an independent one refutes
-what the previous round got wrong and finds what it passed over.
+intent — not only against the findings it fixed. A round that re-checks its
+predecessor's list inherits its blind spots.
 
 ## Bookkeeping
 
-- One issue = one branch = one pull request. The tracker is the `issue`
-  skill: reads and writes go through its operations. Hand it the content — a
-  decision, an observation, a checkpoint answer, a new state — and name the
-  operation; it knows where that content belongs, which is knowledge a caller
-  is better off not having. That holds for subagents too: one that needs the
-  tracker gets the `Skill` tool and orients there, rather than a path in its
-  brief. The skill reaches every session the way the subagents do, so nothing
-  about the tracker needs copying into a project. No child issues.
-- A new session orients itself with that skill and reads nothing else to "get
-  oriented".
-- `README.md` and the rest of the documentation describe the current state,
-  and a change that makes one of them wrong updates it in the same change.
-  Written for humans, they may repeat what a rule or a skill says — a page of
-  pointers serves nobody — but the rule or the skill is where it is defined,
-  so when they disagree, it is the documentation that is out of date.
-- Issues build independently: branch each new one from the current default
-  branch, never on top of an unmerged predecessor.
+- One issue = one branch = one pull request. No child issues — a change too
+  big to land whole gets a task list instead.
+- The tracker is the `issue` skill. Hand it the content — a decision, an
+  observation, a new state — and name the operation; where that lands is the
+  skill's business. This holds for subagents too: one that needs the tracker
+  gets the `Skill` tool, not a path.
+- A new session orients itself through that skill and reads nothing else to
+  get oriented.
+- `README.md` and the rest of the documentation mirror the current state. A
+  change that makes a document wrong updates it in the same change. Documents
+  may repeat what a rule or skill says, but the rule or skill is where it is
+  defined — when they disagree, the document is out of date.
+- Branch each new issue from the current default branch, never on top of an
+  unmerged predecessor.
+- Everything checked in — texts, commit messages — and every pull request is
+  written in English.
 - Never push to the default branch; it advances only through a merged PR.
 - Work found mid-run that serves the current intent joins the task list.
   Anything else is filed through the `issue` skill and waits for its own run.
