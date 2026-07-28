@@ -107,5 +107,22 @@ else
 fi
 [ $failures -eq $prior ] && pass "second run: no failure, no duplicate, no commit"
 
+# --- Case 4: re-run beside unrelated staged work succeeds, leaves it staged -
+prior=$failures
+repo=$(new_repo)
+run_install "$repo" || fail "staged: first run failed: $(cat "$repo.log")"
+echo x >"$repo/unrelated.txt"
+git -C "$repo" add unrelated.txt
+commits_before=$(git -C "$repo" rev-list --count HEAD)
+if run_install "$repo"; then
+  commits_after=$(git -C "$repo" rev-list --count HEAD)
+  [ "$commits_before" = "$commits_after" ] || fail "staged: re-run made a commit"
+  git -C "$repo" diff --cached --name-only | grep -qx 'unrelated.txt' \
+    || fail "staged: user's staged file no longer staged"
+else
+  fail "staged: re-run exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "re-run beside unrelated staged work: no failure, work stays staged"
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

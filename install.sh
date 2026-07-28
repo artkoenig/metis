@@ -74,7 +74,7 @@ PYEOF
 # 3. The commit — a cloud session only benefits from a hook that was
 # committed before it started.
 git add .claude/hooks/session-start.sh .claude/settings.json
-if git diff --cached --quiet; then
+if git diff --cached --quiet -- .claude/hooks/session-start.sh .claude/settings.json; then
   echo "Nothing to commit; already installed."
 else
   git commit --quiet -m "Install metis session-start hook" \

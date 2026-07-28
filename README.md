@@ -20,7 +20,8 @@ Five invariants hold for every change, whatever process judgment picks:
 2. The tests for those criteria are written first and seen to fail; a change
    with nothing to run says so instead.
 3. A fresh context reviews the diff against the written intent before the
-   PR, with a concrete reproduction per finding.
+   PR, with a concrete reproduction per finding — for a change with nothing
+   to run, this review is the only check it gets.
 4. The suite and static analysis pass, shown by exit code; where nothing
    exists to run, that absence is the reported fact.
 5. Decisions, surprises and checkpoint answers are recorded in the issue as

@@ -100,6 +100,20 @@ Acceptance criteria:
   run diagram with checkpoints and retro, retro-as-self-correction focus)
   and "Installing it" (the one-liner plus the fork sentence).
 
+- Review round 1 (fresh context): facts — `test-install.sh` 3 cases exit 0,
+  core suite 5 cases exit 0, `bash -n` exit 0, no shellcheck here. Three
+  findings, all fixed: (1) moderate, criterion 3 — the re-run failed beside
+  unrelated staged work because the staged-changes check was unscoped; test
+  case 4 written first and seen failing, then the check scoped to the two
+  installed paths, 4 cases exit 0. (2) minor, criterion 6 — README's
+  invariant 3 still omitted the no-facts clause; added. (3) nit, no
+  criterion — the loader asset's header named only the bootstrap skill as
+  installer; now names install.sh too (the bookkeeping rule pulled it into
+  this change). Reviewer's verifiability note accepted: the live raw URL
+  cannot be exercised before merge; the pipe mechanism is what the harness
+  proves. Trend: round 1 = 3 findings (criterion 3: 1, criterion 6: 1,
+  no criterion: 1).
+
 ## Checkpoints
 
 ### Before implementation
