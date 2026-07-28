@@ -14,6 +14,15 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 loader="${1:-$here/session-start.sh}"
 base=$(mktemp -d)
 trap 'rm -rf "$base"' EXIT
+
+# A scratch base inside a git repository breaks the sandbox: a case
+# without a repo of its own would see that repo, and git could write into
+# it. Refuse before running any case.
+if git -C "$base" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "test-session-start-loader.sh: refusing to run: $base is inside a git repository (check TMPDIR)" >&2
+  exit 1
+fi
+
 failures=0
 
 fail() { echo "FAIL: $1"; failures=$((failures + 1)); }

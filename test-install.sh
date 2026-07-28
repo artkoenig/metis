@@ -12,6 +12,15 @@ hook_cmd='$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh'
 base=$(mktemp -d)
 http_pid=""
 trap '[ -n "$http_pid" ] && kill "$http_pid" 2>/dev/null; rm -rf "$base"' EXIT
+
+# A scratch base inside a git repository breaks the sandbox: a case
+# without a repo of its own would see that repo, and git could write into
+# it. Refuse before running any case.
+if git -C "$base" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "test-install.sh: refusing to run: $base is inside a git repository (check TMPDIR)" >&2
+  exit 1
+fi
+
 failures=0
 
 fail() { echo "FAIL: $1"; failures=$((failures + 1)); }

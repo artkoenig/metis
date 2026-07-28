@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 branch: claude/offene-issues-3hysxf
 pr:
 ---
@@ -44,6 +44,10 @@ Acceptance criteria:
   exits non-zero. (default, unanswered)
 - Runner named `test.sh` at the repo root, beside `test-install.sh`.
   (default, unanswered)
+- Because the three issues share one branch and one PR, `done` is set when
+  this issue's work is complete on the branch; the `pr:` field is filled
+  in when the shared PR opens. Otherwise two issues would be `active` at
+  once, which the state rules forbid. (default, unanswered)
 
 ## Log
 
