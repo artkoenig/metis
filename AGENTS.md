@@ -124,8 +124,9 @@ predecessor's list inherits its blind spots.
 - A new session orients itself through that skill and reads nothing else to
   get oriented.
 - A session opens by greeting the human and reporting the self-check: the
-  status line the SessionStart hook put into the context. No status there
-  means the hook did not finish — then establish the facts yourself (do the
+  status line the SessionStart hook put into the context. Local sessions
+  never get one; a cloud session without one had a hook failure. Either
+  way, when there is no status, establish the facts yourself (do the
   `~/.claude` skill and agent links resolve? how does
   `.claude/hooks/session-start.log` end?) and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A

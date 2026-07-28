@@ -74,6 +74,19 @@ Acceptance criteria:
   run created: in a cloud session the directories are fresh anyway, and a
   broken skill link is worth reporting whoever made it.
 
+- Review round 1 (fresh context): 3 findings, all blocking, all fixed.
+  (1) The self-check passed an empty clone — it only looked at dangling
+  links; now every outcome is verified (something linked, no clone dir
+  silently skipped, rulebook synced, links resolve) and the FAILED status
+  keeps counts and commit. (2) A quote in a broken link's name broke the
+  JSON; the status line is now stripped of quotes and backslashes before
+  embedding. (3) "No status means the hook did not finish" was false for
+  local sessions, which never get one by design; `AGENTS.md` and
+  `README.md` now say so. The reviewer also noted the red/green run left
+  nothing committed — the harness now lives at
+  `skills/bootstrap/assets/test-session-start-core.sh` (4 cases, including
+  the reviewer's reproductions; scratch dirs only) and exits 0.
+
 ## Checkpoints
 
 ### Before implementation

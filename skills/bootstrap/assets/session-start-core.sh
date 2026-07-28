@@ -63,6 +63,9 @@ done
 if [ -f "${repo_dir}/AGENTS.md" ]; then
   cp "${repo_dir}/AGENTS.md" "${CLAUDE_HOME}/CLAUDE.md"
   echo "Synced AGENTS.md -> ~/.claude/CLAUDE.md"
+  rulebook=synced
+else
+  rulebook=missing
 fi
 
 # 4. Guard the default branch: point the project's git hooks at metis's
@@ -77,21 +80,35 @@ fi
 
 echo "✅ Metis core finished successfully."
 
-# 5. Self-check: every link we created must resolve. The status line below
-#    reaches the session's context; a crashed run never gets here, so a
-#    missing status IS the failure signal — the rulebook says what a session
-#    does then. Keep the line free of quotes and backslashes: it is embedded
-#    in JSON unescaped.
-broken=""
+# 5. Self-check. Not just the links: an empty or half-cloned repo links
+#    nothing and would otherwise pass, so every outcome above is verified —
+#    something was linked, no clone directory was silently skipped, the
+#    rulebook really got synced, and every link resolves. A crashed run
+#    never reaches this line, so a missing status is itself a failure
+#    signal; the rulebook says what a session does then.
+errors=""
+[ "$skills_n" -gt 0 ] || errors="${errors} no skills linked;"
+[ "$agents_n" -gt 0 ] || errors="${errors} no agents linked;"
+[ "$rulebook" = synced ] || errors="${errors} rulebook missing from clone;"
+for dir in "${repo_dir}/skills"/*/; do
+  [ -d "$dir" ] && [ ! -f "${dir}SKILL.md" ] && errors="${errors} skill without SKILL.md: $(basename "$dir");"
+done
+for dir in "${repo_dir}/agents"/*/; do
+  [ -d "$dir" ] && [ ! -f "${dir}agent.md" ] && errors="${errors} agent without agent.md: $(basename "$dir");"
+done
 for link in "$skills_dir"/* "$agents_dir"/*; do
-  [ -L "$link" ] && [ ! -e "$link" ] && broken="${broken} $(basename "$link")"
+  [ -L "$link" ] && [ ! -e "$link" ] && errors="${errors} broken link: $(basename "$link");"
 done
 commit=$(git -C "$repo_dir" rev-parse --short HEAD 2>/dev/null || echo unknown)
-if [ -z "$broken" ]; then
-  status="Metis self-check: ${skills_n} skills and ${agents_n} agents linked, all resolving; rulebook synced; commit ${commit}; no errors."
+status="Metis self-check: ${skills_n} skills and ${agents_n} agents linked; commit ${commit};"
+if [ -z "$errors" ]; then
+  status="${status} no errors."
 else
-  status="Metis self-check FAILED: broken links:${broken}. See .claude/hooks/session-start.log."
+  status="${status} FAILED:${errors} see .claude/hooks/session-start.log."
 fi
+# Filenames can carry anything; strip what would break the JSON embedding.
+status=${status//\\/}
+status=${status//\"/}
 echo "$status"
 
 # 6. Tell Claude Code to reload skills, and hand the status to the session.
