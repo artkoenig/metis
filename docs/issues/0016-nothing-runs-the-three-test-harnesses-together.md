@@ -58,6 +58,12 @@ Acceptance criteria:
 - `skills/bootstrap/SKILL.md` "Keeping it honest" now names the runner
   (criterion 2). `README.md` enumerates no suites, so nothing to keep in
   step there.
+- Review round 1 (fresh context, diff 630832b..HEAD): zero findings. The
+  reviewer reproduced both command facts independently, plus two more
+  (two sabotaged suites → "FAIL: 2 of 3", missing suite file → exit 127
+  counts as failure), and confirmed the no-fourth-suite assumption by
+  `find`. Both criteria met. Trend: round 1 = 0 findings — converged,
+  no repeat round due.
 
 ## Checkpoints
 
@@ -76,8 +82,14 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — `bash test.sh` exit 0 runs all
+  three suites; sabotage makes it exit 1; the skill names the runner.
+  Review round 1 found nothing.
+- What surprised me? The metis reviewer subagent is not a registered
+  subagent type in this cloud harness; the review ran as a
+  general-purpose agent given the reviewer definition verbatim — same
+  fresh context, recorded here so the next session knows.
+- What am I assuming without having verified it? That the human accepts
+  one PR for three issues (recorded as a default in Decisions).
 
 ## Retro
