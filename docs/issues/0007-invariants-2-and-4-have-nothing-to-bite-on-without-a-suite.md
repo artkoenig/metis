@@ -1,0 +1,63 @@
+---
+status: backlog
+branch:
+pr:
+---
+
+# Invariants 2 and 4 have nothing to bite on without a suite
+
+## Intent
+
+Invariant 3 now names the class of change that produces no facts by exit
+code — the rulebook, an agent definition, a skill's page, documentation. But
+invariants 2 ("tests before code") and 4 ("the suite and static analysis
+pass before the PR") still speak as if every change had a suite. For that
+class an agent has no honest path: it must either declare the invariants met
+with no exit code and no tests, or record two violated invariants. The
+implementer definition has the same gap — its steps make a green suite by
+exit code a precondition of reporting `done`, so for a prose change it
+cannot honestly report `done` at all.
+
+The run of issue 0002 hit this itself: a rulebook change with no tests and
+no suite, landed by declaring nothing about invariants 2 and 4 because
+nothing true could be declared.
+
+Wanted behaviour: an agent landing a change with no tests and no suite to
+run can satisfy every invariant honestly — the rules say what those two
+invariants mean for this class, instead of silently not applying.
+
+Acceptance criteria:
+
+1. `AGENTS.md` invariants 2 and 4 account for a change with nothing to run:
+   an agent landing such a change can state, truthfully, that every
+   invariant holds. `README.md`'s restatement of the invariants stays in
+   step.
+2. The `implementer` definition gives the same honest path to `done` that
+   the `reviewer` definition already has — reporting that nothing exists to
+   run, with how it looked, instead of a green suite.
+3. No new machinery: the accommodation is a clause in the existing rules,
+   not a new process or a new class system.
+
+## Plan
+
+## Tasks
+
+## Decisions
+
+## Log
+
+## Checkpoints
+
+### Before implementation
+
+- Does this match what was asked?
+- What surprised me?
+- What am I assuming without having verified it?
+
+### Before the PR
+
+- Does this match what was asked?
+- What surprised me?
+- What am I assuming without having verified it?
+
+## Retro

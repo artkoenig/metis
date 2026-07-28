@@ -102,8 +102,8 @@ judgment, never fired by a condition.
 ```
 idea → issue with acceptance criteria   (grilling only if unclear)
      → implementer                      (plans, writes tests first, implements)
-     → reviewer                         (suite green + diff vs. intent, with a
-                                         concrete reproduction per finding)
+     → reviewer                         (facts by exit code + diff vs. intent,
+                                         a concrete reproduction per finding)
      → commit, push, PR → human merges
 ```
 
