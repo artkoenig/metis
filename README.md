@@ -73,7 +73,8 @@ Everything else is a tool on the shelf, not a step in a pipeline.
 ## Correcting course while running
 
 **Perception rules instead of budgets.** No attempt counters, no round
-limits. One rule: when you notice *repetition* (the same failure twice),
+limits. One rule: when you notice *repetition* (the same failure twice, or
+the same acceptance criterion missed twice, whatever the finding),
 *surprise* (something behaves differently than the docs claim), or
 *regression* (a fix breaks something that worked) — stop, write the
 observation into the issue, and decide: change approach, or ask.

@@ -1,6 +1,6 @@
 ---
 name: test-author
-description: A shelf tool, not a default — writes the failing tests for a change BEFORE it is implemented and WITHOUT ever seeing an implementation. Reach for it when independent verification is worth a dispatch — high-stakes or subtle acceptance criteria where the implementer verifying its own reading of the intent is not enough. Writes test files only, proves every test fails, and never makes one pass.
+description: A shelf tool, not a default — writes the failing tests for a change BEFORE it is implemented and WITHOUT ever seeing an implementation. Reach for it when a test could pass without exercising the behaviour — criteria about absence, about invariance, about something not happening — or wherever the implementer verifying its own reading of the intent is not enough. Writes test files only, proves every test fails, and never makes one pass.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch
 color: green
 ---

@@ -20,7 +20,10 @@ your impression.
    seen only the diff and the written intent checks one against the other.
    Every finding carries a concrete reproduction, or it is not a finding.
 4. **Facts by exit code.** The suite is green and static analysis passes,
-   established by tools, before the PR.
+   established by tools, before the PR. Report the command and what it
+   covered, never the adjective alone: "`npm test -- src/api`, 104 cases,
+   exit 0", not "the suite is green". Exit 0 is a fact about a command; it
+   says nothing about what that command declined to assert.
 5. **The record survives the session.** Decisions, assumptions, surprises, and
    checkpoint answers go into the issue file as they happen — the next session
    resumes from the issue, not from a conversation that no longer exists.
@@ -30,7 +33,9 @@ your impression.
 **Perception, not budgets.** Stop when you notice any of these, whatever an
 attempt count would say:
 
-- *Repetition* — the same failure twice in a row.
+- *Repetition* — the same failure twice in a row, or the same acceptance
+  criterion missed twice, whatever the finding. Identity of the finding is
+  not the test: two unlike defects against one criterion are still a pattern.
 - *Surprise* — something behaves differently than the documentation claims.
 - *Regression* — a fix breaks something that worked.
 
@@ -72,8 +77,9 @@ because a condition fired:
   modules
 - a clean-room second opinion (the `clean-room` skill), when the design could
   be wrong in a way you would not notice
-- a separate test author (the `test-author` subagent), when independent
-  verification is worth a dispatch
+- a separate test author (the `test-author` subagent), when a test could pass
+  without exercising the behaviour — assertions about absence, about
+  invariance, about something *not* happening
 - slicing into steps with intermediate commits, when the change is too big to
   land whole — a task list in the issue file, no tooling needed
 
@@ -97,13 +103,21 @@ Triage the reviewer's findings by judgment: fix now, dismiss with a recorded
 reason, or file for later. A finding without a reproduction is dismissed by
 default.
 
+After a fix, the review repeats from a fresh context, against the whole
+intent — not against the finding it fixed. A round that only re-checks its
+predecessor's findings inherits its blind spots; an independent one refutes
+what the previous round got wrong and finds what it passed over.
+
 ## Bookkeeping
 
 - One issue = one branch = one pull request. An issue is one markdown file
-  under `docs/issues/`, shaped by `docs/issues/TEMPLATE.md` — the sections
-  are the interface between the agents that read and write the file, so
-  their names and order are fixed while their content stays free. No child
-  issues; a large change gets a task list inside its file.
+  under `docs/issues/`, named `NNN-slug.md` — three digits, zero-padded, the
+  next number after the highest already filed, never reused — so the
+  directory lists the issues in the order they were opened. It is shaped by
+  `docs/issues/TEMPLATE.md`: the sections are the interface between the
+  agents that read and write the file, so their names and order are fixed
+  while their content stays free. No child issues; a large change gets a task
+  list inside its file.
 - The frontmatter states the facts: `status` (`backlog | active | waiting |
   done`), `branch`, `pr`. At most one issue is `active` at any moment; any
   number may be `waiting` — with `pr` set it awaits the human's merge,
@@ -111,8 +125,8 @@ default.
 - A new session orients itself from the tracker alone: scan the `status`
   lines under `docs/issues/`, open the `active` file (or the one matching
   the current branch), and read it whole — the filled sections are the
-  progress, and the Decisions and Checkpoint entries are what the previous
-  session knew. Read nothing else to "get oriented".
+  progress, and the Decisions, Log and Checkpoint entries are what the
+  previous session knew. Read nothing else to "get oriented".
 - Issues build independently: branch each new one from the current default
   branch, never on top of an unmerged predecessor.
 - Never push to the default branch; it advances only through a merged PR.

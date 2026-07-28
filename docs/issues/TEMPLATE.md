@@ -7,6 +7,10 @@ pr:                 # set as soon as one is open
 # <title>
 
 <!--
+File this as docs/issues/NNN-slug.md — three digits, zero-padded, the next
+number after the highest already filed, so the directory lists the issues in
+the order they were opened.
+
 The sections below are the interface between the agents that read and write
 this file — their names and order are fixed, their content is free. They fill
 in run order, so the filled sections ARE the progress: Intent only = not
@@ -34,9 +38,17 @@ Acceptance criteria:
 
 ## Decisions
 
-<!-- One line each, as they happen: decisions with their source, defaults
-     marked as defaults, observations (repetition / surprise / regression),
-     questions to the human and their answers. -->
+<!-- What was settled and why — one entry each, with the source it derives
+     from. Defaults marked as defaults. Questions to the human and their
+     answers. Nothing else: a reader arriving mid-run must reach the
+     load-bearing decisions without wading through the run's process. -->
+
+## Log
+
+<!-- The run as it happened, newest last: observations (repetition / surprise
+     / regression), review rounds and how their findings were triaged,
+     attempts that failed and why. This is the section that grows; keeping it
+     out of Decisions is what keeps Decisions readable. -->
 
 ## Checkpoints
 

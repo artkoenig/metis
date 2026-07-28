@@ -16,11 +16,19 @@ Your prompt contains the repository root, the path to the issue file (the
 written intent: acceptance criteria, decisions, checkpoint answers), and the
 diff range (merge base to HEAD). Read the issue file first, then the diff.
 
+If you are reviewing a change that a previous round already found fault with,
+review the whole intent again — not only what that round raised. You are not
+its successor checking its list; you are an independent reading, and part of
+your value is refuting what it got wrong and catching what it passed over.
+
 ## What you check
 
 1. **Facts, by exit code.** Run the test suite and the project's static
-   analysis. Report each as green or red with the exact command and exit code.
-   A red fact is your first finding and outranks everything else.
+   analysis. Report each with the exact command, what it covered, and the
+   exit code — "`npm test -- src/api`, 104 cases, exit 0", never "green" on
+   its own. If the run skipped, filtered or excluded anything, say so: an
+   exit code is a fact about a command, not about the software. A red fact
+   is your first finding and outranks everything else.
 2. **The diff against the intent.** Every acceptance criterion: met, or not?
    Anything in the diff that no criterion asked for? Logic that meets the
    letter of a criterion but not its meaning?
@@ -42,8 +50,9 @@ reproduction by default, so writing one wastes both your time and theirs.
 
 ## Your report
 
-Open with the two facts: suite green/red, static analysis green/red, each with
-command and exit code. Then the findings, most severe first, each with its
+Open with the two facts: the suite and the static analysis, each as the exact
+command, what it covered, and the exit code. Then the findings, most severe
+first, each with its
 reproduction and the criterion or behaviour it violates. Then one line per
 acceptance criterion: met / not met / not verifiable and why.
 
