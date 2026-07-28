@@ -35,13 +35,19 @@ was posed; it only had to be recognised as the same problem.
 
 Acceptance criteria:
 
-1. No file outside `skills/issue/` describes the name, the frontmatter or the
-   sections of an issue file; every mention of one of them names the `issue`
-   skill instead of explaining it. **And** `skills/issue/SKILL.md` describes
-   every frontmatter field and every heading the template contains. The second
-   half is not decoration: without it, deleting the information everywhere
-   satisfies the first half, which is how `branch` came to have no stated
-   meaning at all.
+1. Two properties, and they hold together:
+   - *Absence.* No file outside `skills/issue/` describes the name, the
+     frontmatter or the sections of an issue file. A mention names the `issue`
+     skill and stops. The one exception is a document the `issue` skill itself
+     names as the owner of one part — that document describes that part, and
+     nothing else about the file.
+   - *Presence.* `skills/issue/SKILL.md` covers every frontmatter field and
+     every heading the template contains: it either describes the part itself,
+     or names exactly one other document that owns it.
+
+   Presence is not decoration. Without it, deleting the information everywhere
+   satisfies absence — which is how `branch` came to have no stated meaning at
+   all.
 2. `AGENTS.md` says an issue is filed through that skill and restates none of
    it — not the shape, and not what the states mean. The skill owns the issue
    file whole; the rulebook owns the run.
@@ -342,6 +348,52 @@ Acceptance criteria:
   four decisions above came out of the second attempt. The lesson is about
   briefs to humans as much as briefs to subagents — a question whose options
   are all one design is not a question.
+- **Review round 5 — first round under the ownership model, and criterion 1
+  failed a fourth time.** The reviewer swept all eleven markdown files and all
+  four shell scripts, not the diff. It reported no test suite and no
+  `shellcheck` in the container, and fell back to `bash -n` on the four
+  scripts, exit 0 each — none of them touched by this diff. Criteria 2 to 5
+  met, with the evidence named per criterion.
+- **Round 5 triage.**
+  - *Blocking, fixed:* `skills/grill/SKILL.md` described what belongs in
+    `## Intent` and `## Decisions`, near-verbatim on the criteria triple, and
+    never named the `issue` skill. Round 4 created this one: it copied
+    `"when X, then Y"` into the issue skill and left the grill copy standing.
+    Grill now names the two sections and points; its own stopping rule refers
+    to the form instead of restating it.
+  - *Blocking, fixed in the criterion rather than the code:* `skills/plan/`
+    describes `## Plan`, which the issue skill delegates to it by name — the
+    round-4 fix, deliberate and correct. The criterion forbade the very
+    mechanism the design uses, and on its presence half the delegated row read
+    as a hole. The reviewer refused to pick a reading and stated the
+    reproduction for both, which is the right call: only the author of a
+    criterion can say what it meant. Criterion 1 now names delegation
+    explicitly on both halves.
+  - *Fixed:* `AGENTS.md` said "nothing is copied into a project" with no
+    subject binding it to the issue file — false as a general claim, since
+    `skills/bootstrap/` copies the loader and the settings entry into every
+    project. Third round in a row that a sentence the change itself added was
+    false; the class is worth naming as its own risk.
+  - *Fixed:* the `## Checkpoints` row now names the rulebook as the owner of
+    the three questions, so `AGENTS.md` stating them is delegation rather than
+    duplication.
+  - *Accepted, not fixed:* `README.md` repeats the three checkpoint questions
+    verbatim. The reason it is different from the others: `AGENTS.md` is
+    copied to `~/.claude/CLAUDE.md` and every agent runs on it; `README.md` is
+    loaded into nothing. It is the repository's description for a human
+    reader, and drift there misleads a human who can see the contradiction,
+    not an agent who cannot.
+  - *Accepted, not fixed:* the `## Tasks` condition phrase appears in four
+    places. None outside the skill names the heading, so each is the permitted
+    form — a reader still has to invoke the skill to learn where a task list
+    goes.
+- **Hard stop set for round 6.** Criterion 1 has now failed four times. Each
+  round's cause has been genuinely different — a copy, a duplication, a hole,
+  and now two shelf skills nobody had swept plus a criterion that forbade its
+  own mechanism — so this is not one unsolved problem repeating. But four is
+  where the perception rule stops being a signal and starts being an excuse:
+  if round 6 finds criterion 1 unmet again, the run stops and the question
+  goes to the human, whatever the finding says.
 
 ## Checkpoints
 

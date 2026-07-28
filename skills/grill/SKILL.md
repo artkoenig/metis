@@ -19,16 +19,17 @@ criterion could fail.
    constrains the design. Offer the options you see and your recommendation —
    the human picks faster than they draft. Never bundle questions; bundled
    questions get half-answers.
-3. **Chase the observable.** Every answer must eventually land as behaviour
-   someone could check: "when X, then Y". Push politely past "it should be
-   better" until you have a falsifiable sentence.
+3. **Chase the observable.** Every answer must eventually land as an
+   acceptance criterion in the form the `issue` skill requires. Push politely
+   past "it should be better" until you have one.
 4. **Stop when criteria stop changing.** When two consecutive answers refine
    wording but not substance, you are done — more grilling is ceremony.
 
 ## The output
 
-Write the result into the issue file as acceptance criteria — numbered,
-observable, each one falsifiable — plus the decisions made along the way, each
-attributed to the human's answer. Show the criteria to the human for approval:
-this is the first of their three steering points, and the one place a run
-genuinely waits.
+Write the result into the issue's `## Intent` and `## Decisions`, attributing
+each decision to the human's answer that produced it. The `issue` skill says
+what belongs in those two sections and what form a criterion takes; do not
+work from memory of it. Show the criteria to the human for approval: this is
+the first of their three steering points, and the one place a run genuinely
+waits.

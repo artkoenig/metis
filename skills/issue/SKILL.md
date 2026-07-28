@@ -71,7 +71,7 @@ the first time this skill moves.
 | `## Tasks` | optional content: only when the change is too big to land whole |
 | `## Decisions` | what was settled and why, each with the source it derives from; defaults marked as defaults; questions to the human and their answers. **Nothing else** — a reader arriving mid-run must reach the load-bearing decisions without wading through the run's process |
 | `## Log` | the run as it happened, oldest first: observations, review rounds and how their findings were triaged, attempts that failed. This is the section that grows, and keeping it out of Decisions is what keeps Decisions readable |
-| `## Checkpoints` | `### Before implementation` and `### Before the PR`, the three questions answered under each |
+| `## Checkpoints` | `### Before implementation` and `### Before the PR`, with the rulebook's three questions answered under each — the rulebook owns those, this skill only holds the place |
 | `## Retro` | after the pull request: what got in the way, what should change |
 
 **Every heading is always present, including the empty ones.** "Optional"

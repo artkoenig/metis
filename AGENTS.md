@@ -121,9 +121,9 @@ what the previous round got wrong and finds what it passed over.
   name, its frontmatter, its sections, and what the states mean. Invoke the
   skill; do not work from memory of the shape, and do not restate any of it
   here or anywhere else. That is why it is the one skill that is not a shelf
-  tool. It reaches every session the way the subagents do; nothing is copied
-  into a project. No child issues; a large change gets a task list inside its
-  file.
+  tool. It reaches every session the way the subagents do, so nothing about
+  the issue file is ever copied into a project. No child issues; a large
+  change gets a task list inside its file.
 - A new session orients itself from the tracker alone: scan the `status`
   lines under `docs/issues/`, open the `active` file (or the one matching the
   current branch), and read it whole — what the previous session knew is in
