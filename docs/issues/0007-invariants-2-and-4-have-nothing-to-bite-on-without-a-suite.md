@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -44,15 +44,32 @@ Acceptance criteria:
 
 ## Decisions
 
+- The change touches `AGENTS.md` (invariants 2 and 4), `README.md` (its
+  invariants list) and `agents/implementer/agent.md` (description, steps 3
+  and 4, report format). The reviewer already has the honest path and is the
+  wording model; the `test-author` is a shelf tool dispatched only when tests
+  exist to write, so it stays untouched. Source: grep over the repo for
+  suite/exit-code language (excluding past issue records).
+- Implemented in the main context, not through the `implementer`: prose
+  only, no production code, no tests; the fresh-context review still runs.
+  Source: the precedent recorded in issues 0005 and 0006.
+- Branch is `claude/new-session-xeyz5n`, restarted from `origin/main` after
+  PR 13 merged. Default, unanswered — the session may not push elsewhere.
+
 ## Log
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — a clause in invariants 2 and 4, the
+  README kept in step, and the implementer given the reviewer's honest path;
+  no new machinery.
+- What surprised me? Nothing; the grep matched the intent's own list of
+  gaps exactly.
+- What am I assuming without having verified it? That the reviewer's wording
+  ("report that as the fact and show how you looked") is the right model to
+  mirror — chosen for consistency, not confirmed with the human.
 
 ### Before the PR
 
