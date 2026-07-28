@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/new-session-xeyz5n
 pr:
 ---
 
@@ -43,9 +43,14 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — two narrow criteria, a test-only
+  change; dispatched to the implementer (real code, tests are the
+  deliverable).
+- What surprised me? Nothing yet.
+- What am I assuming without having verified it? That the loader
+  distinguishes local from cloud via `CLAUDE_CODE_REMOTE` and that its
+  local path can run harmlessly in a scratch dir — the implementer
+  verifies against the loader itself.
 
 ### Before the PR
 
