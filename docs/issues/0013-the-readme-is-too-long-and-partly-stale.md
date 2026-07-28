@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/15
 ---
 
 # The README is too long and partly stale
@@ -61,6 +61,12 @@ Acceptance criteria:
   rework would be thoroughness against the simplicity rule. The edges are
   filed as issue 0014. Source: default — the human was asked at the
   second-tier stop and stated no preference.
+- Overridden by the human after the PR opened: a broken settings.json is
+  out of scope for handling — the installer validates it up front and
+  aborts cleanly before writing anything. No repair, no partial install.
+  Done in this run; issue 0014 narrows to the untested curl branch.
+  Source: the human's instruction ("kaputte json ist out of scope, prüfen
+  und abbrechen").
 
 - Direct use is the installation's main path: the loader keeps the
   `artkoenig/metis` URL, every session pulls that repo's current state. A
@@ -179,6 +185,14 @@ Acceptance criteria:
   1 and 2) and the untested curl branch (nit 3) are filed as issue 0014 and
   wait for their own run; the criterion-5 letter observation stays
   dismissed (third independent reading, same conclusion).
+- After the PR opened, the human overrode the shipped-edge default: the
+  installer now validates settings.json up front — invalid JSON, a
+  non-object "hooks", or a SessionStart shape the merge does not
+  understand each abort with an install.sh-prefixed message before
+  anything is written. Test cases 8–10 written first and seen failing
+  (hook written, raw tracebacks), then the precheck: 10 cases exit 0,
+  core suite exit 0, `bash -n` exit 0. Issue 0014 narrowed to the
+  curl-branch gap. Review round 5 pending on this fix.
 
 ## Checkpoints
 

@@ -36,6 +36,33 @@ for p in "${installed_paths[@]}"; do
 done
 git var GIT_COMMITTER_IDENT >/dev/null 2>&1 \
   || die "git has no committer identity here; set user.name and user.email, then re-run."
+# A broken settings.json is out of scope: check it up front and abort before
+# anything is written, instead of dying mid-merge with a file half-installed.
+if [ -f .claude/settings.json ]; then
+  python3 - .claude/settings.json <<'PYEOF' || exit 1
+import json, sys
+
+path = sys.argv[1]
+bad = f"install.sh: {path} "
+try:
+    with open(path) as f:
+        settings = json.load(f)
+except json.JSONDecodeError as e:
+    sys.exit(bad + f"is not valid JSON ({e}); fix it and re-run.")
+if not isinstance(settings, dict):
+    sys.exit(bad + "is not a JSON object; fix it and re-run.")
+hooks = settings.get("hooks", {})
+if not isinstance(hooks, dict):
+    sys.exit(bad + 'has "hooks" that is not an object; fix it and re-run.')
+entries = hooks.get("SessionStart", [])
+if not isinstance(entries, list) or not all(
+    isinstance(e, dict) and isinstance(e.get("hooks", []), list)
+    and all(isinstance(h, dict) for h in e.get("hooks", []))
+    for e in entries
+):
+    sys.exit(bad + 'has a "SessionStart" shape the merge does not understand; fix it and re-run.')
+PYEOF
+fi
 
 # 1. The loader — fetched from the canonical asset, never inlined here.
 mkdir -p .claude/hooks

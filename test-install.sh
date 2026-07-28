@@ -168,5 +168,31 @@ else
 fi
 [ $failures -eq $prior ] && pass "no git identity: clean refusal, nothing installed"
 
+# A repo whose settings.json is broken: clean refusal before any write.
+# $1 = case label, $2 = settings.json content.
+refuses_broken_settings() {
+  local label=$1 content=$2 repo
+  prior=$failures
+  repo=$(new_repo)
+  mkdir -p "$repo/.claude"
+  printf '%s' "$content" >"$repo/.claude/settings.json"
+  if run_install "$repo"; then
+    fail "$label: install succeeded despite broken settings.json"
+  else
+    grep -q "install.sh:" "$repo.log" \
+      || fail "$label: no clear refusal message: $(cat "$repo.log")"
+    [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+      || fail "$label: hook written despite refusal"
+    [ "$(cat "$repo/.claude/settings.json")" = "$content" ] \
+      || fail "$label: settings.json modified despite refusal"
+  fi
+  [ $failures -eq $prior ] && pass "$label: clean refusal, nothing installed"
+}
+
+# --- Cases 8-10: broken settings.json — check and abort, out of scope -------
+refuses_broken_settings "invalid JSON" 'not json'
+refuses_broken_settings "hooks not an object" '{"hooks": []}'
+refuses_broken_settings "SessionStart entry not an object" '{"hooks": {"SessionStart": ["x"]}}'
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
