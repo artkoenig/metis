@@ -194,6 +194,17 @@ Acceptance criteria:
   core suite exit 0, `bash -n` exit 0. Issue 0014 narrowed to the
   curl-branch gap. Review round 5 pending on this fix.
 
+- Review round 5 (fresh context): facts — 10 cases exit 0, core suite exit
+  0, `bash -n` exit 0; curl branch proven against a local HTTP server, live
+  URL 404s pre-merge as expected. Two findings, lightest set yet
+  (trend 3 → 3 → 4 → 3 → 2): (1) minor, fixed — a settings.json that
+  exists but is not a regular file slipped past the `-f` guard and
+  half-installed with a raw traceback, violating the recorded up-front-check
+  decision; case 11 written first and seen failing, then the guard widened
+  to `-e` with a plain refusal, 11 cases exit 0. (2) nit — the criterion-5
+  letter observation, fourth independent reading, agrees with the standing
+  dismissal; stays dismissed. Round 6 pending on the fix.
+
 ## Checkpoints
 
 ### Before implementation

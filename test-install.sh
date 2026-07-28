@@ -194,5 +194,19 @@ refuses_broken_settings "invalid JSON" 'not json'
 refuses_broken_settings "hooks not an object" '{"hooks": []}'
 refuses_broken_settings "SessionStart entry not an object" '{"hooks": {"SessionStart": ["x"]}}'
 
+# --- Case 11: settings.json is not a regular file — same clean refusal ------
+prior=$failures
+repo=$(new_repo)
+mkdir -p "$repo/.claude/settings.json"
+if run_install "$repo"; then
+  fail "settings-dir: install succeeded despite settings.json being a directory"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "settings-dir: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "settings-dir: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "settings.json a directory: clean refusal, nothing installed"
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

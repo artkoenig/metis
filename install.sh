@@ -38,7 +38,9 @@ git var GIT_COMMITTER_IDENT >/dev/null 2>&1 \
   || die "git has no committer identity here; set user.name and user.email, then re-run."
 # A broken settings.json is out of scope: check it up front and abort before
 # anything is written, instead of dying mid-merge with a file half-installed.
-if [ -f .claude/settings.json ]; then
+if [ -e .claude/settings.json ]; then
+  [ -f .claude/settings.json ] \
+    || die ".claude/settings.json exists but is not a regular file; fix it and re-run."
   python3 - .claude/settings.json <<'PYEOF' || exit 1
 import json, sys
 
