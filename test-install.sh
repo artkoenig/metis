@@ -1,7 +1,8 @@
 #!/bin/bash
 # Tests for install.sh. Everything runs against scratch git repos — the real
-# repo and the network are never touched: METIS_SOURCE points the installer
-# at this checkout. Exit 0 = all cases pass.
+# repo is never touched and nothing leaves the machine: METIS_SOURCE points
+# the installer at this checkout, or at a loopback-only HTTP server for the
+# curl arm. Exit 0 = all cases pass.
 set -u
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,7 +10,8 @@ install="$repo_root/install.sh"
 asset="$repo_root/skills/bootstrap/assets/session-start.sh"
 hook_cmd='$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh'
 base=$(mktemp -d)
-trap 'rm -rf "$base"' EXIT
+http_pid=""
+trap '[ -n "$http_pid" ] && kill "$http_pid" 2>/dev/null; rm -rf "$base"' EXIT
 failures=0
 
 fail() { echo "FAIL: $1"; failures=$((failures + 1)); }
@@ -219,6 +221,88 @@ refuses_broken_state "hook path a directory" 'mkdir -p "$1/.claude/hooks/session
 refuses_broken_state ".claude/hooks a regular file" 'mkdir -p "$1/.claude" && touch "$1/.claude/hooks"'
 refuses_broken_state "settings.json a symlink" 'mkdir -p "$1/.claude" && echo "{}" > "$1/outside.json" && ln -s ../outside.json "$1/.claude/settings.json"'
 refuses_broken_state ".claude a symlink" 'mkdir -p "$1/elsewhere" && ln -s elsewhere "$1/.claude"'
+
+# --- Local HTTP server for the curl-arm cases -------------------------------
+# install.sh routes any METIS_SOURCE that is not a local directory through
+# curl; serve a tree on the loopback interface so that arm runs for real.
+# The server binds port 0 (the OS picks a free port) and prints the choice.
+www="$base/www"
+mkdir -p "$www/good/skills/bootstrap/assets" "$www/bad/skills/bootstrap/assets"
+cp "$asset" "$www/good/skills/bootstrap/assets/session-start.sh"
+echo 'not the metis loader' >"$www/bad/skills/bootstrap/assets/session-start.sh"
+python3 - "$www" >"$base/http.port" 2>"$base/http.log" <<'PYEOF' &
+import http.server, os, sys
+os.chdir(sys.argv[1])
+srv = http.server.ThreadingHTTPServer(
+    ("127.0.0.1", 0), http.server.SimpleHTTPRequestHandler)
+print(srv.server_address[1], flush=True)
+srv.serve_forever()
+PYEOF
+http_pid=$!
+for _ in $(seq 1 50); do
+  [ -s "$base/http.port" ] && break
+  sleep 0.1
+done
+[ -s "$base/http.port" ] \
+  || { echo "FAIL: local HTTP server did not start: $(cat "$base/http.log")"; exit 1; }
+http_base="http://127.0.0.1:$(cat "$base/http.port")"
+
+# Run the installer inside a repo with METIS_SOURCE set to $2, again piped
+# through stdin. Proxy variables are cleared so curl talks to the loopback
+# address directly — the suite must not need any network beyond it.
+run_install_http() {
+  (cd "$1" && env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+    -u all_proxy -u ALL_PROXY METIS_SOURCE="$2" bash < "$install") >"$1.log" 2>&1
+}
+
+# --- Case 16: fresh repo over HTTP — the curl arm fetches the real loader ---
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/good"; then
+  cmp -s "$asset" "$repo/.claude/hooks/session-start.sh" \
+    || fail "curl: hook differs from canonical asset"
+  [ "$(count_entries "$repo/.claude/settings.json" "$hook_cmd")" = "1" ] \
+    || fail "curl: SessionStart entry missing or duplicated"
+  git -C "$repo" ls-tree -r --name-only HEAD | grep -q '\.claude/hooks/session-start\.sh' \
+    || fail "curl: hook not committed"
+else
+  fail "curl: install exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "fresh repo over HTTP: curl arm installs the loader"
+
+# --- Case 17: HTTP 404 — clean refusal, nothing installed, no commit --------
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/missing"; then
+  fail "curl-404: install succeeded despite a missing asset"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "curl-404: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "curl-404: hook written despite refusal"
+  [ ! -e "$repo/.claude/settings.json" ] \
+    || fail "curl-404: settings written despite refusal"
+  [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+    || fail "curl-404: a commit was made despite refusal"
+fi
+[ $failures -eq $prior ] && pass "HTTP 404: clean refusal, nothing installed"
+
+# --- Case 18: HTTP 200 with wrong content — sanity check refuses ------------
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/bad"; then
+  fail "curl-content: install succeeded despite a non-loader response"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "curl-content: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "curl-content: hook written despite refusal"
+  [ ! -e "$repo/.claude/settings.json" ] \
+    || fail "curl-content: settings written despite refusal"
+  [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+    || fail "curl-content: a commit was made despite refusal"
+fi
+[ $failures -eq $prior ] && pass "wrong content over HTTP: clean refusal, nothing installed"
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
