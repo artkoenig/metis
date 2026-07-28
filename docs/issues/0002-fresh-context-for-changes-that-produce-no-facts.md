@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: 0002-fresh-context-no-facts
 pr:
 ---
 
@@ -61,9 +61,16 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: the issue asks for three things — the
+  rule in the rulebook, the reason named, and a reviewer definition that can
+  honestly report "nothing to run". Runs 0004 and 0005 hit exactly this case
+  and the reviewers each invented their own way of saying it.
+- What surprised me? Nothing; run 0005 demonstrated the gap four times in a
+  row.
+- What am I assuming without having verified it? That the simplified texts
+  from PR 9 are the base to edit — verified by pulling main after the merge.
+  And that the rule belongs inside invariant 3 rather than as a new
+  invariant: it sharpens an existing rule, it does not add one.
 
 ### Before the PR
 
