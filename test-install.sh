@@ -138,5 +138,35 @@ else
 fi
 [ $failures -eq $prior ] && pass "repo ignoring .claude/: clean refusal, nothing installed"
 
+# --- Case 6: repo ignoring only settings.json — clean refusal, no writes ----
+prior=$failures
+repo=$(new_repo)
+echo ".claude/settings.json" >"$repo/.gitignore"
+if run_install "$repo"; then
+  fail "ignored-settings: install succeeded despite ignored settings.json"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "ignored-settings: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "ignored-settings: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "repo ignoring settings.json: clean refusal, nothing installed"
+
+# --- Case 7: no git identity — clean refusal, no writes ---------------------
+prior=$failures
+repo=$(mktemp -d "$base/XXXXXX")
+git -C "$repo" init --quiet
+git -C "$repo" config user.useConfigOnly true
+if (cd "$repo" && METIS_SOURCE="$repo_root" GIT_CONFIG_GLOBAL=/dev/null \
+    GIT_CONFIG_SYSTEM=/dev/null bash < "$install") >"$repo.log" 2>&1; then
+  fail "identity: install succeeded without a git identity"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "identity: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "identity: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "no git identity: clean refusal, nothing installed"
+
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi

@@ -14,6 +14,9 @@ set -euo pipefail
 source_base="${METIS_SOURCE:-https://raw.githubusercontent.com/artkoenig/metis/main}"
 asset_path="skills/bootstrap/assets/session-start.sh"
 hook_cmd='$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh'
+# Every file this script installs; the preconditions, git add and git commit
+# all read this one list, so no git step can trip over a path it never vetted.
+installed_paths=(.claude/hooks/session-start.sh .claude/settings.json)
 
 die() { echo "install.sh: $1" >&2; exit 1; }
 
@@ -24,9 +27,15 @@ toplevel=$(git rev-parse --show-toplevel 2>/dev/null) \
   || die "run this from the repository root ($toplevel), not a subdirectory."
 command -v python3 >/dev/null 2>&1 \
   || die "python3 is required to merge .claude/settings.json; install it and re-run."
-if git check-ignore -q .claude/hooks/session-start.sh 2>/dev/null; then
-  die ".claude/ is git-ignored here, but the hook only works committed — unignore it and re-run."
-fi
+# The git step must be able to succeed before anything is written: every
+# installed path committable, and a committer identity in place.
+for p in "${installed_paths[@]}"; do
+  if git check-ignore -q "$p" 2>/dev/null; then
+    die "$p is git-ignored here, but the hook only works committed — unignore it and re-run."
+  fi
+done
+git var GIT_COMMITTER_IDENT >/dev/null 2>&1 \
+  || die "git has no committer identity here; set user.name and user.email, then re-run."
 
 # 1. The loader — fetched from the canonical asset, never inlined here.
 mkdir -p .claude/hooks
@@ -76,12 +85,11 @@ PYEOF
 
 # 3. The commit — a cloud session only benefits from a hook that was
 # committed before it started.
-git add .claude/hooks/session-start.sh .claude/settings.json
-if git diff --cached --quiet -- .claude/hooks/session-start.sh .claude/settings.json; then
+git add "${installed_paths[@]}"
+if git diff --cached --quiet -- "${installed_paths[@]}"; then
   echo "Nothing to commit; already installed."
 else
-  git commit --quiet -m "Install metis session-start hook" \
-    -- .claude/hooks/session-start.sh .claude/settings.json
+  git commit --quiet -m "Install metis session-start hook" -- "${installed_paths[@]}"
   echo "Committed the hook and its settings entry."
 fi
 echo "Done. The next Claude session in this project loads metis."

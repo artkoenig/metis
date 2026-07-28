@@ -132,6 +132,30 @@ Acceptance criteria:
   Trend: 3 → 3, but strictly lighter (criterion 3: 1→1 lighter,
   criterion 5: 0→1 nit, criterion 6: 1→0, record/none: 1→1 trivial).
 
+- Review round 3 (fresh context): facts — 5 cases exit 0, core suite exit 0,
+  `bash -n` exit 0; the reviewer proved the live raw-URL fetch from main.
+  Four findings: one minor (settings.json-ignored repo dies half-installed),
+  two nits (missing git identity dies half-installed; README narrows the
+  human's second steering point by dropping "outward-facing"), one repeat of
+  the criterion-5 letter nit.
+- Repetition signal observed, as the rulebook defines it: criterion 3 missed
+  three rounds in a row by different defects of one class — the git step
+  fails partway with git's raw error. Decision: change approach instead of
+  patching the next path. All installed paths now live in one list that the
+  preconditions, `git add` and `git commit` all read, and a committer
+  identity is checked up front — every git precondition now fails cleanly
+  before anything is written. Test cases 6 and 7 written first and seen
+  failing (half-install, raw git errors), then the rework: 7 cases exit 0,
+  core suite exit 0, `bash -n` exit 0.
+- Round 3 triage of the rest: "outward-facing" restored to the README's
+  steering points (one-word fix). The criterion-5 letter nit dismissed
+  afresh, same conclusion as round 2: the letter bound the fork option to
+  one sentence and forbade a step list; the one descriptive sentence
+  explains what the hook does and stays. Trend: 3 → 3 → 4 by count, but
+  round 3's set is lighter (1 minor + 3 nits) and two of the four are
+  record/wording, not behaviour; the behaviour class itself is now closed
+  structurally, not per path.
+
 ## Checkpoints
 
 ### Before implementation

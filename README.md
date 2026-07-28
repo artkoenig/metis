@@ -34,7 +34,8 @@ idea → issue with acceptance criteria → checkpoint 1
 ```
 
 The human steers at three points only: approving the criteria when the idea
-is genuinely unclear, deciding anything irreversible, and merging the PR.
+is genuinely unclear, deciding anything irreversible or outward-facing, and
+merging the PR.
 Everything heavier — grilling, planning, a clean-room second opinion — is a
 tool on the shelf, picked by judgment, never fired by a condition.
 
