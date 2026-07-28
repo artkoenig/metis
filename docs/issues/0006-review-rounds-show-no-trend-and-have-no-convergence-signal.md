@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/new-session-xeyz5n
-pr:
+pr: https://github.com/artkoenig/metis/pull/13
 ---
 
 # Review rounds show no trend and have no convergence signal
@@ -105,3 +105,12 @@ Acceptance criteria:
   those runs enforces it.
 
 ## Retro
+
+- What got in the way: little. The one real defect source was the intent
+  itself — its table spec had no cell for out-of-criteria findings, which a
+  glance at the reviewer's report format (or the researcher) at filing time
+  would have caught. Minor friction: the first commit tripped the committer-
+  identity hook and needed an amend.
+- What should change: nothing in the rules. The new table rule got its first
+  use in this very run (trend 2 → 0 reported after each round) and cost one
+  line per round — no proposal.
