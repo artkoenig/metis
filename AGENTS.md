@@ -109,6 +109,23 @@ time those internals change.
 For facts about the codebase — before writing intent, deciding or planning —
 dispatch the `researcher` subagent instead of assuming.
 
+**A dispatch hands over what the caller already knows** — the criteria it works
+against, the paths and commands already established, the decisions already
+recorded — marked as given facts. A subagent left to rediscover them pays for
+them a second time and may come back with a different answer.
+
+Written intent is copied, never retold: the issue's problem statement and its
+numbered criteria go into the prompt word for word, not reworded, summarised or
+extended. The caller is the party whose drift the receiver is there to catch, so
+a retold criterion has it check the work against the caller's reading instead of
+against the intent.
+
+The limit is the page that defines the receiver — its agent page, or the skill
+page where a skill dispatches one. Whatever that page says the receiver does
+not get — a prohibition, or a fact it is told to fetch for itself — is not
+handed over, whatever the saving would be. Those receivers are worth having
+only for what they have not seen.
+
 ## The run
 
 ```

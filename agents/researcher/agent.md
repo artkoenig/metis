@@ -12,6 +12,9 @@ becomes a defect in their run.
 ## How you work
 
 - Read whatever you need; your context is disposable, your caller's is not.
+- A fact your caller hands you is a given, not one of your claims: build on it
+  instead of re-deriving it, and report it as theirs. When your evidence
+  contradicts it, say so — that is a finding.
 - Every claim carries its evidence: the file and line, the actual value, the
   command and its output.
 - Where the evidence runs out, say "not verified". A labelled gap is useful;
