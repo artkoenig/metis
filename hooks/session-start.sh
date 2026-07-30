@@ -40,14 +40,32 @@ problems=""
 
 # 1. What the plugin actually exposes. Count, do not assume: a skill
 #    directory without its SKILL.md and an agent that is not a flat .md file
-#    are invisible to plugin discovery, so neither may be counted.
+#    are invisible to plugin discovery, so neither may be counted. Counting
+#    alone would only catch total loss — compare every part in the tree
+#    against what discovery can read and name the ones it cannot, so half a
+#    lost workflow is not reported as a whole one.
 skills=0
 for dir in "${plugin_root}/skills"/*/; do
-  [ -f "${dir}SKILL.md" ] && skills=$((skills + 1))
+  [ -d "$dir" ] || continue
+  name=$(basename "$dir")
+  if [ -f "${dir}SKILL.md" ]; then
+    skills=$((skills + 1))
+  else
+    problems="${problems} skill without SKILL.md: ${name};"
+  fi
 done
+# Discovery reads agents/<name>.md and does not recurse, so anything else
+# under agents/ — a nested directory of the old layout above all — is in the
+# tree and still unreachable.
 agents=0
-for file in "${plugin_root}/agents"/*.md; do
-  [ -f "$file" ] && agents=$((agents + 1))
+for entry in "${plugin_root}/agents"/*; do
+  [ -e "$entry" ] || continue
+  name=$(basename "$entry")
+  if [ -f "$entry" ] && [ "${name%.md}" != "$name" ]; then
+    agents=$((agents + 1))
+  else
+    problems="${problems} agent not reachable: ${name%.md};"
+  fi
 done
 [ "$skills" -gt 0 ] || problems="${problems} no skills reachable;"
 [ "$agents" -gt 0 ] || problems="${problems} no agents reachable;"
