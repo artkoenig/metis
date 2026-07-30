@@ -37,9 +37,16 @@ Acceptance criteria:
    that is not handed over, whatever the saving would be.
 3. When a fact is handed to the `researcher`, its definition tells it to treat
    that fact as given rather than as one of its own evidenced claims.
-4. When this change is finished, nothing in it widens what the `reviewer`'s
-   prompt carries: the repository root and the diff range, as its page already
-   says.
+4. When the `reviewer` is dispatched, its prompt carries the repository root,
+   the diff range, and the issue's problem statement and numbered criteria
+   copied word for word — and its page no longer tells it to fetch the intent
+   itself.
+5. When written intent is handed to any receiver, the rulebook requires it
+   copied rather than retold — not reworded, not summarised, not extended.
+6. When the `reviewer` reviews, its page has it judge every changed file
+   against the intent, the issue's own record included wherever the diff
+   carries it — and it reaches the record that way rather than through tracker
+   access of its own.
 
 ## Plan
 
@@ -55,6 +62,28 @@ Acceptance criteria:
   default, unanswered. It is roughly a dozen lines of prose across two files;
   the brief a dispatch would need is longer than the diff. Recorded because the
   run's diagram names the implementer.
+- **The `reviewer` is handed the intent instead of fetching it, and is handed
+  intent and criteria only.** Source: the human's answer, mid-run. This
+  reverses what its page said — that the caller does not hand it the intent —
+  and it collides with nothing: invariant 3 asks for a reviewer that has seen
+  only the diff and the written intent, which is exactly what it now gets. What
+  it must not see is the caller's reasoning, and that is unchanged.
+- **Intent and criteria are copied from the issue word for word, never retold.**
+  Source: the human's answer. The caller is the party whose drift the receiver
+  exists to catch, so a reworded criterion would have the receiver check the
+  work against the caller's reading instead of against the intent. The rule is
+  written for every dispatch, not only the reviewer's.
+- **The `reviewer` keeps judging the issue's record, and reaches it through the
+  diff.** Source: the human's answer to "why should that check go?". It was
+  wrong to remove it: the record is a changed file in the diff — `git diff
+  --name-only origin/main HEAD` lists this issue's own file — so the reviewer
+  needs nothing handed and no tracker access to see it. Everything in the diff,
+  record included, is judged against intent and criteria; what no criterion
+  asked for is a finding, which is also how out-of-scope work gets rejected.
+- **No `researcher` was dispatched for the grilling round.** Source: default,
+  unanswered. The facts the questions touched were already established in this
+  session; dispatching would have been exactly the rediscovery this issue is
+  about. Recorded because the `grill` skill's first step names the researcher.
 - **No test-author is dispatched.** Source: the rulebook's invariant 2. The
   change is prose in the rulebook and an agent definition — nothing a tool
   checks, so there are no tests to write. `./test.sh` is still run for the
@@ -99,6 +128,17 @@ Acceptance criteria:
   - Dismissed: the observation that a universal rule sits in the section about
     shelf tools. No reproduction, and that section already carries the only
     other dispatch rule — the `researcher` line the new text follows.
+- After round 1 the human reversed the `reviewer`'s constraint: it is handed
+  intent and criteria instead of fetching them. Implementing that, the
+  record-against-the-diff check and the `Skill` tool were removed with it
+  (commit `a886e9d`) on the reasoning that the check had lost its input. Wrong,
+  and the human caught it: the record is a file *in the diff*, so the check
+  needs nothing handed. Restored in the form the human named — every changed
+  file, record included, judged against intent and criteria. The removal
+  survived one push; no review round ran against it.
+- Criteria revised mid-run after that reversal: old criterion 4 asserted the
+  opposite of the decision and was replaced; 5 and 6 added for the copied-intent
+  rule and the record reached through the diff.
 - Observation, not caused by this change: the round-1 reviewer reported that
   the definition it was given lacks the record and blast-radius checks. The
   file is not the cause — `diff /root/.claude/metis/agents/reviewer/agent.md
