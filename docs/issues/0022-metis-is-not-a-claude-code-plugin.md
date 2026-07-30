@@ -236,6 +236,30 @@ lands in steps with a commit each.
   closes criterion 6 needs one cloud session per source, and the exit code
   for each.
 
+- **The cloud-environment documentation, handed over by the human**
+  (`https://code.claude.com/docs/en/cloud-environments`). It states the claim
+  plainly: "Plugins declared in `.claude/settings.json` — Yes — Installed at
+  session start from the marketplace you declared. Requires network access to
+  reach the marketplace source." A second and clearer source than the one the
+  earlier decision rested on — and still not an exit code, so criterion 6
+  stays open by its own wording.
+  Two facts on that page matter more than the confirmation:
+  - The default **Trusted** network level allows `github.com`,
+    `api.github.com`, `codeload.github.com` and `raw.githubusercontent.com`,
+    so a github marketplace source is reachable at the default level. Only
+    **None** would block it.
+  - But: "Repository scope: GitHub API and release-asset requests reach only
+    repositories attached to the session, so a setup script that downloads
+    release assets from an unattached repository gets a 403." A *foreign*
+    project's cloud session installing `metis@metis` from
+    `{"source": "github", "repo": "artkoenig/metis"}` does not have this
+    repository attached. Whether the plugin install goes through the GitHub
+    proxy and is therefore subject to that scoping is unknown and untested —
+    if it is, the github source cannot work for any project but this one, and
+    the loader is not replaceable at all. This is now the sharpest open
+    question behind criterion 6, ahead of the directory-vs-github distinction
+    recorded above.
+
 ## Checkpoints
 
 ### Before implementation
