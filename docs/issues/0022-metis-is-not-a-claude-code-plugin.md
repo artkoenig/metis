@@ -60,9 +60,15 @@ lands in steps with a commit each.
    `SessionStart` hook with its script — rulebook text, self-check status and
    push guard.
 3. Wire this repository to its own plugin: `.claude/settings.json` declares the
-   marketplace and enables the plugin, and the dogfooded loader copy goes.
-4. Remove what the plugin replaces: `install.sh`, the `bootstrap` skill, the
-   loader, the core, and the three suites that only guard them.
+   marketplace and enables the plugin. **Superseded:** the dogfooded loader
+   copy stays and is declared alongside the plugin — criterion 6 is open, so
+   this repository must keep the path that works.
+4. **Do not execute.** "Remove what the plugin replaces: `install.sh`, the
+   `bootstrap` skill, the loader, the core, and the three suites that only
+   guard them" — this is criterion 7's *first* branch, and criterion 6 does not
+   hold. Review round 1 found it executed wrongly; commit 077eaaf restored
+   everything, and `test-plugin.sh` now asserts all seven artifacts stay. This
+   step becomes due only once criterion 6 is established.
 5. Rewrite `README.md` for the plugin installation.
 6. Establish criterion 6 by exit code from a fresh cloud session on this
    branch, and record the output.
@@ -324,6 +330,102 @@ lands in steps with a commit each.
   - *Plugin root = repo root ships `docs/` and the suites to every consumer* —
     dismissed: it is the recorded cost of a recorded default, and the round
     says so itself.
+
+- **Review round 3** (fresh context, whole intent): six findings. Trend across
+  the rounds, findings per criterion:
+
+  | criterion | R1 | R2 | R3 |
+  | --- | --- | --- | --- |
+  | 1 validate | 0 | 1 | 0 |
+  | 3 rulebook text | 1 | 0 | 0 |
+  | 4 self-check | 1 | 1 | 1 |
+  | 7 branch in force | 2 | 0 | 0 |
+  | 8 test.sh | 1 | 0 | 0 |
+  | no criterion | 1 | 7 | 5 |
+  | **total** | **6** | **9** | **6** |
+
+  Facts the round established itself: `bash test.sh` 4 suites, 57 cases, exit
+  0, nothing skipped; the same suite exit 1 on a scratch copy with the
+  unquoted-YAML defect reintroduced, so round 2's open item is closed and case
+  3b has teeth; both validate targets exit 0; `bash -n` over all 10 tracked
+  `*.sh` plus `.githooks/pre-push` exit 0; `jq empty` over all 4 tracked
+  `*.json` exit 0; no linter exists (`shellcheck`, `shfmt`, `markdownlint`,
+  `yamllint`, `jsonlint` all missing; `eslint` and `ruff` are on PATH but
+  `git ls-files '*.js' '*.ts' '*.py' '*.mjs'` returns nothing). Verdicts:
+  criteria 1, 2, 3, 5, 7, 8 met; 4 **not met**; 6 not met and open.
+- **Criterion 4 is not met, and round 2's dismissal of it was wrong.**
+  `hooks/session-start.sh:85` treats "count greater than zero" as success, so
+  it detects total loss and never partial loss. Reproduced: remove
+  `skills/plan/SKILL.md` from a copy of the tree and the status says
+  `4 skills and 4 agents reachable; ... no problems` while five directories
+  exist under `skills/`; add an old-layout `agents/planner/agent.md` and it
+  says `5 skills and 4 agents reachable; ... no problems` while the tree holds
+  five agents. The criterion's wording is "when a part is missing, the status
+  says so instead of reporting success", and an absent `SKILL.md` is the
+  plainest reading of missing. The code this replaces detects exactly that
+  (`skills/bootstrap/assets/session-start-core.sh:102-106`,
+  `skill without SKILL.md: <name>`), so the plugin hook is weaker than the
+  loader it is meant to retire. Round 2's dismissal answered the case it was
+  handed — a file that exists is not missing — but named the wrong gap: cases
+  3b/3c guard this repository's tree at test time and do nothing for a session
+  that loads an incomplete plugin. The suite cannot catch it either
+  (`test-plugin.sh:489-491` removes *all* skills, *all* agents or the whole
+  rulebook, never one of many), so those cases verify the code that exists
+  rather than the criterion's wording.
+- **The run is halted here by the human.** Not parked on a question: they were
+  shown criterion 4 unmet with its reproductions and the estimated cost of
+  fixing it, and chose to stop rather than fix it or open the pull request. No
+  pull request exists, so no checkpoint 2 was recorded and no retro is due.
+  `status` stays `active` rather than moving to `waiting`, because `waiting`
+  means parked on a question and nothing else — this is a deliberate stop, and
+  `active` is the state that makes the next session orient here and read this
+  entry. Recorded as the judgment call it is.
+- **The branch's suite is red, by design, and that is where it stops.** The
+  `test-author` run for criterion 4 had finished writing its cases before it
+  was stopped, so `test-plugin.sh` carries them: 71 lines, seven failing
+  assertions across three cases — a skill directory without its `SKILL.md` not
+  named and success still reported, an old-layout `agents/planner/agent.md` not
+  named and success still reported, and both together. `bash test.sh` therefore
+  exits **1**, with the other three suites passing. This is the tests-before-code
+  state the rulebook expects in the middle of a run, not a broken suite: the
+  failing assertions are the proof that criterion 4 is unmet, and the
+  implementer that makes them pass may not edit them.
+  A correction to the record: the commit that halted the run first claimed
+  `bash test.sh` exit 0. That was wrong — it was written from the run before
+  the test cases landed, and the commit message was amended to say exit 1 with
+  this reason.
+- **What a next session finds open.** Criterion 4 needs a per-part comparison
+  in `hooks/session-start.sh`; its tests already exist and are red.
+  Criterion 6 still needs its exit code from a real cloud session, and the
+  sharpest question behind it is whether the GitHub proxy's repository scoping
+  lets a foreign project install from a github marketplace source at all.
+  Three findings of round 3 were left unfixed on purpose, all of them
+  documentation this branch itself made wrong: `AGENTS.md:160-168` still misses
+  the world `README.md` creates — a project that declares the plugin but has
+  nothing installed gets no status in a local session, and the bullet tells
+  that session to report a failure that did not happen, while line 168 points
+  at a log a plugin-only project never has; and `README.md:82-84` states as
+  fact that a session here works with the checked-out tree, which is
+  measurably false locally (`claude plugin list` → `No plugins installed`
+  despite the declaration) and unproven in the cloud.
+- **Two findings outside the criteria were filed for their own runs**, on the
+  human's decision: issue 0023 (the plugin hook overwrites a project's
+  existing `core.hooksPath` and reports success) and issue 0024 (the plugin
+  ships and exposes the `bootstrap` skill, whose description tells a session to
+  install the loader path into the consumer's repository).
+- **A rule decision from the human, for the rulebook.** They rejected making
+  the last review round before a pull request always fresh, because a fresh
+  round can raise the finding count again and start another loop. The evidence
+  from this run cuts both ways: R1 6 → R2 9 is exactly the effect they name,
+  and it was the fresh R2 that found this repository had unwired itself while
+  R3 found criterion 4 unmet after it had been wrongly dismissed. Their
+  preference is intermediate rounds resumed rather than restarted. What the
+  numbers actually blame for the loop is not the fresh context but fixing
+  findings outside the criteria: 5 of 6 findings in R3 and 7 of 9 in R2 hang
+  on no criterion, and round 2 repaired several of them instead of filing
+  them, which made new diff for the next round to review. The rulebook already
+  says such a finding goes to the human; applying that strictly is the cheaper
+  half of the fix.
 
 ## Checkpoints
 

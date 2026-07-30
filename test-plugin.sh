@@ -48,6 +48,18 @@
 #     no push guard — is named and the status stops reporting success; a
 #     project that is not a git repository makes the guard not applicable
 #     rather than failed.
+#     Cases 21-24: partial loss, not only total loss. "When a part is
+#     missing, the status says so instead of reporting success" holds for one
+#     part out of many, not just for all of them: a skill directory that has
+#     lost its SKILL.md (22) and an agent that sits in a directory instead of
+#     being a flat .md file (23) are each in the tree and invisible to plugin
+#     discovery, so each must be named and success withdrawn. Case 24 is the
+#     repeat: both at once, both named. Case 21 is the centre those bracket —
+#     an untouched copy of the tree still reports no problems with the real
+#     counts, so naming an unreachable part may not be bought by flagging
+#     every tree. A component whose file is simply gone (rm agents/x.md)
+#     leaves nothing in the tree to compare against and is deliberately not
+#     a case here.
 #   Criterion 5 — a push to the default branch is refused
 #     Case 14: with core.hooksPath set the way the hook sets it, `git push`
 #     to main against a scratch bare remote is refused by exit code, the
@@ -489,6 +501,65 @@ names_missing_part() {
 names_missing_part "no skills" 'rm -rf "$1/skills" && mkdir "$1/skills"' 'no skills|0 skills|skills missing'
 names_missing_part "no agents" 'rm -rf "$1/agents"' 'no agents|0 agents|agents missing'
 names_missing_part "no rulebook" 'rm -f "$1/AGENTS.md"' 'rulebook|AGENTS\.md'
+
+# --- Case 21: the centre cases 22-24 bracket ------------------------------
+# An untouched copy of the tree, run through the same scratch machinery as
+# the partial-loss cases below: the counts still equal the tree and the
+# status still reports no problem. Without this, "name the unreachable part"
+# could be satisfied by flagging every plugin root.
+prior=$failures
+plug=$(copy_plugin)
+proj=$(new_project)
+if hook_status "$plug" "$proj"; then
+  got_skills=$(grep -oEi '[0-9]+ skills' "$status_file" | head -1 | cut -d' ' -f1)
+  got_agents=$(grep -oEi '[0-9]+ agents' "$status_file" | head -1 | cut -d' ' -f1)
+  [ "${got_skills:-x}" = "$skills_total" ] \
+    || fail "intact copy: names ${got_skills:-no} skills, the tree has $skills_total: $(show "$status_file")"
+  [ "${got_agents:-x}" = "$agents_total" ] \
+    || fail "intact copy: names ${got_agents:-no} agents, the tree has $agents_total: $(show "$status_file")"
+  says_success "$status_file" \
+    || fail "intact copy: reports a problem on a complete plugin: $(show "$status_file")"
+else
+  fail "intact copy: $why"
+fi
+[ $failures -eq $prior ] && pass "intact copy of the tree: counts match, no problem reported"
+
+# --- Cases 22-23: a part in the tree but unreachable ----------------------
+# Neither of these two is absent from the tree: the skill directory is still
+# there and the agent file is still there. Both are invisible to plugin
+# discovery — discovery reads skills/<name>/SKILL.md and does not recurse
+# into agents/ — so a session that is told "reachable" without a word about
+# them is told the workflow is whole when half a component is gone. Which
+# words the status uses is the implementer's choice; that the part is named
+# and success withdrawn is the criterion. The nested agent path is built from
+# a variable so that case 15's search for the removed nested layout does not
+# match this file.
+names_missing_part "skill directory without its SKILL.md" \
+  'rm -f "$1/skills/plan/SKILL.md"' '\bplan\b'
+names_missing_part "agent in a directory instead of a flat .md file" \
+  'nest="$1/agents/planner"; mkdir -p "$nest" && cp "$1/agents/reviewer.md" "$nest/agent.md"' \
+  '\bplanner\b'
+
+# --- Case 24: the repeat — two unreachable parts at once -------------------
+# Both are named, not just whichever the check happens to see first.
+prior=$failures
+plug=$(copy_plugin)
+rm -f "$plug/skills/plan/SKILL.md"
+nest="$plug/agents/planner"
+mkdir -p "$nest"
+cp "$plug/agents/reviewer.md" "$nest/agent.md"
+proj=$(new_project)
+if hook_status "$plug" "$proj"; then
+  grep -Eqi '\bplan\b' "$status_file" \
+    || fail "two unreachable parts: the skill is not named: $(show "$status_file")"
+  grep -Eqi '\bplanner\b' "$status_file" \
+    || fail "two unreachable parts: the agent is not named: $(show "$status_file")"
+  says_failure "$status_file" \
+    || fail "two unreachable parts: status still reports success: $(show "$status_file")"
+else
+  fail "two unreachable parts: $why"
+fi
+[ $failures -eq $prior ] && pass "two unreachable parts: both named, success withdrawn"
 
 # --- Case 13a: no .githooks in the plugin, project is a git repo -----------
 # Pushes from that project are possible and unguarded, so this is a failure,
