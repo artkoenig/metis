@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/issue-25-4vhg5a
 pr:
 ---
 
@@ -55,6 +55,60 @@ Acceptance criteria:
 - The metric to optimise is cache-read tokens, not output tokens: in the
   measurement above they outweigh output by roughly 300× and cache writes by
   16×. Source: that measurement.
+- **Transcript layout, confirmed fresh.** A dispatch made during this run
+  produced `~/.claude/projects/<project>/<session>/subagents/agent-<id>.jsonl`
+  plus a sidecar `agent-<id>.meta.json` holding `agentType`, `description`
+  (the short label the caller passed at dispatch — this is "what it was
+  dispatched for"), `toolUseId` and `spawnDepth`. Source: inspecting the
+  files this run's own `researcher` dispatch created.
+- **`output_tokens` is unreliable specifically on subagent transcripts,
+  reproduced independently of the 0022 measurement.** That dispatch's final
+  message carried a real ~600-character answer but reported
+  `usage.output_tokens: 1`. `cache_creation_input_tokens` and
+  `cache_read_input_tokens` behaved consistently (grew monotonically,
+  plausible scale) and are the fields the command reports; `output_tokens` is
+  marked unreliable and never printed as a count, unconditionally — there is
+  no runtime signal to tell a good dispatch's count from a bad one, so
+  criterion 5 is met by never trusting the field rather than by guessing
+  which rows are fine. Source: same fresh dispatch.
+- **A "model step" is one unique `message.id` among `type: "assistant"`
+  lines, not one JSONL line.** The same dispatch's transcript shows a single
+  turn's `thinking` content and its `tool_use` content as two separate JSONL
+  lines sharing one `message.id`, each carrying the identical full `usage`
+  block. Summing per line double-counts; the command dedupes by
+  `message.id` before counting steps or summing tokens. Source: same fresh
+  dispatch.
+- **No `plan` skill invocation for this change.** It is one self-contained
+  new capability (a script plus its documentation) with only mechanical
+  wiring elsewhere (`test.sh`, and README/AGENTS.md if criterion 4 turns out
+  to need a rulebook line) — not modules with shared contracts to weigh
+  against each other.
+- **Criterion 4 gets a rulebook line, not just a one-off for this run.**
+  "When a run ends, the per-dispatch numbers are in the issue's record"
+  reads in the same "when X, then Y" style as the rest of `AGENTS.md`, and
+  this repo's own precedent (issues 0006, 0012, 0020) is to fold a
+  behavioural finding straight into the rulebook. `AGENTS.md`'s Bookkeeping
+  section gets one line: a run that dispatched subagents records the
+  command's per-dispatch output in the issue before it is marked done. This
+  run demonstrates it by doing exactly that below. Source: this run's own
+  reading of the acceptance criterion; a prose-only change, so the reviewer
+  is the only check it gets, per invariant 3.
+- **Command shape, decided so test-author and implementer build the same
+  contract without a full `plan` round-trip.** A new skill,
+  `skills/token-cost/`, holds `SKILL.md` and `assets/token-cost.py`
+  (`python3`, matching the `python3` precedent already set by `install.sh`
+  for JSON handling). Invocation: `python3
+  ~/.claude/skills/token-cost/assets/token-cost.py` (reachable at that path
+  in any metis-wired session once bootstrap's symlinking runs). Contract:
+  reads `$CLAUDE_CODE_SESSION_ID` and `$HOME` from the environment (both
+  overridable, which is what makes it testable against a scratch
+  `$HOME/.claude/projects` tree instead of the real one); locates
+  `$HOME/.claude/projects/*/<session-id>/subagents/agent-*.jsonl` by an
+  exact session-id match — never scans other sessions' files; exits 0 with
+  a per-dispatch table plus a grand-total row on success, exits 1 with a
+  message on stderr when the session can't be found or dispatched no
+  subagent; never writes any file. `assets/test-token-cost.sh` is its test
+  harness, wired into root `test.sh` alongside the existing two harnesses.
 
 ## Log
 
@@ -79,9 +133,20 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes — a documented command that reports
+  per-dispatch subagent token cost from this session's own transcripts, with
+  the two edge cases (no dispatches, unreliable field) as hard requirements,
+  and this run's own numbers landing in this record afterward.
+- What surprised me? Reproducing the log's flagged surprise myself, fresh:
+  a subagent's own final answer, ~600 real characters long, reported
+  `output_tokens: 1`. And a mechanism I had to find to implement this
+  correctly at all — a single model turn can appear as two JSONL lines
+  sharing one `message.id`, each carrying the same full `usage` block, so a
+  naive per-line sum silently doubles cache-write and cache-read.
+- What am I assuming without having verified it? That `CLAUDE_CODE_SESSION_ID`
+  is set in every metis-wired session, and that the `agent-<id>.jsonl` /
+  `.meta.json` layout is stable across Claude Code versions, not an artifact
+  of this container's version (2.1.220) alone.
 
 ### Before the PR
 
