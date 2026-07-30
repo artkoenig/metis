@@ -680,6 +680,12 @@ lands in steps with a commit each.
   proof; it is what the documented mechanism's confirmed unreliability
   requires. The loader, the installer, the bootstrap skill and their
   guarding suites stay.
+- **The temporary github-source `ref` was reverted**, commit to follow:
+  `.claude/settings.json` is back to `{"source": "directory", "path": "."}`,
+  the source recorded in Decisions for this repository's own dogfooding —
+  criterion 6 no longer needs a branch-specific `ref` to stay reachable
+  after the merge, since it is now settled rather than pending. `bash
+  test.sh` exits 0, 4 suites, unchanged by the revert.
 
 ## Checkpoints
 
