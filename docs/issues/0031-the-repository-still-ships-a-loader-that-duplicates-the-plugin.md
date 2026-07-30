@@ -64,6 +64,20 @@ Acceptance criteria:
 
 ## Log
 
+- **The `test-author` wrote `test-loader-removed.sh`** from this intent alone,
+  without seeing an implementation: one case per testable criterion (1, 2, 3,
+  4, 5 — criterion 6 has nothing to run, since closing two other issues is
+  bookkeeping, not behaviour). Run directly, it fails all 18 assertions,
+  `bash test-loader-removed.sh` exits 1 — confirmed myself, not taken on the
+  subagent's word. Criterion 3's marker for "instructs installing the plugin"
+  is the literal command `claude plugin install`, chosen from issue 0022's own
+  decision record; flagged by the test-author as a judgment call the reviewer
+  may need to revisit if the implementer phrases the instruction differently.
+  `test.sh` itself is left untouched by the test-author on instruction, and
+  now exits 1 rather than 0 for an expected reason: `test-plugin.sh`'s own
+  criterion-8 case sees the new suite file on disk and fails because it is
+  not yet wired into `test.sh`'s list — the implementer's job.
+
 ## Checkpoints
 
 ### Before implementation
