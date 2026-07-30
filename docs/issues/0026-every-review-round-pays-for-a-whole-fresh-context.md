@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/issue-26-8lvd7s
-pr:
+pr: https://github.com/artkoenig/metis/pull/27
 ---
 
 # Every review round pays for a whole fresh context
