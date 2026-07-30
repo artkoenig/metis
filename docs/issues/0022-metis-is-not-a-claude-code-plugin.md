@@ -649,6 +649,37 @@ lands in steps with a commit each.
   something this investigation can toggle to test its effect, so the
   directory-source case (measurement 4) stays open with `SKIP_PLUGIN_MARKETPLACE`
   as an unconfirmed, now unfalsifiable-from-here candidate.
+- **The human's request to search for how other repositories handle this**
+  surfaced a confirmed, closed bug report that settles criterion 6.
+  `anthropics/claude-code` issue #32606, "extraKnownMarketplaces +
+  enabledPlugins in project settings never prompts user to install": a
+  project's `.claude/settings.json` declaring `extraKnownMarketplaces` and
+  `enabledPlugins`, exactly the mechanism `cloud-environments.md` and
+  `discover-plugins.md` document, tested by that reporter across 12+
+  repositories with an identical configuration — none triggered the install
+  prompt or populated `installed_plugins.json`. **Status: closed as not
+  planned**, no maintainer comment confirming a fix or a documentation
+  correction. A second, related report, issue #51806, found the same root
+  shape from the CLI side: `/plugin marketplace add` writes to
+  `settings.json`'s `extraKnownMarketplaces`, but plugin discovery reads a
+  separate internal cache (`~/.claude/plugins/known_marketplaces.json`) that
+  the write never reaches — closed as a duplicate of the same underlying
+  gap.
+  This matches every measurement in this Log: three real cloud sessions,
+  two source types, one `SKIP_PLUGIN_MARKETPLACE` override attempt, all
+  negative, all with the identical "no marketplace configured" shape #32606
+  describes. It also means the source-type question (directory vs. github)
+  and the `SKIP_PLUGIN_MARKETPLACE` hypothesis were never the deciding
+  factor: the declare-only mechanism this repository's `.claude/settings.json`
+  uses does not work, confirmed by a third party and left unfixed by
+  Anthropic, independent of source type or environment variable.
+  **Criterion 6 is settled: not met**, by the strongest evidence available
+  without filing a new report against Anthropic — five own measurements
+  plus a maintainer-closed bug report describing the identical failure.
+  Criterion 7's second branch is therefore not a temporary state pending
+  proof; it is what the documented mechanism's confirmed unreliability
+  requires. The loader, the installer, the bootstrap skill and their
+  guarding suites stay.
 
 ## Checkpoints
 
