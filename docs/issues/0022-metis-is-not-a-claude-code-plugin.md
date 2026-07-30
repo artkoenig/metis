@@ -712,6 +712,51 @@ lands in steps with a commit each.
   flattening the agent layout costs nothing, since after this change nothing
   but plugin discovery reads it.
 
+### Before the PR (this pull request, `claude/metis-plugin-0022` into `main`)
+
+Recorded after the merge with `main` (`d5fbc16`) and after criterion 6 was
+settled (`dd070e9`), before opening the pull request the human asked for.
+Supersedes the "Before the PR" answers below for this branch's current diff —
+those were written for pull request 26, opened while the run was halted, on a
+diff since rebased, merged and further changed.
+
+- **Does this match what was asked?** Yes, and now completely: metis is a
+  plugin, installable from its own marketplace, shown by 108 passing cases
+  across 4 suites (`bash test.sh`, exit 0). Seven of the eight acceptance
+  criteria are met by an exit code. Criterion 6 — whether a cloud session
+  auto-installs a plugin declared in a project's `.claude/settings.json` — is
+  the one exception, and it is now settled as **not met**, not merely
+  untested: five real cloud-session measurements (three against a `directory`
+  source, two against a `github` source) all showed no marketplace and no
+  plugin after a fresh session started, and two independent upstream reports
+  — `anthropics/claude-code#32606` and `#51806` — confirm the mechanism does
+  not work as documented, regardless of source type or environment. Criterion
+  7's second branch — keep the loader path since the plugin path is
+  incomplete — therefore still holds, and the per-project machinery stays in
+  the tree.
+- **What surprised me?** That I repeated, once, the exact mistake the run's
+  own Log already recorded a prior session making: turning a negative
+  measurement into a documentation contradiction before checking what the
+  measurement actually covered. The human's question ("was heißt 'entgegen
+  der Doku'?") caught it before it became a decision; the actual gap was that
+  a `directory` source is not a network source, so the doc's "requires
+  network access" qualifier for auto-install was never tested by that
+  measurement, not contradicted by it. Also surprising: switching the
+  marketplace source from `directory` to `github` changed nothing about the
+  outcome, and a second, independently-filed upstream issue (`#51806`) traces
+  the failure to a sync gap between `settings.json` and an internal cache —
+  a cause neither this issue nor the human had guessed at.
+- **What am I assuming without having verified it?** That `SKIP_PLUGIN_MARKETPLACE=true`
+  being set in every cloud session observed is a real contributing cause
+  rather than a coincidence — the human's attempt to override it to `false`
+  via the environment dialog did not change the value in a fresh session, so
+  this could not be isolated by experiment and rests on the two upstream
+  reports instead, not on a measurement of this variable's effect in
+  isolation. That reverting the marketplace source from `github` back to
+  `directory` (`d8df358`) has no effect on the four criteria the plugin
+  suite already covers — `bash test.sh` exiting 0 after the revert is the
+  check for that, not a separate one.
+
 ### Before the PR
 
 Recorded after the pull request was opened, not before it: the human opened
