@@ -84,9 +84,8 @@ default, and carry on.
 **How to talk to them.** Informally — in a language that marks the
 distinction, use the informal form (German: du). Short, simple words. Cut
 every reply to the essentials: the finding, the decision, the change. Assume
-no knowledge the reader does not have: say what a rule requires instead of
-where it stands, and explain a term where it first appears. This holds for
-every text written here, these pages included.
+no knowledge they do not have: say what a rule requires instead of where it
+stands, and explain a term the first time you use it.
 
 ## The shelf
 
@@ -125,8 +124,9 @@ idea → issue with acceptance criteria      (grilling only if unclear)
 Producing the state the checks run on is the session's job, not the
 reviewer's: fetch the default branch from the remote and merge it into the
 branch before the review is dispatched, so the fresh context reads what will
-land. A merge that conflicts is undone and reported, never committed;
-keeping the merge commit afterwards is your call.
+land. A merge that conflicts is undone and reported, never committed; a fetch
+that fails is reported as the base you could not reach, and the checks then
+stand on the branch alone. Keeping the merge commit afterwards is your call.
 
 A run opens with the issue in front of the human: its title and its
 numbered acceptance criteria, as a table. What "done" means is visible

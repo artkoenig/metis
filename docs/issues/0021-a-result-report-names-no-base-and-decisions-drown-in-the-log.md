@@ -26,16 +26,15 @@ because entries were written as stories — which review round found the
 problem, what held before it, why the earlier reading was wrong. A reader
 looking for what currently holds has to reconstruct it from the narration.
 
-**Texts that presuppose.** The failure is not a missing cross-reference — it
-is a text that assumes knowledge its reader does not have, and often cannot
-get. A passage that says "the class invariant 3 names"
-is unreadable without counting invariants first, and a term used before it is
-explained sends the reader elsewhere. The rulebook does this to itself in one
-place. The rule the retro asks for is about how every text is written,
-including the rulebook.
+**Replies that presuppose.** The failure is not a missing cross-reference —
+it is a reply that assumes knowledge the human does not have and cannot get
+from the conversation. "Criterion 3 is not met" says nothing to someone who
+would have to go and count criteria first, and a term used before it is
+explained does the same. The rulebook says how to talk to the human and does
+not cover this.
 
 Wanted: a reported result that names what it ran against, a decision that can
-be read in one line, and texts that carry their own meaning.
+be read in one line, and replies that carry their own meaning.
 
 Acceptance criteria:
 
@@ -52,11 +51,9 @@ Acceptance criteria:
 4. The `issue` skill states that a Decisions entry says what holds now and
    where it came from, and that the history behind it — the round that found
    it, the reading it replaced — belongs in the Log.
-5. The rulebook requires a text to assume no knowledge its reader does not
-   have — naming what a rule says rather than its number, and explaining a
-   term where it first appears.
-6. The rulebook holds to criterion 5 itself: no passage in it identifies a
-   rule only by its position.
+5. The rulebook requires a reply to the human to assume no knowledge they do
+   not have — naming what a rule says rather than its number, and explaining
+   a term at its first use.
 
 ## Plan
 
@@ -71,11 +68,15 @@ Acceptance criteria:
   orienting a session read two. Source: default, unanswered — the human was
   asked and did not answer.
 
-- Criterion 5 is about presupposition, not about cross-references. The first
-  wording of both the criterion and the rule said "never send the reader
-  elsewhere", which describes a text that points somewhere; the failure being
-  fixed is a text that assumes what the reader already knows. Source: the
-  human, mid-run.
+- The rule criterion 5 adds binds replies to the human and nothing else. The
+  texts in this repository are not covered, so criterion 6 — the rulebook
+  holding to that rule itself — is withdrawn. Source: the human, mid-run.
+- The three rulebook edits criterion 6 had asked for stay in the change,
+  although no criterion requires them any more: invariant 2 names its class
+  instead of citing an invariant's number, invariant 5 explains the tracker
+  where it first appears, and both run diagrams name each checkpoint by its
+  moment. Each is small and clearer than what it replaced. Source: default,
+  unanswered.
 - The rule criterion 5 adds stays inside the paragraph on talking to the
   human, although a session about to write a skill page has no reason to look
   under a heading about the human. Source: the human's request named that
@@ -123,6 +124,27 @@ Acceptance criteria:
   The round also named a risk outside the criteria: nothing stopped a
   conflicted merge from reaching a commit. The run section now says such a
   merge is undone and reported, never committed.
+- The rule about presupposition was worded three times. First "never send the
+  reader elsewhere", which describes a text that points somewhere rather than
+  one that assumes; then "assume no knowledge the reader does not have",
+  scoped to every text in this repository; now scoped to the conversation
+  with the human. Each narrowing came from the human mid-run.
+- Review round 3: nine findings. Three of them — ordinal checkpoint labels in
+  the tracker skill, a check named by its number in the reviewer's page, and
+  the rulebook using "the retro" and "the test-author" before explaining them
+  — existed only because the rule then claimed to hold for every text here.
+  The human has since scoped it to replies, so all three fall away untouched.
+  Six stand and are fixed here. 1. The record claimed a fallback for a
+  failing fetch that was never shipped; only the conflicting merge had one.
+  2. The base comparison criterion 2 asks for reached the rulebook and
+  neither agent page, so a reviewer meeting a red suite reports it as its own
+  finding without ever measuring the base. 3. Nothing made the fetch
+  verifiable: a stale local copy of the default branch satisfies every page,
+  and the reviewer now checks the remote instead. 4. This issue's own
+  Decisions entry narrated the reading it replaced — the very thing the
+  change forbids there. 5. One broken paragraph wrap survived round 2.
+  6. Round 2 handed a finding to the human and no answer was recorded; the
+  answer is now the scoping decision above.
 - This branch carried a different change first: an idempotent session-start
   loader, filed as issue 0021 with five further issues around it, seventeen
   commits, suite green. The human dropped it in favour of these three retro
