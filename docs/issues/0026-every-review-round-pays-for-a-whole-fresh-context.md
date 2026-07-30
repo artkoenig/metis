@@ -1,7 +1,7 @@
 ---
-status: backlog
-branch:
-pr:
+status: done
+branch: claude/issue-26-8lvd7s
+pr: https://github.com/artkoenig/metis/pull/27
 ---
 
 # Every review round pays for a whole fresh context
@@ -66,6 +66,23 @@ Acceptance criteria:
   numbers blame those on findings outside the criteria being repaired, which is
   issue 0027. Source: the finding counts per criterion in issue 0022's trend
   table.
+- No test-author dispatch: the change touches only `AGENTS.md`,
+  `agents/reviewer/agent.md` and `README.md` — prose, nothing `test.sh`'s three
+  suites exercise. `grep -rn 'AGENTS.md' test.sh skills/bootstrap/assets/*.sh`
+  shows the rulebook only as a file that must exist or gets copied, never as
+  content a suite checks, so there is nothing to run and invariant 2 is held by
+  saying so. Source: the same grep issue 0021 ran for the identical question.
+- Criterion 3 cannot be shown by exit code in this run: it names "the command
+  from issue 0025", and 0025 is still `backlog` — no such command exists yet.
+  The reviewer reports this criterion as not verifiable rather than guessing at
+  a number. Source: `docs/issues/0025-a-runs-token-cost-is-invisible.md`
+  frontmatter.
+- The mechanism for "the same reviewing context continues" is the harness's
+  existing agent-resume path (continue a dispatched agent by addressing it
+  again, rather than launching a fresh one) — already available, nothing new
+  to build. `AGENTS.md` states the requirement in tool-agnostic terms and
+  leaves the mechanism to judgment, matching how the rest of the rulebook
+  stays silent on tool mechanics. Source: default, unanswered.
 
 ## Log
 
@@ -76,19 +93,103 @@ Acceptance criteria:
   tokens for a result nobody ever saw. Whether a continued reviewer makes that
   loss cheaper or more expensive is unmeasured, and worth a thought during
   implementation.
+- Facts before review: `./test.sh` — 3 suites, all cases, exit 0. It covers the
+  installer and the session-start hook; the change touches only `AGENTS.md`,
+  `agents/reviewer/agent.md` and `README.md`, none of which any suite reads as
+  content. No static analysis exists in the repository (no `.github/`, no lint
+  config in `git ls-files`). This review is the change's only check.
+- Criterion 5, established by `grep -rn 'fresh' --include='*.md' .` over the
+  repository (excluding `docs/issues/`), exit 0: every remaining "fresh"
+  either names invariant 3's unchanged property (`AGENTS.md:25`,
+  `README.md:23`), the first review round specifically (`AGENTS.md:143`,
+  `agents/reviewer/agent.md:3,18,69`), or an unrelated mechanism
+  (`clean-room/SKILL.md`'s blind dispatch, `agents/implementer/agent.md:48`'s
+  boundary against reviewing its own work, `README.md:47`'s "loads metis
+  fresh"). No document still claims every round is fresh.
+- Review round 1 (fresh context — no prior round existed to continue): 2
+  findings. Triage: finding 1 (`AGENTS.md:145` said the reviewing context
+  checks "not only the findings it fixed itself" — the reviewer never fixes,
+  only the implementer does, contradicting `agents/reviewer/agent.md:80` and
+  the run diagram; the parallel sentence in `agents/reviewer/agent.md` already
+  said "raised") fixed by changing "fixed" to "raised" in `AGENTS.md`. Finding
+  2 (`agents/reviewer/agent.md`'s opening line claimed the reviewer "has seen
+  nothing but the diff and the written intent," unconditional, though 11 lines
+  later the same file says a continued round also carries its own prior
+  reading) fixed by qualifying the opening line: "only the diff and the
+  written intent, and, from the second round on, your own prior reading of
+  them." Both fixes touch files the criteria are about, so the waiver does not
+  apply; round 2 is due and continues the same reviewing context, per the rule
+  this issue itself establishes.
+- Trend after round 1:
+
+  | criterion | round 1 |
+  | --- | --- |
+  | 1 | 0 |
+  | 2 | 0 |
+  | 3 | 0 |
+  | 4 | 0 |
+  | 5 | 2 |
+  | outside all criteria | 0 |
+  | **total** | **2** |
+
+- Review round 2 (continued — same reviewing context as round 1, dispatched via
+  the harness's agent-resume path, not a fresh `Agent` call): 0 findings.
+  Rechecked the whole intent, not only the two findings it raised itself, and
+  found both fixed correctly with no new defect. This round is itself the
+  first real instance of criterion 2 and criterion 4 being exercised, not just
+  documented: a reviewing context that continued, reviewed the whole intent,
+  and the issue's own record (this Log) says which round was which.
+- Trend after round 2:
+
+  | criterion | round 1 | round 2 |
+  | --- | --- | --- |
+  | 1 | 0 | 0 |
+  | 2 | 0 | 0 |
+  | 3 | 0 | 0 |
+  | 4 | 0 | 0 |
+  | 5 | 2 | 0 |
+  | outside all criteria | 0 | 0 |
+  | **total** | **2** | **0** |
+
+  Converged in one repeat round (2 → 0); no third round needed.
+- What round 2 could not show: whether continuing costs fewer cache-read
+  tokens than a fresh round would have (criterion 3) — issue 0025's command
+  still doesn't exist to measure that, and the subagent transcript's own
+  reported token counts are cumulative across the continued conversation, not
+  broken out per round, so they cannot stand in for that measurement either.
+  Criterion 3 stays unverified by this run; it needs issue 0025 first.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: the human's decision (recorded
+  above) already rejected the opposite fix, so the direction is fixed —
+  intermediate rounds resume, they do not restart.
+- **What surprised me?** How little there is to build: the harness already
+  supports resuming a dispatched agent, so this issue is a rulebook and
+  agent-definition rewrite, not new tooling — the same shape as issue 0021.
+- **What am I assuming without having verified it?** That criterion 3 is
+  meant to hold as a property of the new arrangement, not as something this
+  run itself has to measure — issue 0025's command doesn't exist yet to
+  measure it with.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: `AGENTS.md` and
+  `agents/reviewer/agent.md` now say the first round is fresh and every round
+  after a fix continues the same context against the whole intent, recorded
+  per round; criteria 1, 2, 4 and 5 are met, criterion 3 stays unverified for
+  the stated reason (issue 0025 doesn't exist yet).
+- **What surprised me?** Round 2, run as a real continuation of round 1 via
+  the harness's agent-resume path rather than a fresh `Agent` dispatch, is
+  itself the first working instance of the rule this issue writes down — the
+  review of this change ended up demonstrating criteria 2 and 4 directly,
+  not just reading the prose that states them.
+- **What am I assuming without having verified it?** That the agent-resume
+  mechanism this run used is what future sessions will also reach for — the
+  rulebook states the requirement in tool-agnostic terms and leaves the
+  mechanism to judgment, so a future session could pick a different way to
+  continue a context and still satisfy the written rule.
 
 ## Retro
