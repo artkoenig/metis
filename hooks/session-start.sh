@@ -23,12 +23,15 @@ project_dir="${CLAUDE_PROJECT_DIR:-.}"
 rulebook="${plugin_root}/AGENTS.md"
 guard_dir="${plugin_root}/.githooks"
 
-# JSON-encode stdin as the body of a JSON string: drop the control bytes a
-# JSON string cannot carry anyway, escape the two delimiters and the tab,
-# then fold the newlines. Multibyte UTF-8 passes through untouched.
+# JSON-encode stdin as the body of a JSON string: drop the control bytes that
+# carry no text anyway, escape the two delimiters, the tab and the carriage
+# return, then fold the newlines. A raw CR would end the JSON string's
+# validity as surely as a raw newline, so it is escaped rather than dropped —
+# a rulebook with CRLF line ends arrives whole. Multibyte UTF-8 passes
+# through untouched.
 json_body() {
   LC_ALL=C tr -d '\000-\010\013\014\016-\037\177' \
-    | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\t/\\t/g' \
+    | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\t/\\t/g' -e 's/\r/\\r/g' \
     | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' \
     | tr -d '\n'
 }

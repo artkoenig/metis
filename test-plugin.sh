@@ -22,6 +22,14 @@
 #   Criterion 3 — the rulebook text itself is delivered
 #     Case 7: additionalContext contains the whole text of AGENTS.md
 #     verbatim, which a pointer to the file could not carry.
+#     Cases 16-18: the delivery does not depend on which bytes the rulebook
+#     holds. A CRLF line, a lone CR, a double quote, a backslash and a tab
+#     each stay inside a JSON string one way or another; whatever the hook
+#     does with them, its stdout must parse and both the rulebook text and
+#     the status must arrive. A raw CR cannot sit in a JSON string, so
+#     escaping it and dropping it are both faithful and the CR cases
+#     compare with CR removed from both sides; quote, backslash and tab
+#     have to survive as they are.
 #   Criterion 4 — a self-check status naming counts and the guard state
 #     Case 6: hooks/hooks.json registers exactly one SessionStart command
 #     hook and it runs hooks/session-start.sh from the plugin root.
@@ -37,14 +45,23 @@
 #     to main against a scratch bare remote is refused by exit code, the
 #     remote branch is not created, and a push to a non-default branch still
 #     succeeds.
+#   Criterion 7 — while criterion 6 does not hold, the per-project
+#   machinery stays in the repository
+#     Case 19: install.sh, the bootstrap skill, the loader, the core and the
+#     suites that only guard them are all present. Which branch of the
+#     criterion is in force is a record in the issue; that criterion 6 is
+#     open is the premise of this case.
 #   Criterion 8 — test.sh names existing suites
 #     Case 15: every path in test.sh's `suites` list exists, and no listed
 #     suite is still pinned to the nested agent layout that this change
 #     removes — a suite that moves `agents/<name>/agent.md` cannot exit 0
 #     once agents are flat files, so test.sh could not exit 0 either.
+#     Case 20: the other direction — every suite file in the tree is named
+#     in test.sh, so a suite nobody wired in cannot hide behind a green
+#     `test.sh`.
 #
-# Criteria 6 and 7 are records in the issue, not behaviour, and have nothing
-# to run here.
+# Criterion 6 is a measurement recorded in the issue, not behaviour, and has
+# nothing to run here.
 #
 # Wording the status assertions rely on, since "says so instead of reporting
 # success" needs a token to test: a status that reports a problem contains
@@ -513,6 +530,111 @@ EOF
 echo "$listed_suites" | grep -qx "$(basename "${BASH_SOURCE[0]}")" \
   || fail "test.sh: the suites list does not name $(basename "${BASH_SOURCE[0]}")"
 [ $failures -eq $prior ] && pass "test.sh names existing suites, none pinned to the nested agent layout"
+
+# --- Cases 16-18: whatever bytes the rulebook holds, the envelope holds ----
+# Run the hook against a scratch plugin root whose AGENTS.md carries the given
+# bytes and check three things: stdout parses as JSON, the rulebook text
+# arrives in additionalContext, and the self-check status arrives beside it
+# and reports no problem (the copy is complete).
+# $1 = case label, $2 = file holding the bytes AGENTS.md gets,
+# $3 = "exact" when every byte must survive, "cr-may-drop" when a CR may be
+#      dropped on the way — a JSON string cannot carry a raw CR, so escaping
+#      it and dropping it are both faithful; losing the text is not.
+hostile_rulebook() {
+  local label=$1 bytes=$2 mode=$3 plug proj d
+  prior=$failures
+  plug=$(copy_plugin)
+  cp "$bytes" "$plug/AGENTS.md"
+  proj=$(new_project)
+  d=$(mktemp -d "$base/XXXXXX")
+  if ! run_hook "$plug" "$proj" >"$d/out.json" 2>"$d/err"; then
+    fail "$label: hook exited non-zero: $(tr '\n' ' ' <"$d/err" | cut -c1-200)"
+  elif ! python3 - "$d/out.json" "$plug/AGENTS.md" "$mode" "$d/status" \
+         >/dev/null 2>"$d/why" <<'PYEOF'
+import json, sys
+out_path, book_path, mode, status_out = sys.argv[1:5]
+raw = open(out_path, "rb").read()
+try:
+    doc = json.loads(raw.decode("utf-8"))
+except Exception as exc:
+    sys.exit("stdout does not parse as JSON (%s); stdout=%r" % (exc, raw[:200]))
+h = doc.get("hookSpecificOutput")
+if not isinstance(h, dict) or h.get("hookEventName") != "SessionStart":
+    sys.exit("envelope is not a SessionStart hookSpecificOutput: %r" % (doc,))
+ctx = h.get("additionalContext")
+if not isinstance(ctx, str) or not ctx.strip():
+    sys.exit("additionalContext is %r, expected a non-empty string" % (ctx,))
+book = open(book_path, "rb").read().decode("utf-8")
+norm = (lambda s: s.replace("\r", "")) if mode == "cr-may-drop" else (lambda s: s)
+want, got = norm(book).strip("\n"), norm(ctx)
+if want not in got:
+    for line in want.split("\n"):
+        if line.strip() and line not in got:
+            sys.exit("rulebook text did not arrive; first missing line %r; context=%r"
+                     % (line[:80], got[:200]))
+    sys.exit("rulebook lines arrived but not the text as a whole; context=%r" % (got[:200],))
+status = got.replace(want, "", 1)
+if "self-check" not in status:
+    sys.exit("no self-check status beside the rulebook: %r" % (status[:200],))
+open(status_out, "w", encoding="utf-8").write(status)
+PYEOF
+  then
+    fail "$label: $(tail -2 "$d/why" | tr '\n' ' ' | cut -c1-400)"
+  else
+    says_failure "$d/status" \
+      && fail "$label: status reports a problem on a complete plugin: $(show "$d/status")"
+  fi
+  [ $failures -eq $prior ] && pass "$label: stdout parses, rulebook text and status arrive"
+}
+
+printf 'The rulebook\r\nIntent first: criteria before code.\r\nLast line.\n' \
+  >"$base/rulebook-crlf.md"
+hostile_rulebook "CRLF line in AGENTS.md" "$base/rulebook-crlf.md" cr-may-drop
+
+printf 'The rulebook\rIntent first: criteria before code.\nLast line.\n' \
+  >"$base/rulebook-cr.md"
+hostile_rulebook "lone CR in AGENTS.md" "$base/rulebook-cr.md" cr-may-drop
+
+printf 'A "quoted" word, a backslash \\ and a\ttab.\nLast line.\n' \
+  >"$base/rulebook-escapes.md"
+hostile_rulebook 'quote, backslash and tab in AGENTS.md' "$base/rulebook-escapes.md" exact
+
+# --- Case 19: the machinery criterion 7 keeps while criterion 6 is open ----
+# Criterion 6 does not hold yet, so the criterion's second branch is in
+# force: install.sh, the bootstrap skill, the per-project loader, the core it
+# execs and the suites that only guard them all remain in the repository.
+prior=$failures
+for p in install.sh \
+         skills/bootstrap/SKILL.md \
+         .claude/hooks/session-start.sh \
+         skills/bootstrap/assets/session-start-core.sh \
+         test-install.sh \
+         skills/bootstrap/assets/test-session-start-core.sh \
+         skills/bootstrap/assets/test-session-start-loader.sh; do
+  [ -f "$repo_root/$p" ] \
+    || fail "criterion 7: $p is missing, but criterion 6 does not hold — it must remain"
+done
+[ $failures -eq $prior ] && pass "the per-project machinery is still in the repository"
+
+# --- Case 20: test.sh names every suite the tree holds --------------------
+# Case 15 checks that what test.sh names exists; this is the other direction.
+# A suite file in the tree that test.sh does not name never runs, so "the
+# suite is green" would be a statement about a subset.
+prior=$failures
+found_suites=$(cd "$repo_root" && find . -path ./.git -prune -o -type f -name 'test*.sh' -print \
+  | while IFS= read -r p; do p=${p#./}; [ "$p" = "test.sh" ] || echo "$p"; done | sort)
+n_found=$(printf '%s\n' "$found_suites" | grep -c .)
+[ "$n_found" -ge 2 ] \
+  || fail "test.sh coverage: only $n_found suite file(s) found in the tree — the search is broken"
+listed_norm=$(printf '%s\n' "$listed_suites" | tr -d "\"'")
+while IFS= read -r suite; do
+  [ -n "$suite" ] || continue
+  printf '%s\n' "$listed_norm" | grep -qxF "$suite" \
+    || fail "test.sh coverage: $suite exists in the tree but test.sh does not name it"
+done <<EOF
+$found_suites
+EOF
+[ $failures -eq $prior ] && pass "test.sh names every one of the $n_found suites in the tree"
 
 echo
 [ $skips -gt 0 ] && echo "note: $skips case(s) skipped"

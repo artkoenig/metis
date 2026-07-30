@@ -42,8 +42,11 @@ for skill in "${repo_dir}/skills"/*/; do
   skills_n=$((skills_n + 1))
 done
 
-# 2. Same treatment for subagents (agents/<name>/agent.md; Claude Code scans
-#    ~/.claude/agents recursively and takes identity from the `name` field).
+# 2. Same treatment for subagents. An agent is one flat file, agents/<name>.md,
+#    and is linked under that same name — Claude Code scans ~/.claude/agents
+#    recursively and takes identity from the `name` field. The prune also
+#    catches the links of the earlier nested layout (agents/<name> pointing at
+#    a directory), which no longer resolve.
 mkdir -p "$agents_dir"
 for link in "$agents_dir"/*; do
   [ -L "$link" ] || continue
@@ -52,9 +55,9 @@ for link in "$agents_dir"/*; do
   esac
 done
 agents_n=0
-for agent in "${repo_dir}/agents"/*/; do
-  [ -f "${agent}agent.md" ] || continue
-  ln -sfn "${agent%/}" "${agents_dir}/$(basename "$agent")"
+for agent in "${repo_dir}/agents"/*.md; do
+  [ -f "$agent" ] || continue
+  ln -sfn "$agent" "${agents_dir}/$(basename "$agent")"
   echo "Linked agent: $(basename "$agent")"
   agents_n=$((agents_n + 1))
 done
@@ -108,12 +111,10 @@ for dir in "${repo_dir}/skills"/*/; do
   fi
 done
 agents_ok=0
-for dir in "${repo_dir}/agents"/*/; do
-  [ -d "$dir" ] || continue
-  name=$(basename "$dir")
-  if [ ! -f "${dir}agent.md" ]; then
-    errors="${errors} agent without agent.md: ${name};"
-  elif [ "$(readlink "${agents_dir}/${name}" 2>/dev/null)" != "${dir%/}" ]; then
+for file in "${repo_dir}/agents"/*.md; do
+  [ -f "$file" ] || continue
+  name=$(basename "$file")
+  if [ "$(readlink "${agents_dir}/${name}" 2>/dev/null)" != "$file" ]; then
     errors="${errors} agent not reachable: ${name};"
   else
     agents_ok=$((agents_ok + 1))
