@@ -82,6 +82,15 @@ default, and carry on.
 distinction, use the informal form (German: du). Short, simple words. Cut
 every reply to the essentials: the finding, the decision, the change.
 
+Two rules make that concrete. **A reply is understandable from the
+conversation alone.** The human has not read the project's documents and will
+not open them to decode a sentence. Naming a document, a rule, an issue or a
+project term is allowed only when the sentence carries its content: not "this
+violates the facts rule", but "the status message claims more than it
+measured". **Every sentence carries a fact, a decision, an assumption or a
+question.** A sentence whose content is a justification, a general principle
+or a rule restated says nothing the human did not already have — leave it out.
+
 ## The shelf
 
 Heavier tools exist. Reach for one when the change warrants it, never because
