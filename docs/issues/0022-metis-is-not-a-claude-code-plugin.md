@@ -426,6 +426,35 @@ lands in steps with a commit each.
   them, which made new diff for the next round to review. The rulebook already
   says such a finding goes to the human; applying that strictly is the cheaper
   half of the fix.
+- **The scope was restored to the eight criteria, retroactively.** The human's
+  rule — the scope is fixed, no feedback changes it, nothing outside it is
+  fixed — was filed as issue 0027 and then applied to this branch. Reverted to
+  `origin/main`: `README.md` (76 lines), `AGENTS.md`'s self-check bullet (13
+  lines), and the paragraph added to `skills/bootstrap/SKILL.md`. No criterion
+  asks for any of them; criterion 7 gates the `README.md` rewrite on criterion
+  6 holding, and 6 does not hold, so that requirement never fired at all.
+  Two of round 3's six findings are void rather than fixed by this:
+  `AGENTS.md:160-168` and `README.md:82-84` were both statements this branch
+  introduced and got wrong, and removing the text removes the falsehood.
+  Documenting the plugin belongs to the change that makes it the delivery
+  mechanism, which is criterion 7's first branch.
+  One bounded correction stays: adding `test-plugin.sh` to `test.sh` made
+  `skills/bootstrap/SKILL.md`'s enumeration of the suites incomplete, so it now
+  names the fourth — criterion 8's own consequence, not new content.
+  No fact was lost with the reverted text: the version-pinning measurement and
+  the release-on-request decision live in this issue's Decisions and Log, not
+  in `README.md`.
+  What remains in the diff, per criterion: `.claude-plugin/*` and the quoted
+  YAML in `agents/researcher.md` (1); the flat `agents/<name>.md` layout (2);
+  `hooks/hooks.json` and `hooks/session-start.sh` (3, 4, 5); the plugin
+  declaration and the restored loader entry in `.claude/settings.json` (2-6,
+  and 7's "all of them remain"); the flat-agent support in
+  `skills/bootstrap/assets/session-start-core.sh` with its suite, which the
+  layout change of criterion 2 forced and criterion 8 requires to stay green;
+  `test-plugin.sh` and the `test.sh` line (8); the issue files (invariant 5).
+  Fact after the revert: `bash test.sh` exits 1 with the same seven criterion-4
+  assertions as before and 58 cases passing, so nothing the revert touched was
+  load-bearing for the rest.
 
 ## Checkpoints
 

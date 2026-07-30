@@ -158,14 +158,11 @@ call.
 - A new session orients itself through that skill and reads nothing else to
   get oriented.
 - A session opens by greeting the human and reporting the self-check: the
-  status line a SessionStart hook put into the context. The plugin's hook
-  emits one in every session; the older loader emits one in cloud sessions
-  only and is deliberately silent locally. So in a project on the loader
-  alone, a local session without a status is normal — anywhere else it means
-  the hook did not run. When there is no status and one was due, establish
-  the facts yourself — is the plugin installed and enabled, does its
-  component inventory hold every skill and agent, how does
-  `.claude/hooks/session-start.log` end? — and report those instead.
+  status line the SessionStart hook put into the context. Local sessions
+  never get one; a cloud session without one had a hook failure. Either
+  way, when there is no status, establish the facts yourself (do the
+  `~/.claude` skill and agent links resolve? how does
+  `.claude/hooks/session-start.log` end?) and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A
   change that makes a document wrong updates it in the same change. Documents
   may repeat what a rule or skill says, but the rule or skill is where it is
