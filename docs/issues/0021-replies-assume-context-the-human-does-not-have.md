@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/agent-response-optimization-h73q5x
-pr:
+pr: https://github.com/artkoenig/metis/pull/25
 ---
 
 # Replies assume context the human does not have and pad it with justification
@@ -171,3 +171,31 @@ Acceptance criteria:
   session's replies read, which only the next runs can show.
 
 ## Retro
+
+What got in the way:
+
+- Every round after the first found a defect that the previous round's fix had
+  introduced, not one from the original change: a new list colliding with the
+  old one, then a deleted length limit, then a prohibition that had outgrown
+  its own unit. Rewriting a rule in place is where this run lost its time; the
+  trend fell 5 → 5 → 4 → 2 only once the rewrites stopped.
+- Twice the record cited line numbers that the same commit's own edit had
+  already invalidated. That is the *Repetition* signal, and the fix was to
+  change the approach: the record cites commands, counts and exit codes, never
+  a line number. Worth carrying into the rulebook or the `issue` skill as a
+  rule of its own — a line number in a record is stale by design.
+- Deciding that a change has nothing to run made the review the only check, and
+  four rounds of one reviewer cost more than the change itself. Cheap and
+  unavailable here: a check that reads the rulebook for self-contradiction, the
+  class of defect three of the four rounds found.
+- The last round was cut short by the human ("keine tests mehr"), after the
+  contrast example was removed from the rule at their request. That removal
+  therefore carries no fresh-context reading; it deletes text and adds none.
+
+What should change:
+
+- The rulebook's paragraph on talking to the human is now 110 words on a page
+  whose second rule is "few rules, plain words". Two of those words are
+  exemptions the rulebook forced ("a greeting aside", "unasked"). A future run
+  could shorten this by making the mandated session greeting exempt where it is
+  mandated, instead of here.
