@@ -120,6 +120,44 @@ Acceptance criteria:
   them." Both fixes touch files the criteria are about, so the waiver does not
   apply; round 2 is due and continues the same reviewing context, per the rule
   this issue itself establishes.
+- Trend after round 1:
+
+  | criterion | round 1 |
+  | --- | --- |
+  | 1 | 0 |
+  | 2 | 0 |
+  | 3 | 0 |
+  | 4 | 0 |
+  | 5 | 2 |
+  | outside all criteria | 0 |
+  | **total** | **2** |
+
+- Review round 2 (continued — same reviewing context as round 1, dispatched via
+  the harness's agent-resume path, not a fresh `Agent` call): 0 findings.
+  Rechecked the whole intent, not only the two findings it raised itself, and
+  found both fixed correctly with no new defect. This round is itself the
+  first real instance of criterion 2 and criterion 4 being exercised, not just
+  documented: a reviewing context that continued, reviewed the whole intent,
+  and the issue's own record (this Log) says which round was which.
+- Trend after round 2:
+
+  | criterion | round 1 | round 2 |
+  | --- | --- | --- |
+  | 1 | 0 | 0 |
+  | 2 | 0 | 0 |
+  | 3 | 0 | 0 |
+  | 4 | 0 | 0 |
+  | 5 | 2 | 0 |
+  | outside all criteria | 0 | 0 |
+  | **total** | **2** | **0** |
+
+  Converged in one repeat round (2 → 0); no third round needed.
+- What round 2 could not show: whether continuing costs fewer cache-read
+  tokens than a fresh round would have (criterion 3) — issue 0025's command
+  still doesn't exist to measure that, and the subagent transcript's own
+  reported token counts are cumulative across the continued conversation, not
+  broken out per round, so they cannot stand in for that measurement either.
+  Criterion 3 stays unverified by this run; it needs issue 0025 first.
 
 ## Checkpoints
 
@@ -138,8 +176,20 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: `AGENTS.md` and
+  `agents/reviewer/agent.md` now say the first round is fresh and every round
+  after a fix continues the same context against the whole intent, recorded
+  per round; criteria 1, 2, 4 and 5 are met, criterion 3 stays unverified for
+  the stated reason (issue 0025 doesn't exist yet).
+- **What surprised me?** Round 2, run as a real continuation of round 1 via
+  the harness's agent-resume path rather than a fresh `Agent` dispatch, is
+  itself the first working instance of the rule this issue writes down — the
+  review of this change ended up demonstrating criteria 2 and 4 directly,
+  not just reading the prose that states them.
+- **What am I assuming without having verified it?** That the agent-resume
+  mechanism this run used is what future sessions will also reach for — the
+  rulebook states the requirement in tool-agnostic terms and leaves the
+  mechanism to judgment, so a future session could pick a different way to
+  continue a context and still satisfy the written rule.
 
 ## Retro
