@@ -42,9 +42,9 @@ Acceptance criteria:
 
 ## Log
 
-- Found by issue 0028's round-2 review, as finding 1: the halt sentence at
-  `agents/reviewer/agent.md:23-25` served no criterion of 0028 and preceded
-  check 1, so a halt would drop the one check invariant 4 requires. The
+- Found by issue 0028's round-2 review, as finding 1: the halt sentence in the
+  reviewer's premise served no criterion of 0028 and preceded check 1, so a
+  halt would drop the one check invariant 4 requires. The
   sentence was removed and the underlying gap filed here, per the rule that a
   finding outside the running intent gets its own run.
 

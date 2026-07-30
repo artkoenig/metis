@@ -157,6 +157,21 @@ Acceptance criteria:
   - Not a finding, flagged for me to disagree with: `0029` in the diff serves
     no criterion. It stands as filed-and-waiting work, which the rulebook asks
     for; the same holds for `0030`.
+- **Review round 3 — the same context continued.** One finding, and it is
+  against the caller, not the diff: the round-3 dispatch broke the very bound
+  this change installs. Beyond the three permitted items it carried my account
+  of what I had fixed and my characterisation of `0030` as "the filed-and-
+  waiting form of the gap" — handed before the reviewer had read either file,
+  which is exactly the anchoring the reviewer's page forbids. Round 2's
+  dispatch did the same in smaller degree. No file needs changing; the fix is
+  the caller's conduct, and the rule that catches it was already in the diff
+  it was reviewing. Triaged as fixed in conduct, carried into the retro.
+- Round 3 also flagged a historical line-number pointer in `0030` — corrected,
+  the sentence now names the place without the numbers.
+- Reviewing stopped after round 3. Its only finding needs no change to any
+  file, so a further round would re-read an unchanged diff; and the anchoring
+  it names has already happened in that context and cannot be undone by
+  another round in it.
 - Observation, not caused by this change: the round-1 reviewer reported that
   the definition it was given lacks the record and blast-radius checks. The
   file is not the cause — `diff /root/.claude/metis/agents/reviewer/agent.md
@@ -187,8 +202,20 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes, and further than the opening request:
+  the human asked for dispatches that leave less to discover, then decided
+  mid-run that the reviewer is handed intent and criteria copied word for word,
+  and that everything in the diff — the record included — is judged against
+  them. All three are in the change.
+- What surprised me? That I broke the rule in the act of shipping it. Round 3's
+  dispatch carried my account of what I had fixed and my reading of a file the
+  reviewer was there to judge. The rule is one sentence and I violated it one
+  message after writing it, which says the danger is habit, not ignorance.
+- What am I assuming without having verified it? Two things. That copying the
+  recorded intent is enough — a recorded intent that is thin passes through
+  untouched, which is filed as `0030` and not solved here. And that the
+  reviewer's dispatch was the only place my own reasoning leaks into a
+  receiver; I did not examine the implementer or test-author dispatches,
+  because this run made none.
 
 ## Retro
