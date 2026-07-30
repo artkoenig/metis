@@ -191,9 +191,9 @@ judgment call.
 - A session opens by greeting the human and reporting the self-check: the
   status line the SessionStart hook put into the context. Local sessions
   never get one; a cloud session without one had a hook failure. Either
-  way, when there is no status, establish the facts yourself (do the
-  `~/.claude` skill and agent links resolve? how does
-  `.claude/hooks/session-start.log` end?) and report those instead.
+  way, when there is no status, establish the facts yourself (does `claude
+  plugin list` show metis enabled? does invoking a skill or an agent by name
+  actually work?) and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A
   change that makes a document wrong updates it in the same change, bounded
   to the statements it falsified — content no criterion asks for is drift

@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 branch: claude/metis-remove-loader-0031
 pr: https://github.com/artkoenig/metis/pull/31
 ---
@@ -194,6 +194,34 @@ Acceptance criteria:
   Decisions section already named "drop bootstrap once the loader path goes
   away" as one of its options — this issue is that decision). Corrected
   criterion 6 above to close only 0024; 0023 is left open and untouched.
+
+- **Review round 1, fresh** (first review of this diff): confirmed all six
+  criteria met, verified independently — not on the test's word alone: its
+  own `git ls-files`/grep pass across all 22 tracked non-`docs/issues/` files,
+  its own read of `hooks/session-start.sh:93` (still writes `core.hooksPath`
+  unconditionally, confirming 0023 correctly stays open), its own `bash
+  test.sh` run (exit 0). Two findings, both violating no listed criterion:
+  (1) `AGENTS.md`'s self-check fallback instructions named two artifacts
+  (`~/.claude` skill/agent links, `.claude/hooks/session-start.log`) that only
+  the now-deleted loader ever produced, so that fallback text could never
+  again describe anything real — this is the documentation-falsification
+  exception the rulebook itself carves out, so fixed in this change: replaced
+  the fallback with a check of `claude plugin list` and directly invoking a
+  skill/agent. (2) `.gitignore` still ignores `.claude/hooks/session-start.log`,
+  a harmless dead entry, but not a false documentation statement — filed as
+  issue 0032, not fixed here. Re-ran `bash test.sh` after the AGENTS.md edit:
+  exit 0, unchanged.
+
+  | | Round 1 |
+  | --- | --- |
+  | Criterion 1 | 0 |
+  | Criterion 2 | 0 |
+  | Criterion 3 | 0 |
+  | Criterion 4 | 0 |
+  | Criterion 5 | 0 |
+  | Criterion 6 | 0 |
+  | Violates no criterion | 2 (1 fixed here, 1 filed as 0032) |
+  | **Total** | **2** |
 
 ## Checkpoints
 
