@@ -591,6 +591,26 @@ lands in steps with a commit each.
   session on this commit, reporting `claude plugin marketplace list` and
   `claude plugin list`, to settle criterion 6 for the source consumers
   actually use.
+- **Criterion 6, fifth measurement** — a real fresh cloud session on commit
+  `11831c0` (github source, `ref: claude/metis-plugin-0022`), confirmed via
+  the settings file the human pasted back matching what was pushed: `claude
+  plugin marketplace list` → "No marketplaces configured", exit 0; `claude
+  plugin list` → "No plugins installed", exit 0. Same negative result as the
+  directory source. The human confirmed `SKIP_PLUGIN_MARKETPLACE=true` is
+  also set in this session. That variable is not documented on
+  `code.claude.com`'s environment-variables or cloud-environments pages, and
+  a web search found no independent source describing its scope either — its
+  exact effect is unconfirmed. It remains, as an earlier entry in this Log
+  already said, "the likeliest reason no marketplace is ever configured and
+  no plugin ever installed here, whatever `.claude/settings.json`
+  declares... not yet measured against a session without it, so it is a
+  lead, not the answer." Two real cloud sessions, two different marketplace
+  source types, identical negative result, both with this variable set: the
+  common factor is the variable, not the source type, but nothing here rules
+  the source type out on its own, since no session without the variable has
+  been measured. Criterion 6 stays open; a session in an environment that
+  does not set `SKIP_PLUGIN_MARKETPLACE` is what would separate the two
+  explanations.
 
 ## Checkpoints
 
