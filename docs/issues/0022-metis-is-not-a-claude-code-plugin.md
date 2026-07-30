@@ -549,6 +549,17 @@ lands in steps with a commit each.
   returns to `active` and `pr` is cleared: the pull request that carried this
   change no longer does, and the `issue` skill's `done` means the change's own
   pull request is open.
+- **Rebased onto `main` (`33f72bb`) by merge (`d91417f`)**, since `main` had
+  independently resolved issues 0026 and 0027 (same file paths, different
+  content) after this branch split off. Conflicts resolved by taking `main`'s
+  completed versions of both files; everything else auto-merged cleanly,
+  verified against `origin/main` and by content diff of `agents/reviewer.md`
+  and `agents/researcher.md`. Facts after the merge: `bash test.sh` — 4
+  suites, exit 0; `claude plugin validate .claude-plugin/plugin.json
+  --strict` — exit 0; `claude plugin validate . --strict` — exit 0. Pushed
+  to `origin/claude/metis-plugin-0022`. Criterion 6 is still open and needs
+  one fresh cloud session opened on this branch, reporting `claude plugin
+  list`'s exit code, to settle it.
 
 ## Checkpoints
 
