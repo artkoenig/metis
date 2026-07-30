@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/metis-plugin-0022
-pr:
+pr: https://github.com/artkoenig/metis/pull/30
 ---
 
 # Metis is not a Claude Code plugin
