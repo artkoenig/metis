@@ -15,15 +15,16 @@
 #   Criterion 2 — this repository's own settings declare no SessionStart hook
 #     Case: .claude/settings.json either has no "hooks" key at all, or a
 #     "hooks" key without a "SessionStart" entry in it.
-#   Criterion 3 — README.md and AGENTS.md point only at the plugin
-#     Case: neither file names "install.sh" (the loader's install step), and
-#     each names the plugin's own install command instead. The marker used
-#     for "instructs installing the plugin" is the literal CLI invocation
-#     `claude plugin install` — the documented installation per issue 0022's
-#     own record (`claude plugin marketplace add artkoenig/metis` followed
-#     by `claude plugin install metis@metis`). If the eventual wording
-#     instructs installation without that literal command, this case's
-#     marker choice — not the criterion — would need revisiting.
+#   Criterion 3 — README.md instructs the plugin install; neither file names
+#   a step that installs the loader
+#     Case: README.md does not name "install.sh" (the loader's install step)
+#     and does name the plugin's own install command instead — the literal
+#     CLI invocation `claude plugin install`, the documented installation per
+#     issue 0022's own record (`claude plugin marketplace add artkoenig/metis`
+#     followed by `claude plugin install metis@metis`). AGENTS.md never
+#     carried install instructions of either kind, so it is only checked for
+#     the absence of "install.sh" — it is not required to newly gain plugin
+#     install instructions it never had.
 #   Criterion 4 — no reference to the removed paths anywhere in the tree
 #     Case: grepping the tracked tree, excluding docs/issues/ (historical
 #     Log entries there are allowed to mention these paths), for
@@ -88,22 +89,27 @@ else
 fi
 [ $failures -eq $prior ] && pass "own settings.json declares no SessionStart hook (criterion 2)"
 
-# --- Criterion 3: README.md and AGENTS.md point only at the plugin ---------
-check_doc_points_at_plugin() {
-  local file=$1
-  local prior=$failures
-  if [ ! -f "$repo_root/$file" ]; then
-    fail "$file: missing"
-  else
-    grep -q "install\.sh" "$repo_root/$file" \
-      && fail "$file: still names install.sh as an install step"
-    grep -q "claude plugin install" "$repo_root/$file" \
-      || fail "$file: does not instruct installing the plugin (expected 'claude plugin install')"
-  fi
-  [ $failures -eq $prior ] && pass "$file: instructs the plugin install, names no loader step (criterion 3)"
-}
-check_doc_points_at_plugin "README.md"
-check_doc_points_at_plugin "AGENTS.md"
+# --- Criterion 3: README.md instructs the plugin install, neither file
+# names a step that installs the loader -------------------------------------
+prior=$failures
+if [ ! -f "$repo_root/README.md" ]; then
+  fail "README.md: missing"
+else
+  grep -q "install\.sh" "$repo_root/README.md" \
+    && fail "README.md: still names install.sh as an install step"
+  grep -q "claude plugin install" "$repo_root/README.md" \
+    || fail "README.md: does not instruct installing the plugin (expected 'claude plugin install')"
+fi
+[ $failures -eq $prior ] && pass "README.md: instructs the plugin install, names no loader step (criterion 3)"
+
+prior=$failures
+if [ ! -f "$repo_root/AGENTS.md" ]; then
+  fail "AGENTS.md: missing"
+else
+  grep -q "install\.sh" "$repo_root/AGENTS.md" \
+    && fail "AGENTS.md: still names install.sh as an install step"
+fi
+[ $failures -eq $prior ] && pass "AGENTS.md: names no loader install step (criterion 3)"
 
 # --- Criterion 4: no reference to the removed paths anywhere in the tree ---
 prior=$failures

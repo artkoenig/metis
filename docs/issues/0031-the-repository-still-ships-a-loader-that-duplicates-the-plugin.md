@@ -46,8 +46,10 @@ Acceptance criteria:
 2. This repository's own `.claude/settings.json` no longer declares a
    `SessionStart` hook pointing at the removed loader script; its plugin
    declaration (`extraKnownMarketplaces`, `enabledPlugins`) stays untouched.
-3. `README.md` and `AGENTS.md` instruct a reader to install the plugin, and
-   name no step that installs the loader.
+3. `README.md` instructs a reader to install the plugin and names no step
+   that installs the loader; `AGENTS.md` (which never carried install
+   instructions of either kind) names no step that installs the loader
+   either.
 4. Searching the repository's current tree — excluding `docs/issues/`, and
    excluding the plugin's own retained `hooks/session-start.sh` and
    `hooks/hooks.json` — for `install.sh`, the `bootstrap` skill, or the
@@ -131,6 +133,22 @@ Acceptance criteria:
   criterion 4's file list, the same way `docs/issues/` already is. Confirmed:
   `bash test-loader-removed.sh` still exits 1, still 18 failures, and no
   failure line now names `test-loader-removed.sh`.
+- **A third correction, also found by re-reading the criteria against the
+  actual repository before implementing further**: criterion 3 originally
+  required both `README.md` and `AGENTS.md` to instruct installing the
+  plugin. `git log --all -p -- AGENTS.md | grep install.sh` finds no commit
+  where `AGENTS.md` ever named `install.sh` or any install step at all — it
+  never carried install instructions, so requiring it to newly gain plugin
+  install text is not correcting drift, it is adding content no prior state
+  asked for. Corrected criterion 3 to only require README.md to instruct the
+  plugin install; AGENTS.md is only required to name no loader step (which it
+  already doesn't). `test-loader-removed.sh`'s criterion 3 case split
+  accordingly. README.md's install section rewritten directly (by me): the
+  `curl ... install.sh` block replaced with
+  `claude plugin marketplace add artkoenig/metis` /
+  `claude plugin install metis@metis`, matching issue 0022's own decision
+  record. `bash test-loader-removed.sh` now shows 15 failures, not 18 — both
+  criterion-3 cases already pass.
 
 ## Checkpoints
 
