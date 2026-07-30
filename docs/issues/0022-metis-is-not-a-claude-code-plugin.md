@@ -1,7 +1,7 @@
 ---
-status: done
-branch: claude/metis-claude-plugin-anmted
-pr: 26
+status: active
+branch: claude/metis-plugin-0022
+pr:
 ---
 
 # Metis is not a Claude Code plugin
@@ -492,6 +492,63 @@ lands in steps with a commit each.
   `.claude/settings.json`. The fact the greeting does establish: the loader path
   works in a fresh cloud session, which is why criterion 7's second branch keeps
   it.
+- **Criterion 4 was implemented** in `b2abb11`: both loops in
+  `hooks/session-start.sh` now compare every entry in the tree against what
+  plugin discovery can read and name what it cannot — `skill without SKILL.md:
+  <name>`, `agent not reachable: <name>`, the loader core's wording. The
+  test-author's seven assertions pass without any test being edited.
+  `bash test.sh`: 4 suites, 61 cases, exit 0.
+- **Review round 4** (fresh context, whole intent): five findings, and seven of
+  the eight criteria met, each by a command's exit code.
+
+  | criterion | R1 | R2 | R3 | R4 |
+  | --- | --- | --- | --- | --- |
+  | 1 validate | 0 | 1 | 0 | 0 |
+  | 3 rulebook text | 1 | 0 | 0 | 0 |
+  | 4 self-check | 1 | 1 | 1 | 1 |
+  | 6 cloud install | 0 | 0 | 0 | 1 |
+  | 7 branch in force | 2 | 0 | 0 | 0 |
+  | 8 test.sh | 1 | 0 | 0 | 0 |
+  | no criterion | 1 | 7 | 5 | 3 |
+  | **total** | **6** | **9** | **6** | **5** |
+
+  Criterion 6 appears as a row only from round 4 on; the earlier rounds recorded
+  it as open rather than counting it. Facts the round established itself: `bash
+  test.sh` exit 0, 61 cases, 0 skipped, over four suites; both validate targets
+  exit 0; `bash -n` over all 10 tracked `*.sh` plus `.githooks/pre-push` exit 0;
+  `jq empty` over all 4 tracked `*.json` exit 0; no linter exists. It also
+  proved the criterion-4 tests have teeth by mutation: the implementation
+  reverted → 7 assertions fail; either `else` branch deleted alone → 3 fail;
+  `problems` seeded non-empty to flag everything → 6 other cases fail, so the
+  cheap pass is refused.
+  Triage: *criterion 6* — not fixable from inside a container, it is the open
+  criterion itself, and the round added a third negative measurement with its
+  confounders named. *The record contradicting the diff* — fixed here.
+  *The per-criterion list missing `skills/clean-room/SKILL.md`* — fixed above,
+  with the round's measurement. *A component whose file is deleted entirely is
+  still reported as "no problems"* — **dismissed with reason**: the plugin tree
+  is its own only inventory, so nothing remains to compare against once a file
+  is gone; `test-plugin.sh:60-62` excludes the case deliberately and says so;
+  fixing it would mean inventing an expected-inventory list, which no criterion
+  asks for. *A stale `core.hooksPath` after a version bump or an uninstall
+  silently disables every git hook in a consumer project* — outside every
+  criterion, reproduced, and not filed yet.
+  Not filed either: the loader core is blind to an agent in the old nested
+  layout, found by the implementer and left alone by it.
+  The fixes from this round touch only the tracker record and the pull request
+  body — no file the criteria are about — so the rulebook's waiver applies and
+  the round is not repeated. Recorded as the judgment call it is.
+- **A new fact about criterion 6**: this cloud environment sets
+  `SKIP_PLUGIN_MARKETPLACE=true`. That is the likeliest reason no marketplace is
+  ever configured and no plugin ever installed here, whatever
+  `.claude/settings.json` declares. Not yet measured against a session without
+  it, so it is a lead, not the answer.
+- **The run was split on the human's instruction.** The plugin change and its
+  record move to their own branch, `claude/metis-plugin-0022`; pull request 26
+  keeps only the issues this run filed (0023 to 0027). `status` therefore
+  returns to `active` and `pr` is cleared: the pull request that carried this
+  change no longer does, and the `issue` skill's `done` means the change's own
+  pull request is open.
 
 ## Checkpoints
 
@@ -526,13 +583,14 @@ are the state at that moment.
 
 - **Does this match what was asked?** In part, and the parts are named. Metis
   is a plugin: a session that loads it has the rulebook text, five skills, four
-  agents and the push guard, each shown by a suite case. Two of the eight
-  criteria are not met — the self-check still reports success when one part of
-  many is unreachable (4), and no exit code establishes the cloud install (6) —
-  so nothing was removed and the loader path stays, which is what criterion 7's
-  second branch prescribes. Criterion 8 fails only as a consequence of 4. The
-  pull request body states all of this, so the state is visible before the
-  merge rather than after it.
+  agents and the push guard, each shown by a suite case. *Corrected after
+  criterion 4 was implemented in `b2abb11` and review round 4 read the result:*
+  seven of the eight criteria are met, each by an exit code; only criterion 6 is
+  not, because no exit code establishes the cloud install. Nothing was therefore
+  removed and the loader path stays, which is what criterion 7's second branch
+  prescribes. `bash test.sh` exits 0 over four suites and 61 cases.
+  *(The first version of this answer, written while the run was halted, said
+  criteria 4 and 8 were unmet as well; that was true when written.)*
 - **What surprised me?** That the criteria were never what made this run long.
   Of 21 findings across three rounds, 13 belonged to no criterion, and
   repairing them was what produced the next round each time. Two regressions
