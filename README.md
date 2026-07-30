@@ -51,14 +51,14 @@ its own failures.
 
 ## Installing it
 
-Run this in the root of your project (a git repository):
+Metis is a Claude Code plugin, installed from its own marketplace:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/artkoenig/metis/main/install.sh | bash
+claude plugin marketplace add artkoenig/metis
+claude plugin install metis@metis
 ```
 
-It installs and commits a `SessionStart` hook that loads the current
-rulebook, subagents and skills into every Claude Code cloud session of the
-project — updates included, no re-installation. To own the feedback loop —
-retros landing as rule changes in *your* rulebook — fork this repository and
-point the installed hook (and `METIS_SOURCE`) at your fork.
+A session with the plugin active has the rulebook, subagents and skills of
+the current `main` — updates included, no re-installation. To own the
+feedback loop — retros landing as rule changes in *your* rulebook — fork this
+repository and point the marketplace add at your fork instead.
