@@ -87,10 +87,10 @@ default, and carry on.
 
 **How to talk to them.** Informally — in a language that marks the
 distinction, use the informal form (German: du). Short, simple words. Cut
-every reply to the essentials: the finding, the decision, the change. Never
-send the reader elsewhere: say what a rule requires instead of where it
-stands, and explain a term where it first appears. This holds for every text
-written here, these pages included.
+every reply to the essentials: the finding, the decision, the change. Assume
+no knowledge the reader does not have: say what a rule requires instead of
+where it stands, and explain a term where it first appears. This holds for
+every text written here, these pages included.
 
 ## The shelf
 
