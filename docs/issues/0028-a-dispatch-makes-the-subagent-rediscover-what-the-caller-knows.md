@@ -139,6 +139,24 @@ Acceptance criteria:
 - Criteria revised mid-run after that reversal: old criterion 4 asserted the
   opposite of the decision and was replaced; 5 and 6 added for the copied-intent
   rule and the record reached through the diff.
+- **Review round 2 — the same context continued**, dispatched under the new
+  rule: repository root, diff range, and the intent copied word for word. The
+  reviewer verified the copy byte for byte against the issue file and reported
+  `diff -u` exit 0. Two findings, both fixed:
+  1. The halt sentence added to the reviewer's premise — "if the intent is too
+     thin, say so and stop" — served no criterion and sat before check 1, so a
+     halt would drop the suite and static-analysis facts invariant 4 requires.
+     Removed. The gap it tried to cover is real but outside this intent, so it
+     is filed as its own issue rather than fixed here.
+  2. Merging the record check into check 2 kept "a recorded decision the diff
+     contradicts" and lost the rest of the removed check's cues. Shown by this
+     run: round 1's first finding was reached through a checkpoint answer, an
+     admitted-unverified assumption that contradicted nothing. Restored — the
+     record's parts are named again, and so are the three places to look
+     hardest.
+  - Not a finding, flagged for me to disagree with: `0029` in the diff serves
+    no criterion. It stands as filed-and-waiting work, which the rulebook asks
+    for; the same holds for `0030`.
 - Observation, not caused by this change: the round-1 reviewer reported that
   the definition it was given lacks the record and blast-radius checks. The
   file is not the cause — `diff /root/.claude/metis/agents/reviewer/agent.md

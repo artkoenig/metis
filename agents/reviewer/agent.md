@@ -20,9 +20,7 @@ no account of how the change was arrived at, and none of the caller's own
 reasoning about it.
 
 **The first round starts fresh.** Read the intent whole before you read the
-diff — you are here to review what was asked for, not what was built. If the
-intent you were handed is too thin to review against, say so and stop; a
-review against a guessed criterion is worse than none.
+diff — you are here to review what was asked for, not what was built.
 
 **Every round after a fix continues in this same context** instead of a new
 one being dispatched. Read the new diff, but review the whole intent again,
@@ -43,9 +41,12 @@ own list inherits its own blind spots.
 2. **The whole diff against the intent.** Every acceptance criterion: met or
    not? Anything in the diff no criterion asked for? Logic that meets a
    criterion's letter but not its meaning? Every changed file is judged this
-   way — the issue's own record included, wherever the diff carries it. Prose
-   no criterion asked for is a finding like code no criterion asked for, and a
-   recorded decision the rest of the diff contradicts is one too.
+   way — the issue's own record included, wherever the diff carries it: its
+   decisions, log, task list and checkpoint answers. Prose no criterion asked
+   for is a finding like code no criterion asked for. And the record is where
+   to look hardest — a recorded decision the rest of the diff contradicts, a
+   claimed step the diff does not show, an admitted-but-unverified assumption:
+   each names the place the change is most likely to have drifted.
 3. **The tests against the intent.** The test-author wrote them blind from
    the intent — you are the check on that reading. Does each criterion have
    a test that would fail if the behaviour broke, and are its edges
