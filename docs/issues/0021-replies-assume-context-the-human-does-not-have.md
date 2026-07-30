@@ -60,6 +60,14 @@ Acceptance criteria:
 - The prohibition keeps "only" ("a sentence whose only content is …"), so a
   sentence that carries a fact and a justification stays permitted. Source:
   reviewer round 1, finding 3.
+- The rule keeps a length limit of its own — "only as many sentences as the
+  human needs now" — because the merge in round 1 dropped the older brevity
+  instruction, and a per-sentence content filter permits an arbitrarily long
+  reply. Source: reviewer round 2, finding 1.
+- Two exemptions are named instead of left to reading: a greeting carries none
+  of the listed content but the rulebook mandates one at session start, and a
+  justification is the answer itself when the human asks "why". Source:
+  reviewer round 2, findings 2 and 3.
 - The `grill` skill's "one question per turn" stays untouched: it constrains a
   turn addressed to the human, but the change's intent is the content of a
   reply, not how many questions one may hold. Outside the intent, so it goes
@@ -75,10 +83,13 @@ Acceptance criteria:
   repository: no `.github/`, no lint config in `git ls-files`, `shellcheck` not
   installed. This review is the change's only check.
 - Criterion 4, established by
-  `grep -rniE 'informal|\bdu\b|talk to (them|the human)|repl(y|ies)|tone|concise|terse|short words|plain words|prose|greet' README.md AGENTS.md agents/ skills/ .claude/ install.sh`
-  — hits only in `AGENTS.md` (lines 12, 81-85, 160) — and by reading
-  `README.md` whole: its paragraph on the human lists the three steering
-  points and no reply style. No document had to change.
+  `grep -rniE 'repl(y|ies)|talk to (them|the human)|informal|tone\b|concise|terse' README.md AGENTS.md agents/ skills/ .claude/ install.sh test-install.sh test.sh`
+  — four hits, all in `AGENTS.md`, all inside the changed paragraph (lines 81,
+  82, 84, 88), exit 0 — and by reading `README.md` whole: its paragraph on the
+  human lists the three steering points and no reply style. No document had to
+  change. An earlier, wider version of this command was recorded here with
+  line numbers that no longer matched and with hits it did not mention; this
+  entry replaces it (reviewer round 2, finding 4).
 - Review round 1 (fresh context): 5 findings plus one style note. Triage:
   findings 1 and 3 fixed by merging the two lists into one and keeping "only"
   in the prohibition; finding 2 fixed by recording the commands here;
@@ -86,6 +97,15 @@ Acceptance criteria:
   finding 4 handed to the human as outside the intent; the style note on the
   rulebook's own justification sentences was acted on anyway — those sentences
   are now gone, which shortens the rule.
+- Review round 2 (fresh context): 5 findings. The count did not decrease
+  against round 1. Triage: finding 1 (round 1's merge deleted the brevity
+  instruction and no criterion asked for that) fixed by "only as many sentences
+  as the human needs now"; finding 2 (a reply to "why?" was required and
+  forbidden at once) fixed by exempting what the human asked for; finding 3
+  (the rule forbade the session-opening greeting the rulebook mandates) fixed
+  by "a greeting aside"; finding 4 fixed by re-running the command and
+  recording what it actually shows; finding 5 stays dismissed on the recorded
+  reason — the `grill` skill is outside this intent and is the human's call.
 
 ## Checkpoints
 

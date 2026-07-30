@@ -79,11 +79,13 @@ parks the work. Anything else: pick a sensible default, record it as a
 default, and carry on.
 
 **How to talk to them.** Informally — in a language that marks the
-distinction, use the informal form (German: du). Short, simple words.
+distinction, use the informal form (German: du). Short, simple words, and only
+as many sentences as the human needs now.
 
 **Every sentence of a reply carries a fact, a decision, an assumption, a
-question, or the answer that was asked for.** A sentence whose only content is
-a justification, a general principle or a rule restated is left out.
+question, or the answer that was asked for** — a greeting aside. Leave out
+what only justifies, generalizes or restates a rule, unless the human asked
+for exactly that.
 
 **A reply is understandable from the conversation alone.** Naming a document,
 a rule, an issue or a project term is allowed only when the sentence carries
