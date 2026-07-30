@@ -73,9 +73,14 @@ lands in steps with a commit each.
   "replace the hook, or stand beside it?" — *"replace, but only after proof"*.
   The first reading of the measurements said the proof failed; the human
   challenged it and the documentation settled it the other way (see the Log).
-  A cloud session installs a plugin declared in the repository's
-  `.claude/settings.json` before the session starts, so the loader, the core,
-  the installer and the bootstrap skill have nothing left to do.
+  That documentation says a cloud session installs a plugin declared in the
+  repository's `.claude/settings.json` before the session starts — a
+  documented claim, not an exit code. **Amended by review round 1:** this
+  bullet was written as flat fact and the removals were made on it, but the
+  human's answer was "replace, but only after proof" and criterion 6 has no
+  proof. So the two paths coexist for now: the plugin is added, the loader,
+  the core, the installer and the bootstrap skill stay until criterion 6
+  holds. Criterion 7's second branch, not its first.
 - **This repository is its own marketplace**, and registering it is an
   accepted prerequisite for installing the plugin. Source: the human, asked
   nothing — they said so unprompted after seeing the measurements: if a
@@ -180,7 +185,9 @@ lands in steps with a commit each.
   `test-plugin.sh`, 16 cases, exit 0. `claude plugin validate . --strict` —
   exit 0, but it validates the *marketplace* manifest only.
   `claude plugin validate .claude-plugin/plugin.json --strict` — exit 0, and
-  this is the one that walks all five skills and all four agents.
+  this is the one that walks all four skills and all four agents. (Corrected
+  from "five skills" by review round 1: `ls -d skills/*/` counts four —
+  clean-room, grill, issue, plan.)
 - The second validate target failed with exit 1 until two frontmatter
   descriptions were quoted. `skills/clean-room/SKILL.md` and
   `agents/researcher.md` carried unquoted YAML scalars containing `": "`, so
@@ -192,6 +199,42 @@ lands in steps with a commit each.
   Any split would have left an intermediate commit whose suite was red: the
   flattened agents fail the old core's harness, and the plugin manifests fail
   until the hook script exists. A red commit buys nothing here.
+- **Review round 1** (fresh context, diff against intent): six findings, all
+  with reproductions. Per criterion — 3: 1, 4: 1, 7: 2, 8: 1, no criterion: 1;
+  total 6. Facts the round established itself: `bash test.sh` 16 cases exit 0,
+  `claude plugin validate .claude-plugin/plugin.json --strict` exit 0 (proven
+  to walk the components by breaking `agents/researcher.md` frontmatter in a
+  scratch copy → exit 1), `claude plugin validate . --strict` exit 0 but
+  marketplace manifest only. Triage:
+  - *Criterion 7 took the wrong branch* — fixed. Criterion 6 is open, so the
+    machinery had to remain; it was deleted. Restored verbatim from the
+    default branch.
+  - *Every already-wired project loses metis on merge* — fixed by the same
+    restoration. Reproduced by the round: a project holding the old loader
+    against this branch's clone exits 1 with `Core script missing at
+    …/skills/bootstrap/assets/session-start-core.sh`, and afterwards
+    `~/.claude/agents` and `~/.claude/CLAUDE.md` do not exist. The round also
+    found that the restored core links agents as directories while agents are
+    now flat `.md` — so restoring alone is not enough; tests and a fix follow.
+  - *A CR byte in `AGENTS.md` makes the plugin hook emit invalid JSON with
+    exit 0* — fixed. `hooks/session-start.sh` drops the other control bytes
+    but neither drops nor escapes `\015`, so criteria 3 and 4 fail silently
+    for a CRLF edit. The code this replaced was immune (whitelist
+    `tr -dc '\040-\176'`).
+  - *Criterion 7's falsifiable half has no test, and `test.sh` names one of
+    four suites* — fixed; tests written first.
+  - *The designated criterion-6 proof would exercise the wrong source* — filed
+    as the decision below, not fixed in the diff.
+  - *"five skills" is four* — corrected above.
+- **How criterion 6 must be proven, and what a green result would and would
+  not establish.** Source: review round 1, reproduced. This repository's
+  `.claude/settings.json` declares `{"source": "directory", "path": "."}`,
+  while `README.md` tells every other project to use
+  `{"source": "github", "repo": "artkoenig/metis"}`. A cloud session on this
+  branch therefore settles criterion 6 for the *directory* source only; the
+  github source that other projects depend on stays unproven by it. Whoever
+  closes criterion 6 needs one cloud session per source, and the exit code
+  for each.
 
 ## Checkpoints
 
