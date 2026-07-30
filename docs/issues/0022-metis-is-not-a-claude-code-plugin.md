@@ -665,17 +665,22 @@ lands in steps with a commit each.
   separate internal cache (`~/.claude/plugins/known_marketplaces.json`) that
   the write never reaches — closed as a duplicate of the same underlying
   gap.
-  This matches every measurement in this Log: three real cloud sessions,
-  two source types, one `SKIP_PLUGIN_MARKETPLACE` override attempt, all
-  negative, all with the identical "no marketplace configured" shape #32606
-  describes. It also means the source-type question (directory vs. github)
-  and the `SKIP_PLUGIN_MARKETPLACE` hypothesis were never the deciding
-  factor: the declare-only mechanism this repository's `.claude/settings.json`
-  uses does not work, confirmed by a third party and left unfixed by
-  Anthropic, independent of source type or environment variable.
+  This matches every confirmed measurement in this Log: two real fresh
+  cloud sessions, one per source type, one `SKIP_PLUGIN_MARKETPLACE`
+  override attempt, all negative, all with the identical "no marketplace
+  configured" shape #32606 describes. (The three earlier self-probes from
+  inside this container are not counted among these — they were run before
+  the course correction that recognised a plain `claude -p` in this
+  container does not exercise the cloud session's actual startup path.) It
+  also means the source-type question (directory vs. github) and the
+  `SKIP_PLUGIN_MARKETPLACE` hypothesis were never the deciding factor: the
+  declare-only mechanism this repository's `.claude/settings.json` uses does
+  not work, confirmed by a third party and left unfixed by Anthropic,
+  independent of source type or environment variable.
   **Criterion 6 is settled: not met**, by the strongest evidence available
-  without filing a new report against Anthropic — five own measurements
-  plus a maintainer-closed bug report describing the identical failure.
+  without filing a new report against Anthropic — two real cloud-session
+  measurements plus a maintainer-closed bug report describing the identical
+  failure.
   Criterion 7's second branch is therefore not a temporary state pending
   proof; it is what the documented mechanism's confirmed unreliability
   requires. The loader, the installer, the bootstrap skill and their
@@ -686,6 +691,37 @@ lands in steps with a commit each.
   criterion 6 no longer needs a branch-specific `ref` to stay reachable
   after the merge, since it is now settled rather than pending. `bash
   test.sh` exits 0, 4 suites, unchanged by the revert.
+- **Review round 5**, a fresh round on the full diff `origin/main...HEAD`
+  (merge with `main`, the checkpoint-2 entry, all five criterion-6
+  measurements and the source-type revert included). Facts established:
+  `bash test.sh` exits 0, 61 `ok:` cases across 4 suites; `claude plugin
+  validate . --strict` and `claude plugin validate .claude-plugin/plugin.json
+  --strict` both exit 0; every `.sh` file parses (`bash -n`) and every
+  `.json` file parses (`jq empty`); no project linter exists, so `bash -n`/
+  `jq empty` are reported as the closest available static check, not as a
+  substitute for one. Two findings, both against this issue's own
+  checkpoint-2 text (not against production code), both explicitly named as
+  violating no acceptance criterion: the case count it cited (108) did not
+  match `bash test.sh`'s own output (61, matching every earlier Log entry),
+  and its cloud-session measurement tally (five, three directory/two github)
+  did not match what the Log's individual measurement entries actually
+  support (two confirmed real fresh cloud sessions, one per source type; the
+  other three were self-probes already recognised elsewhere in this Log as
+  not exercising the cloud startup path). Triage: both fixed in this same
+  commit, since both are this issue's own record made wrong by this branch's
+  own prior commit and bounded to exactly what they misstated — the same
+  documentation-mirror exception the bookkeeping rule states for a
+  diff-caused false statement, applied here to the tracker record itself
+  rather than to `README.md`. All eight criteria confirmed met or settled by
+  the round's own commands, independent of the two corrected passages: 1, 2,
+  3, 4, 5, 7 and 8 met by exit code; 6 settled not-met by two real
+  cloud-session measurements plus `anthropics/claude-code#32606` and
+  `#51806`. No finding named a violated criterion. Round started fresh, per invariant
+  3 — a new reviewer context with no memory of rounds 1–4, dispatched
+  because the diff since round 4 (the merge with `main`, all criterion-6
+  measurements, the source-type revert, checkpoint 2) is substantially new,
+  not a re-check of round 4's own fixes. It read the whole intent and the
+  issue's own record, not only a prior round's finding list.
 
 ## Checkpoints
 
@@ -721,19 +757,21 @@ those were written for pull request 26, opened while the run was halted, on a
 diff since rebased, merged and further changed.
 
 - **Does this match what was asked?** Yes, and now completely: metis is a
-  plugin, installable from its own marketplace, shown by 108 passing cases
+  plugin, installable from its own marketplace, shown by 61 passing cases
   across 4 suites (`bash test.sh`, exit 0). Seven of the eight acceptance
   criteria are met by an exit code. Criterion 6 — whether a cloud session
   auto-installs a plugin declared in a project's `.claude/settings.json` — is
   the one exception, and it is now settled as **not met**, not merely
-  untested: five real cloud-session measurements (three against a `directory`
-  source, two against a `github` source) all showed no marketplace and no
-  plugin after a fresh session started, and two independent upstream reports
-  — `anthropics/claude-code#32606` and `#51806` — confirm the mechanism does
-  not work as documented, regardless of source type or environment. Criterion
-  7's second branch — keep the loader path since the plugin path is
-  incomplete — therefore still holds, and the per-project machinery stays in
-  the tree.
+  untested: two confirmed fresh cloud-session measurements — one per
+  marketplace source type, `directory` and `github` — both showed no
+  marketplace and no plugin after a fresh session started (an earlier set of
+  three self-probes from inside this container was later recognised as not
+  reaching the cloud session's actual startup path, and is not counted among
+  these); two independent upstream reports — `anthropics/claude-code#32606`
+  and `#51806` — confirm the mechanism does not work as documented, regardless
+  of source type or environment. Criterion 7's second branch — keep the
+  loader path since the plugin path is incomplete — therefore still holds,
+  and the per-project machinery stays in the tree.
 - **What surprised me?** That I repeated, once, the exact mistake the run's
   own Log already recorded a prior session making: turning a negative
   measurement into a documentation contradiction before checking what the
