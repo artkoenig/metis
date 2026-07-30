@@ -1,0 +1,317 @@
+#!/bin/bash
+# Tests for install.sh. Everything runs against scratch git repos — the real
+# repo is never touched and nothing leaves the machine: METIS_SOURCE points
+# the installer at this checkout, or at a loopback-only HTTP server for the
+# curl arm. Exit 0 = all cases pass.
+set -u
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+install="$repo_root/install.sh"
+asset="$repo_root/skills/bootstrap/assets/session-start.sh"
+hook_cmd='$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh'
+base=$(mktemp -d)
+http_pid=""
+trap '[ -n "$http_pid" ] && kill "$http_pid" 2>/dev/null; rm -rf "$base"' EXIT
+
+# A scratch base inside a git repository breaks the sandbox: a case
+# without a repo of its own would see that repo, and git could write into
+# it. Refuse before running any case.
+if git -C "$base" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "test-install.sh: refusing to run: $base is inside a git repository (check TMPDIR)" >&2
+  exit 1
+fi
+
+failures=0
+
+fail() { echo "FAIL: $1"; failures=$((failures + 1)); }
+pass() { echo "ok:   $1"; }
+
+# Prepare a scratch target repo with a local git identity; prints its path.
+new_repo() {
+  local repo
+  repo=$(mktemp -d "$base/XXXXXX")
+  git -C "$repo" init --quiet
+  git -C "$repo" config user.email "test@example.invalid"
+  git -C "$repo" config user.name "Test"
+  echo "$repo"
+}
+
+# Run the installer inside a repo, piped through stdin like the curl | bash
+# path would — a script that needs its own file path must fail here.
+run_install() {
+  (cd "$1" && METIS_SOURCE="$repo_root" bash < "$install") >"$1.log" 2>&1
+}
+
+# Count SessionStart entries whose hooks name our loader command.
+count_entries() { python3 -c '
+import json, sys
+s = json.load(open(sys.argv[1]))
+n = 0
+for entry in s.get("hooks", {}).get("SessionStart", []):
+    for h in entry.get("hooks", []):
+        if h.get("type") == "command" and h.get("command") == sys.argv[2]:
+            n += 1
+print(n)' "$1" "$2"; }
+
+# --- Case 1: fresh repo — hook installed, settings created, commit made -----
+repo=$(new_repo)
+if run_install "$repo"; then
+  [ -f "$repo/.claude/hooks/session-start.sh" ] || fail "fresh: hook file missing"
+  [ -x "$repo/.claude/hooks/session-start.sh" ] || fail "fresh: hook not executable"
+  cmp -s "$asset" "$repo/.claude/hooks/session-start.sh" \
+    || fail "fresh: hook differs from canonical asset"
+  [ -f "$repo/.claude/settings.json" ] || fail "fresh: settings.json missing"
+  [ "$(count_entries "$repo/.claude/settings.json" "$hook_cmd")" = "1" ] \
+    || fail "fresh: SessionStart entry missing or duplicated"
+  commits=$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)
+  [ "$commits" -ge 1 ] || fail "fresh: no commit exists"
+  git -C "$repo" ls-tree -r --name-only HEAD | grep -q '\.claude/hooks/session-start\.sh' \
+    || fail "fresh: hook not committed"
+  git -C "$repo" ls-tree -r --name-only HEAD | grep -q '\.claude/settings\.json' \
+    || fail "fresh: settings not committed"
+  [ -z "$(git -C "$repo" status --porcelain)" ] || fail "fresh: working tree not clean"
+else
+  fail "fresh: install exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq 0 ] && pass "fresh repo: hook, settings entry, commit"
+
+# --- Case 2: existing settings with unrelated keys survive the merge --------
+prior=$failures
+repo=$(new_repo)
+mkdir -p "$repo/.claude"
+cat >"$repo/.claude/settings.json" <<'EOF'
+{
+  "permissions": {"allow": ["Bash(ls:*)"]},
+  "hooks": {
+    "PreToolUse": [{"hooks": [{"type": "command", "command": "echo pre"}]}]
+  }
+}
+EOF
+if run_install "$repo"; then
+  python3 -c '
+import json, sys
+s = json.load(open(sys.argv[1]))
+assert s["permissions"] == {"allow": ["Bash(ls:*)"]}, s
+assert s["hooks"]["PreToolUse"] == [{"hooks": [{"type": "command", "command": "echo pre"}]}], s
+' "$repo/.claude/settings.json" || fail "merge: unrelated keys disturbed"
+  [ "$(count_entries "$repo/.claude/settings.json" "$hook_cmd")" = "1" ] \
+    || fail "merge: SessionStart entry missing or duplicated"
+else
+  fail "merge: install exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "existing settings survive the merge"
+
+# --- Case 3: second run is idempotent ---------------------------------------
+prior=$failures
+repo=$(new_repo)
+run_install "$repo" || fail "idempotent: first run failed: $(cat "$repo.log")"
+commits_before=$(git -C "$repo" rev-list --count HEAD)
+if run_install "$repo"; then
+  commits_after=$(git -C "$repo" rev-list --count HEAD)
+  [ "$commits_before" = "$commits_after" ] || fail "idempotent: second run made a commit"
+  [ "$(count_entries "$repo/.claude/settings.json" "$hook_cmd")" = "1" ] \
+    || fail "idempotent: hook entry duplicated"
+  cmp -s "$asset" "$repo/.claude/hooks/session-start.sh" \
+    || fail "idempotent: hook no longer matches the asset"
+else
+  fail "idempotent: second run exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "second run: no failure, no duplicate, no commit"
+
+# --- Case 4: re-run beside unrelated staged work succeeds, leaves it staged -
+prior=$failures
+repo=$(new_repo)
+run_install "$repo" || fail "staged: first run failed: $(cat "$repo.log")"
+echo x >"$repo/unrelated.txt"
+git -C "$repo" add unrelated.txt
+commits_before=$(git -C "$repo" rev-list --count HEAD)
+if run_install "$repo"; then
+  commits_after=$(git -C "$repo" rev-list --count HEAD)
+  [ "$commits_before" = "$commits_after" ] || fail "staged: re-run made a commit"
+  git -C "$repo" diff --cached --name-only | grep -qx 'unrelated.txt' \
+    || fail "staged: user's staged file no longer staged"
+else
+  fail "staged: re-run exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "re-run beside unrelated staged work: no failure, work stays staged"
+
+# --- Case 5: repo ignoring .claude/ — clean refusal, nothing installed ------
+prior=$failures
+repo=$(new_repo)
+echo ".claude/" >"$repo/.gitignore"
+if run_install "$repo"; then
+  fail "ignored: install succeeded in a repo that ignores .claude/"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "ignored: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "ignored: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "repo ignoring .claude/: clean refusal, nothing installed"
+
+# --- Case 6: repo ignoring only settings.json — clean refusal, no writes ----
+prior=$failures
+repo=$(new_repo)
+echo ".claude/settings.json" >"$repo/.gitignore"
+if run_install "$repo"; then
+  fail "ignored-settings: install succeeded despite ignored settings.json"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "ignored-settings: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "ignored-settings: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "repo ignoring settings.json: clean refusal, nothing installed"
+
+# --- Case 7: no git identity — clean refusal, no writes ---------------------
+prior=$failures
+repo=$(mktemp -d "$base/XXXXXX")
+git -C "$repo" init --quiet
+git -C "$repo" config user.useConfigOnly true
+if (cd "$repo" && METIS_SOURCE="$repo_root" GIT_CONFIG_GLOBAL=/dev/null \
+    GIT_CONFIG_SYSTEM=/dev/null bash < "$install") >"$repo.log" 2>&1; then
+  fail "identity: install succeeded without a git identity"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "identity: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "identity: hook written despite refusal"
+fi
+[ $failures -eq $prior ] && pass "no git identity: clean refusal, nothing installed"
+
+# A repo whose settings.json is broken: clean refusal before any write.
+# $1 = case label, $2 = settings.json content.
+refuses_broken_settings() {
+  local label=$1 content=$2 repo
+  prior=$failures
+  repo=$(new_repo)
+  mkdir -p "$repo/.claude"
+  printf '%s' "$content" >"$repo/.claude/settings.json"
+  if run_install "$repo"; then
+    fail "$label: install succeeded despite broken settings.json"
+  else
+    grep -q "install.sh:" "$repo.log" \
+      || fail "$label: no clear refusal message: $(cat "$repo.log")"
+    [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+      || fail "$label: hook written despite refusal"
+    [ "$(cat "$repo/.claude/settings.json")" = "$content" ] \
+      || fail "$label: settings.json modified despite refusal"
+  fi
+  [ $failures -eq $prior ] && pass "$label: clean refusal, nothing installed"
+}
+
+# --- Cases 8-10: broken settings.json — check and abort, out of scope -------
+refuses_broken_settings "invalid JSON" 'not json'
+refuses_broken_settings "hooks not an object" '{"hooks": []}'
+refuses_broken_settings "SessionStart entry not an object" '{"hooks": {"SessionStart": ["x"]}}'
+
+# A repo whose filesystem state at the installed paths is broken: clean
+# refusal before any write, no commit. $1 = case label, $2 = a command that
+# breaks the state, run with the repo as its argument.
+refuses_broken_state() {
+  local label=$1 break_cmd=$2 repo
+  prior=$failures
+  repo=$(new_repo)
+  bash -c "$break_cmd" _ "$repo"
+  if run_install "$repo"; then
+    fail "$label: install succeeded despite broken state"
+  else
+    grep -q "install.sh:" "$repo.log" \
+      || fail "$label: no clear refusal message: $(cat "$repo.log")"
+    [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+      || fail "$label: a commit was made despite refusal"
+  fi
+  [ $failures -eq $prior ] && pass "$label: clean refusal, nothing committed"
+}
+
+# --- Cases 11-15: broken state at the installed paths — check and abort -----
+refuses_broken_state "settings.json a directory" 'mkdir -p "$1/.claude/settings.json"'
+refuses_broken_state "hook path a directory" 'mkdir -p "$1/.claude/hooks/session-start.sh"'
+refuses_broken_state ".claude/hooks a regular file" 'mkdir -p "$1/.claude" && touch "$1/.claude/hooks"'
+refuses_broken_state "settings.json a symlink" 'mkdir -p "$1/.claude" && echo "{}" > "$1/outside.json" && ln -s ../outside.json "$1/.claude/settings.json"'
+refuses_broken_state ".claude a symlink" 'mkdir -p "$1/elsewhere" && ln -s elsewhere "$1/.claude"'
+
+# --- Local HTTP server for the curl-arm cases -------------------------------
+# install.sh routes any METIS_SOURCE that is not a local directory through
+# curl; serve a tree on the loopback interface so that arm runs for real.
+# The server binds port 0 (the OS picks a free port) and prints the choice.
+www="$base/www"
+mkdir -p "$www/good/skills/bootstrap/assets" "$www/bad/skills/bootstrap/assets"
+cp "$asset" "$www/good/skills/bootstrap/assets/session-start.sh"
+echo 'not the metis loader' >"$www/bad/skills/bootstrap/assets/session-start.sh"
+python3 - "$www" >"$base/http.port" 2>"$base/http.log" <<'PYEOF' &
+import http.server, os, sys
+os.chdir(sys.argv[1])
+srv = http.server.ThreadingHTTPServer(
+    ("127.0.0.1", 0), http.server.SimpleHTTPRequestHandler)
+print(srv.server_address[1], flush=True)
+srv.serve_forever()
+PYEOF
+http_pid=$!
+for _ in $(seq 1 50); do
+  [ -s "$base/http.port" ] && break
+  sleep 0.1
+done
+[ -s "$base/http.port" ] \
+  || { echo "FAIL: local HTTP server did not start: $(cat "$base/http.log")"; exit 1; }
+http_base="http://127.0.0.1:$(cat "$base/http.port")"
+
+# Run the installer inside a repo with METIS_SOURCE set to $2, again piped
+# through stdin. Proxy variables are cleared so curl talks to the loopback
+# address directly — the suite must not need any network beyond it.
+run_install_http() {
+  (cd "$1" && env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+    -u all_proxy -u ALL_PROXY METIS_SOURCE="$2" bash < "$install") >"$1.log" 2>&1
+}
+
+# --- Case 16: fresh repo over HTTP — the curl arm fetches the real loader ---
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/good"; then
+  cmp -s "$asset" "$repo/.claude/hooks/session-start.sh" \
+    || fail "curl: hook differs from canonical asset"
+  [ "$(count_entries "$repo/.claude/settings.json" "$hook_cmd")" = "1" ] \
+    || fail "curl: SessionStart entry missing or duplicated"
+  git -C "$repo" ls-tree -r --name-only HEAD | grep -q '\.claude/hooks/session-start\.sh' \
+    || fail "curl: hook not committed"
+else
+  fail "curl: install exited non-zero: $(cat "$repo.log")"
+fi
+[ $failures -eq $prior ] && pass "fresh repo over HTTP: curl arm installs the loader"
+
+# --- Case 17: HTTP 404 — clean refusal, nothing installed, no commit --------
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/missing"; then
+  fail "curl-404: install succeeded despite a missing asset"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "curl-404: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "curl-404: hook written despite refusal"
+  [ ! -e "$repo/.claude/settings.json" ] \
+    || fail "curl-404: settings written despite refusal"
+  [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+    || fail "curl-404: a commit was made despite refusal"
+fi
+[ $failures -eq $prior ] && pass "HTTP 404: clean refusal, nothing installed"
+
+# --- Case 18: HTTP 200 with wrong content — sanity check refuses ------------
+prior=$failures
+repo=$(new_repo)
+if run_install_http "$repo" "$http_base/bad"; then
+  fail "curl-content: install succeeded despite a non-loader response"
+else
+  grep -q "install.sh:" "$repo.log" \
+    || fail "curl-content: no clear refusal message: $(cat "$repo.log")"
+  [ ! -e "$repo/.claude/hooks/session-start.sh" ] \
+    || fail "curl-content: hook written despite refusal"
+  [ ! -e "$repo/.claude/settings.json" ] \
+    || fail "curl-content: settings written despite refusal"
+  [ "$(git -C "$repo" rev-list --count HEAD 2>/dev/null || echo 0)" = "0" ] \
+    || fail "curl-content: a commit was made despite refusal"
+fi
+[ $failures -eq $prior ] && pass "wrong content over HTTP: clean refusal, nothing installed"
+
+echo
+if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
