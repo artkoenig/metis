@@ -118,8 +118,8 @@ idea → issue with acceptance criteria      (grilling only if unclear)
                                             when there is something to run)
      → implementer                         (plans, implements, makes the
                                             tests pass without editing them)
-     → reviewer                            (fresh context: diff vs. intent,
-                                            facts by exit code, repro per finding)
+     → reviewer                            (diff vs. intent, facts by exit
+                                            code, repro per finding)
      → checkpoint 2
      → commit, push, PR → human merges
      → retro
@@ -140,12 +140,14 @@ one column per round so far, each cell the number of findings, and the
 totals per round (e.g. 5 → 3 → 1). Whether the run is converging must be
 visible, not asked for.
 
-After a fix, the review repeats from a fresh context, against the whole
-intent — not only against the findings it fixed. A round that re-checks its
-predecessor's list inherits its blind spots. One waiver: when the fix
-touches only the tracker record — no file the criteria are about — the
-repeat may be skipped; record the waiver in the issue like any judgment
-call.
+The first review of a change is fresh, per invariant 3. After a fix, that
+same reviewing context continues instead of a new one starting, and checks
+the whole intent again — not only the findings it fixed itself. A round that
+re-checks only its own list inherits its own blind spots. Record in the
+issue whether each round continued or started fresh. One waiver: when the
+fix touches only the tracker record — no file the criteria are about — the
+round may be skipped entirely; record the waiver in the issue like any
+judgment call.
 
 ## Bookkeeping
 

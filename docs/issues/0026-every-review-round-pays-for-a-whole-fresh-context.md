@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/issue-26-8lvd7s
 pr:
 ---
 
@@ -66,6 +66,23 @@ Acceptance criteria:
   numbers blame those on findings outside the criteria being repaired, which is
   issue 0027. Source: the finding counts per criterion in issue 0022's trend
   table.
+- No test-author dispatch: the change touches only `AGENTS.md`,
+  `agents/reviewer/agent.md` and `README.md` — prose, nothing `test.sh`'s three
+  suites exercise. `grep -rn 'AGENTS.md' test.sh skills/bootstrap/assets/*.sh`
+  shows the rulebook only as a file that must exist or gets copied, never as
+  content a suite checks, so there is nothing to run and invariant 2 is held by
+  saying so. Source: the same grep issue 0021 ran for the identical question.
+- Criterion 3 cannot be shown by exit code in this run: it names "the command
+  from issue 0025", and 0025 is still `backlog` — no such command exists yet.
+  The reviewer reports this criterion as not verifiable rather than guessing at
+  a number. Source: `docs/issues/0025-a-runs-token-cost-is-invisible.md`
+  frontmatter.
+- The mechanism for "the same reviewing context continues" is the harness's
+  existing agent-resume path (continue a dispatched agent by addressing it
+  again, rather than launching a fresh one) — already available, nothing new
+  to build. `AGENTS.md` states the requirement in tool-agnostic terms and
+  leaves the mechanism to judgment, matching how the rest of the rulebook
+  stays silent on tool mechanics. Source: default, unanswered.
 
 ## Log
 
@@ -76,14 +93,34 @@ Acceptance criteria:
   tokens for a result nobody ever saw. Whether a continued reviewer makes that
   loss cheaper or more expensive is unmeasured, and worth a thought during
   implementation.
+- Facts before review: `./test.sh` — 3 suites, all cases, exit 0. It covers the
+  installer and the session-start hook; the change touches only `AGENTS.md`,
+  `agents/reviewer/agent.md` and `README.md`, none of which any suite reads as
+  content. No static analysis exists in the repository (no `.github/`, no lint
+  config in `git ls-files`). This review is the change's only check.
+- Criterion 5, established by `grep -rn 'fresh' --include='*.md' .` over the
+  repository (excluding `docs/issues/`), exit 0: every remaining "fresh"
+  either names invariant 3's unchanged property (`AGENTS.md:25`,
+  `README.md:23`), the first review round specifically (`AGENTS.md:143`,
+  `agents/reviewer/agent.md:3,18,69`), or an unrelated mechanism
+  (`clean-room/SKILL.md`'s blind dispatch, `agents/implementer/agent.md:48`'s
+  boundary against reviewing its own work, `README.md:47`'s "loads metis
+  fresh"). No document still claims every round is fresh.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: the human's decision (recorded
+  above) already rejected the opposite fix, so the direction is fixed —
+  intermediate rounds resume, they do not restart.
+- **What surprised me?** How little there is to build: the harness already
+  supports resuming a dispatched agent, so this issue is a rulebook and
+  agent-definition rewrite, not new tooling — the same shape as issue 0021.
+- **What am I assuming without having verified it?** That criterion 3 is
+  meant to hold as a property of the new arrangement, not as something this
+  run itself has to measure — issue 0025's command doesn't exist yet to
+  measure it with.
 
 ### Before the PR
 
