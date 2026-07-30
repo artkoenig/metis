@@ -33,18 +33,14 @@ need. This holds for the work and for these texts alike.
    ran on, never the adjective alone: "`npm test -- src/api`, 104 cases,
    exit 0, on main merged in", not "the suite is green". Before the PR that
    state is the merge with the default branch, because the merge is what
-   lands — keeping the merge commit or dropping it afterwards is your call,
-   and a fetch or a merge that fails is itself the state you report. When a
-   check already fails on the default branch, run it there too and report
-   the difference;
-   adding no new failure is not the same as passing. When no suite or no
-   analysis exists, that absence is the fact: report it with the commands
-   that established it.
+   lands. When a check already fails on the default branch, run it there too
+   and report the difference; adding no new failure is not the same as
+   passing. When no suite or no analysis exists, that absence is the fact:
+   report it with the commands that established it.
 5. **The record survives the session.** Record decisions, assumptions,
    surprises and checkpoint answers through the `issue` skill — the tracker,
-   one file per issue — as they happen.
-   The next session resumes from the tracker, not from a conversation that no
-   longer exists.
+   one file per issue — as they happen. The next session resumes from the
+   tracker, not from a conversation that no longer exists.
 
 ## Correcting course
 
@@ -114,17 +110,23 @@ dispatch the `researcher` subagent instead of assuming.
 
 ```
 idea → issue with acceptance criteria      (grilling only if unclear)
-     → checkpoint 1
+     → checkpoint: before implementation
      → test-author                         (failing tests from the intent,
                                             when there is something to run)
      → implementer                         (plans, implements, makes the
                                             tests pass without editing them)
      → reviewer                            (fresh context: diff vs. intent,
                                             facts by exit code, repro per finding)
-     → checkpoint 2
+     → checkpoint: before the PR
      → commit, push, PR → human merges
      → retro
 ```
+
+Producing the state the checks run on is the session's job, not the
+reviewer's: fetch the default branch from the remote and merge it into the
+branch before the review is dispatched, so the fresh context reads what will
+land. A merge that conflicts is undone and reported, never committed;
+keeping the merge commit afterwards is your call.
 
 A run opens with the issue in front of the human: its title and its
 numbered acceptance criteria, as a table. What "done" means is visible

@@ -68,8 +68,9 @@ by default.
 
 Open with the two facts: the suite and the static analysis, each as the exact
 command, what it covered, the exit code and the state it ran on — or the fact
-that none exists, with the commands that established it. Then the findings, most severe
-first, each with its reproduction and the criterion or behaviour it violates.
+that none exists, with the commands that established it. Then the findings,
+most severe first, each with its reproduction and the criterion or behaviour
+it violates.
 Then one line per acceptance criterion: met / not met / not verifiable and
 why. Close with your answer to what the change could break outside the
 criteria — "nothing found" is an answer; silence is not.

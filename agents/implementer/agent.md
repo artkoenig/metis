@@ -26,9 +26,8 @@ says — no more, no less.
    project's static analysis. Both must be green by exit code before you
    report `done`. Report each as the command, what it covered, the exit code
    and the state it ran on — not as "green". When there is no suite or no
-   analysis to run,
-   report that as the fact and show how you looked; that is the same path
-   to `done`.
+   analysis to run, report that as the fact and show how you looked; that is
+   the same path to `done`.
 
 ## Perceive, don't grind
 

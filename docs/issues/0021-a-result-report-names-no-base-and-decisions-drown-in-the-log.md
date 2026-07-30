@@ -102,6 +102,27 @@ Acceptance criteria:
      whether the merge commit stays in the branch. 7. The new sentence about
      decision entries sat behind the skill's interface line, where a caller
      reading only the operations table would not see it.
+- Review round 2: five findings, four fixed in this run, one for the human.
+  1. The decision that the session, not the reviewer, produces the merge was
+     recorded but shipped nowhere, so no text told anyone to do it — and the
+     reviewer's page demanded a state its own read-only rule forbids it to
+     create. The run section now assigns the fetch and the merge to the
+     session. 2. Criterion 3 asks for a fetch and the rulebook never
+     instructed one; a session merging a stale local copy of the default
+     branch satisfied the wording and still shipped what continuous
+     integration would reject. Now explicit: fetch from the remote. 3. The
+     writing rule against presupposition read as forbidding any pointer,
+     which collides with the tracker skill describing its own parts and
+     nowhere else. Reviewed against the wording before the correction above;
+     the corrected sentence forbids assuming what the reader knows, not
+     naming an owner. Left to the human rather than fixed. 4. The run diagram
+     labelled the checkpoints by ordinal, which the reader can only resolve
+     by counting — the failure criterion 6 names, in a passage the diff had
+     not touched. Both diagrams now name the moment. 5. Four lines this diff
+     created broke the paragraph wrap of their own files.
+  The round also named a risk outside the criteria: nothing stopped a
+  conflicted merge from reaching a commit. The run section now says such a
+  merge is undone and reported, never committed.
 - This branch carried a different change first: an idempotent session-start
   loader, filed as issue 0021 with five further issues around it, seventeen
   commits, suite green. The human dropped it in favour of these three retro

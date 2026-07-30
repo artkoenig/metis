@@ -31,10 +31,10 @@ Five invariants hold for every change, whatever process judgment picks:
    they happen — the record outlives the session.
 
 ```
-idea → issue with acceptance criteria → checkpoint 1
+idea → issue with acceptance criteria → checkpoint: before implementation
      → test-author (failing tests)    → implementer
      → reviewer (fresh context)
-     → checkpoint 2 → PR → human merges → retro
+     → checkpoint: before the PR → PR → human merges → retro
 ```
 
 The human steers at three points only: approving the criteria when the idea
