@@ -83,9 +83,9 @@ distinction, use the informal form (German: du). Short, simple words, and only
 as many sentences as the human needs now.
 
 **Every sentence of a reply carries a fact, a decision, an assumption, a
-question, or the answer that was asked for** — a greeting aside. Leave out
-what only justifies, generalizes or restates a rule, unless the human asked
-for exactly that.
+question, or the answer that was asked for** — a greeting aside. A sentence
+whose only content is an unasked justification, a general principle or a rule
+restated is left out.
 
 **A reply is understandable from the conversation alone.** Naming a document,
 a rule, an issue or a project term is allowed only when the sentence carries
