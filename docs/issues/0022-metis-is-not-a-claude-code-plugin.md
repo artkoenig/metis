@@ -164,6 +164,35 @@ lands in steps with a commit each.
   no marketplace and no install step at all; it loads as
   `<name>@skills-dir`.
 
+- Criterion 6's exit code could not be produced from inside this container.
+  Two attempts: `claude --cloud <prompt>` refuses without a TTY, and under a
+  pseudo-TTY it produced no output and was killed at the timeout (exit 143) —
+  a cloud session cannot be started from within a cloud session. A
+  trigger-created session would start on the default branch, where the
+  declaration this change adds does not exist yet, so it would prove nothing.
+  What settles it is one cloud session opened on this branch: if its first
+  line is the `Metis self-check:` status, the plugin was installed before the
+  session started. Until then criterion 6 is open, and the risk it carries is
+  the human's to weigh: if a cloud session does not perform the install, then
+  after the merge every project wired to metis — including this one — loses it
+  until its own `.claude/settings.json` declares the plugin.
+- Implementation facts by exit code: `bash test.sh` — one suite,
+  `test-plugin.sh`, 16 cases, exit 0. `claude plugin validate . --strict` —
+  exit 0, but it validates the *marketplace* manifest only.
+  `claude plugin validate .claude-plugin/plugin.json --strict` — exit 0, and
+  this is the one that walks all five skills and all four agents.
+- The second validate target failed with exit 1 until two frontmatter
+  descriptions were quoted. `skills/clean-room/SKILL.md` and
+  `agents/researcher.md` carried unquoted YAML scalars containing `": "`, so
+  both loaded with *every* frontmatter field silently dropped — the
+  `researcher` agent had no description for a model to select it by. The
+  defect predates this change; it is fixed here because criterion 1 demands
+  the validator exit 0, and the validator is what surfaced it.
+- The task list's six steps landed in one commit rather than one commit each.
+  Any split would have left an intermediate commit whose suite was red: the
+  flattened agents fail the old core's harness, and the plugin manifests fail
+  until the hook script exists. A red commit buys nothing here.
+
 ## Checkpoints
 
 ### Before implementation
