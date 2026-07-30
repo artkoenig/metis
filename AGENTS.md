@@ -114,10 +114,11 @@ against, the paths and commands already established, the decisions already
 recorded — marked as given facts. A subagent left to rediscover them pays for
 them a second time and may come back with a different answer.
 
-The limit is the receiving agent's own page: where it says the agent must not
-see something — the implementation, the caller's reasoning, the existing
-solution — that is not handed over, whatever the saving would be. Those agents
-are worth having only for what they have not seen.
+The limit is the page that defines the receiver — its agent page, or the skill
+page where a skill dispatches one. Whatever that page says the receiver does
+not get — a prohibition, or a fact it is told to fetch for itself — is not
+handed over, whatever the saving would be. Those receivers are worth having
+only for what they have not seen.
 
 ## The run
 

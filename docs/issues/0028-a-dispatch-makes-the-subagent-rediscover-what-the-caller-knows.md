@@ -80,6 +80,34 @@ Acceptance criteria:
     no docs, no leaning.
   - `grill`, `plan`, `issue` — no collision; the first two only dispatch the
     `researcher`.
+- Facts before the first review: `./test.sh`, 3 suites, 30 cases, exit 0 — a
+  regression fact only, since no harness asserts on the content of `AGENTS.md`
+  or an agent page. No static analysis exists: `which shellcheck markdownlint
+  vale` finds none, and there is no `package.json`, `Makefile` or lint config.
+- **Review round 1 — fresh context**, dispatched with the repository root and
+  the diff range and nothing else, which is the new rule applied to the
+  `reviewer`. Two findings, both on criterion 2, both fixed:
+  1. The bound was keyed on "must not see", but the `reviewer`'s page phrases
+     its constraint as *fetch the intent yourself*. A caller could hand the
+     reviewer the criteria without breaking the letter of the bound — exactly
+     what criterion 4 forbids. Fixed: the bound now covers a fact the page
+     tells the receiver to fetch for itself.
+  2. The bound was keyed on "the receiving agent's own page", and the
+     `clean-room` skill dispatches a general-purpose agent that has no page —
+     so its receiver had no limit at all. Fixed: the bound now names the skill
+     page where a skill defines the dispatch.
+  - Dismissed: the observation that a universal rule sits in the section about
+    shelf tools. No reproduction, and that section already carries the only
+    other dispatch rule — the `researcher` line the new text follows.
+- Observation, not caused by this change: the round-1 reviewer reported that
+  the definition it was given lacks the record and blast-radius checks. The
+  file is not the cause — `diff /root/.claude/metis/agents/reviewer/agent.md
+  agents/reviewer/agent.md` is empty and the clone stands at `2932063`, the
+  commit that added those checks. What is stale is the definition this session
+  registered at start: the agent list in the session's own prompt still carries
+  the pre-`2932063` reviewer description. So a session can register a subagent
+  from the clone as it was before the start hook updated it. Filed as its own
+  issue, not fixed here — it makes the new bound read from a stale page.
 
 ## Checkpoints
 
