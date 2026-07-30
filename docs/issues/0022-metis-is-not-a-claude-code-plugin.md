@@ -611,6 +611,32 @@ lands in steps with a commit each.
   been measured. Criterion 6 stays open; a session in an environment that
   does not set `SKIP_PLUGIN_MARKETPLACE` is what would separate the two
   explanations.
+- **A documented gate found in `/docs/en/discover-plugins#configure-team-marketplaces`**
+  (fetched as raw markdown via `curl`, not summarised, after the WebFetch tool
+  truncated the settings page twice before reaching this section): "As of
+  Claude Code v2.1.195, this install step applies on every path that loads
+  plugins. A plugin that only the project's `.claude/settings.json` enables,
+  and that comes from an external source such as a GitHub repository or npm
+  package, doesn't load until the team member installs it. Until then,
+  Claude Code reports the plugin as not installed and shows the `claude
+  plugin install` command to run." This session runs `claude` 2.1.220, after
+  that change. It fully explains the github-source negative result
+  (measurement 5): an external-source plugin declared only in project
+  settings needs a per-user consent step a non-interactive cloud session
+  cannot perform.
+  It does not fully explain the directory-source result (measurement 4): the
+  quoted text specifically scopes the gate to "an external source such as a
+  GitHub repository or npm package," and a `directory` source pointing at
+  the already-checked-out working tree is not that. Both measurements also
+  reported "No marketplaces configured" rather than "found, install needed,"
+  which is not the message this gate's own description predicts. So the
+  gate is a confirmed, documented cause for one of the two negative results
+  and not, on its own, a full explanation for the other; `SKIP_PLUGIN_MARKETPLACE`
+  remains the standing candidate for the directory-source case, still
+  unconfirmed. `cloud-environments.md`'s claim ("Installed at session start
+  from the marketplace you declared") and this gate read as in tension for
+  the github source specifically; which one describes the actual cloud
+  bootstrap path is not resolved by anything measured so far.
 
 ## Checkpoints
 
