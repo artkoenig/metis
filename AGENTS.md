@@ -142,7 +142,7 @@ visible, not asked for.
 
 The first review of a change is fresh, per invariant 3. After a fix, that
 same reviewing context continues instead of a new one starting, and checks
-the whole intent again — not only the findings it fixed itself. A round that
+the whole intent again — not only the findings it raised itself. A round that
 re-checks only its own list inherits its own blind spots. Record in the
 issue whether each round continued or started fresh. One waiver: when the
 fix touches only the tracker record — no file the criteria are about — the

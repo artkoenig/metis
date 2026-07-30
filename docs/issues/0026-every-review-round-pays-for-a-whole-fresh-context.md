@@ -106,6 +106,20 @@ Acceptance criteria:
   (`clean-room/SKILL.md`'s blind dispatch, `agents/implementer/agent.md:48`'s
   boundary against reviewing its own work, `README.md:47`'s "loads metis
   fresh"). No document still claims every round is fresh.
+- Review round 1 (fresh context — no prior round existed to continue): 2
+  findings. Triage: finding 1 (`AGENTS.md:145` said the reviewing context
+  checks "not only the findings it fixed itself" — the reviewer never fixes,
+  only the implementer does, contradicting `agents/reviewer/agent.md:80` and
+  the run diagram; the parallel sentence in `agents/reviewer/agent.md` already
+  said "raised") fixed by changing "fixed" to "raised" in `AGENTS.md`. Finding
+  2 (`agents/reviewer/agent.md`'s opening line claimed the reviewer "has seen
+  nothing but the diff and the written intent," unconditional, though 11 lines
+  later the same file says a continued round also carries its own prior
+  reading) fixed by qualifying the opening line: "only the diff and the
+  written intent, and, from the second round on, your own prior reading of
+  them." Both fixes touch files the criteria are about, so the waiver does not
+  apply; round 2 is due and continues the same reviewing context, per the rule
+  this issue itself establishes.
 
 ## Checkpoints
 
