@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/offene-probleme-fivte0
 pr:
 ---
 
@@ -82,19 +82,55 @@ Acceptance criteria:
 - Findings dismissed in that run as a recorded cost, rather than filed, would
   be filed under this issue's rule: the "plugin root ships `docs/` to every
   consumer" item of round 2 is the example.
+- Round 1 (fresh context). 1 finding: `AGENTS.md`'s triage paragraph made
+  filing the only, unconditional outcome for an off-criterion finding, which
+  contradicted the bookkeeping rule that a documentation statement the change
+  itself falsifies is still fixed in the same change (criterion 3) — the exact
+  tension flagged in checkpoint 1. Violates criterion 5. Fixed now: the
+  triage paragraph carves out that one exception and points at the
+  bookkeeping rule for its bound. No findings filed as their own issues.
+  Suite: `bash test.sh`, 30 cases across the repo's three shell suites, exit
+  0 — none cover the changed prose files, so the review is the real check.
+  No static analysis applies; none exists in the repository.
+- Round 2 (same context continued). 0 findings — the round-1 fix resolved
+  the contradiction and a full re-check of the intent found nothing new.
+  Same suite result as round 1, re-run: exit 0, still uncovering the changed
+  files. Trend: round 1 → 1 finding (criterion 5, no off-criterion findings);
+  round 2 → 0 findings. All five acceptance criteria met.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: freeze the criteria at checkpoint 1,
+  make every finding name a criterion or state it violates none, make filing
+  the only outcome for an off-criterion finding, and bound the standing
+  documentation-mirror rule to what the change itself falsified.
+- What surprised me? The documentation-mirror exception in criterion 3 is not
+  the same rule as "off-criterion findings get filed" in criterion 2 — a
+  document the diff itself made false is still fixed in the same change, just
+  bounded, while every other off-criterion finding is filed and left unfixed.
+  Conflating the two would silently reopen the unbounded README-growth this
+  issue exists to close.
+- What am I assuming without having verified it? That this is a prose-only
+  change to `AGENTS.md` and `agents/reviewer/agent.md` with nothing to run —
+  no test suite or static analysis applies, so invariant 2 means there is
+  nothing to write a failing test for, and review is the change's only check.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: all five acceptance criteria are met
+  after two review rounds, and the two edited files no longer contradict each
+  other.
+- What surprised me? The reviewer's round-1 finding landed exactly on the
+  tension named in checkpoint 1 — naming it in advance did not prevent the
+  rule as first written from missing it; only the review round caught that
+  the actual sentence was still unconditional.
+- What am I assuming without having verified it? That committing this
+  reconciled rule closes the loop for good — i.e. that no third place in the
+  repository states the old, unconditional triage rule in a way that now
+  contradicts it. The reviewer checked `README.md` and `skills/issue/SKILL.md`
+  for exactly this and found neither states the removed rule; I have not
+  independently re-checked every remaining file myself.
 
 ## Retro

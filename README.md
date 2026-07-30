@@ -31,7 +31,7 @@ Five invariants hold for every change, whatever process judgment picks:
 ```
 idea → issue with acceptance criteria → checkpoint 1
      → test-author (failing tests)    → implementer
-     → reviewer (fresh context)
+     → reviewer (fresh first round, continued after)
      → checkpoint 2 → PR → human merges → retro
 ```
 

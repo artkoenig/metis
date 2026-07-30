@@ -109,6 +109,23 @@ time those internals change.
 For facts about the codebase — before writing intent, deciding or planning —
 dispatch the `researcher` subagent instead of assuming.
 
+**A dispatch hands over what the caller already knows** — the criteria it works
+against, the paths and commands already established, the decisions already
+recorded — marked as given facts. A subagent left to rediscover them pays for
+them a second time and may come back with a different answer.
+
+Written intent is copied, never retold: the issue's problem statement and its
+numbered criteria go into the prompt word for word, not reworded, summarised or
+extended. The caller is the party whose drift the receiver is there to catch, so
+a retold criterion has it check the work against the caller's reading instead of
+against the intent.
+
+The limit is the page that defines the receiver — its agent page, or the skill
+page where a skill dispatches one. Whatever that page says the receiver does
+not get — a prohibition, or a fact it is told to fetch for itself — is not
+handed over, whatever the saving would be. Those receivers are worth having
+only for what they have not seen.
+
 ## The run
 
 ```
@@ -118,8 +135,9 @@ idea → issue with acceptance criteria      (grilling only if unclear)
                                             when there is something to run)
      → implementer                         (plans, implements, makes the
                                             tests pass without editing them)
-     → reviewer                            (fresh context: diff vs. intent,
-                                            facts by exit code, repro per finding)
+     → reviewer                            (diff vs. intent, facts by exit
+                                            code, repro and criterion per
+                                            finding)
      → checkpoint 2
      → commit, push, PR → human merges
      → retro
@@ -129,10 +147,21 @@ A run opens with the issue in front of the human: its title and its
 numbered acceptance criteria, as a table. What "done" means is visible
 before implementation starts — not on request.
 
-Triage the reviewer's findings by judgment: fix now, dismiss with a recorded
-reason, or file for later. A finding without a reproduction is dismissed by
-default. A finding outside the issue's intent — however reproducible — goes
-to the human instead of being fixed by default.
+The acceptance criteria are fixed once implementation starts. A finding, a
+review round or any other feedback may not add, edit or reinterpret one —
+at the pull request they read word for word as they did before
+implementation began.
+
+The reviewer names, for every finding, the acceptance criterion it violates
+— or states that it violates none. Triage by that name. A finding without a
+reproduction is dismissed by default — the rulebook already dismisses it. A
+finding that names a criterion keeps the three-way choice: fix now, dismiss
+with a recorded reason, or file for later. A finding that violates no
+criterion has one outcome only: file it as its own issue, named in the
+record — except a finding that this change's own diff made a documentation
+statement false, which the documentation rule below still fixes in the same
+change, bounded to what it falsified. Outside that one exception, the diff
+never carries a fix for an off-criterion finding, however reproducible.
 
 After every review round, show the human the trend as a table: one row per
 acceptance criterion — plus one row for findings that violate no criterion —
@@ -140,12 +169,14 @@ one column per round so far, each cell the number of findings, and the
 totals per round (e.g. 5 → 3 → 1). Whether the run is converging must be
 visible, not asked for.
 
-After a fix, the review repeats from a fresh context, against the whole
-intent — not only against the findings it fixed. A round that re-checks its
-predecessor's list inherits its blind spots. One waiver: when the fix
-touches only the tracker record — no file the criteria are about — the
-repeat may be skipped; record the waiver in the issue like any judgment
-call.
+The first review of a change is fresh, per invariant 3. After a fix, that
+same reviewing context continues instead of a new one starting, and checks
+the whole intent again — not only the findings it raised itself. A round that
+re-checks only its own list inherits its own blind spots. Record in the
+issue whether each round continued or started fresh. One waiver: when the
+fix touches only the tracker record — no file the criteria are about — the
+round may be skipped entirely; record the waiver in the issue like any
+judgment call.
 
 ## Bookkeeping
 
@@ -164,9 +195,11 @@ call.
   `~/.claude` skill and agent links resolve? how does
   `.claude/hooks/session-start.log` end?) and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A
-  change that makes a document wrong updates it in the same change. Documents
-  may repeat what a rule or skill says, but the rule or skill is where it is
-  defined — when they disagree, the document is out of date.
+  change that makes a document wrong updates it in the same change, bounded
+  to the statements it falsified — content no criterion asks for is drift
+  like any other and is filed, not written. Documents may repeat what a rule
+  or skill says, but the rule or skill is where it is defined — when they
+  disagree, the document is out of date.
 - Branch each new issue from the current default branch, never on top of an
   unmerged predecessor.
 - Everything checked in — texts, commit messages — and every pull request is
