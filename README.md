@@ -64,8 +64,8 @@ The plugin carries the rulebook, the four subagents and the skills. Its
 self-check status, and points the project's git hooks at the push guard that
 refuses a direct push to the default branch.
 
-A cloud session installs the plugin before it starts when the project
-declares it — commit this as `.claude/settings.json`:
+For a cloud session, declare the plugin in the project so the session has it
+from the start — commit this as `.claude/settings.json`:
 
 ```json
 {
@@ -81,6 +81,20 @@ declares it — commit this as `.claude/settings.json`:
 This repository declares its own plugin the same way, but from
 `{"source": "directory", "path": "."}`: a session on a branch then works with
 that branch's rulebook, agents and skills instead of the released ones.
+
+Whether a cloud session really performs that install before it starts is
+documented but not yet shown by an exit code. Until it is, the older path
+stays in this repository and keeps working:
+
+```
+curl -fsSL https://raw.githubusercontent.com/artkoenig/metis/main/install.sh | bash
+```
+
+It installs and commits a `SessionStart` hook that clones this repository and
+links the rulebook, subagents and skills into `~/.claude` — the mechanism the
+plugin is meant to replace. A project already running it needs to change
+nothing. Install one or the other, not both: each sets the project's
+`core.hooksPath`, and the last one to run wins.
 
 To own the feedback loop — retros landing as rule changes in *your* rulebook
 — fork this repository and install the plugin from your fork.

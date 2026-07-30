@@ -158,11 +158,11 @@ call.
 - A new session orients itself through that skill and reads nothing else to
   get oriented.
 - A session opens by greeting the human and reporting the self-check: the
-  status line the plugin's SessionStart hook put into the context. Local and
-  cloud sessions alike get one, so a session without one means the plugin did
-  not load or its hook failed. Establish the facts yourself then — is the
-  plugin installed and enabled, and does its component inventory hold every
-  skill and agent? — and report those instead.
+  status line a SessionStart hook put into the context — the plugin's, or in
+  a project still on the older loader, that loader's. Either way a session
+  without a status means the hook did not run. Establish the facts yourself
+  then — is the plugin installed and enabled, and does its component
+  inventory hold every skill and agent? — and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A
   change that makes a document wrong updates it in the same change. Documents
   may repeat what a rule or skill says, but the rule or skill is where it is
