@@ -111,6 +111,26 @@ Acceptance criteria:
   cloud case this issue is about. Criteria 1 and 4 corrected above; no
   production file was touched by the blocked implementer run, so nothing
   needed reverting.
+- **The `test-author` corrected `test-loader-removed.sh`'s criteria 1 and 4
+  cases** to match: criterion 1 now expects `.claude/hooks/session-start.sh`
+  absent instead of `hooks/session-start.sh`/`hooks/hooks.json`, and asserts
+  the latter two are still present (the plugin's own hook, retained);
+  criterion 4's grep patterns now target the loader script's own path
+  specifically rather than a bare `session-start.sh`, so a legitimate mention
+  of the plugin's own retained hook no longer trips it. Confirmed myself:
+  `bash test-loader-removed.sh` still exits 1, still 18 failures, and none of
+  them names `hooks/session-start.sh` or `hooks/hooks.json`.
+- **A second test bug, found by running the corrected file myself**:
+  criterion 4's grep searched the whole tracked tree including
+  `test-loader-removed.sh` itself, which necessarily contains the literal
+  path strings it searches for (in its own `removed_paths` array and header
+  comment) — so criterion 4 could never pass, even after a correct
+  implementation, since the test file would always match its own patterns.
+  Fixed directly (by me, not a subagent, since the human asked for that after
+  declining another dispatch): excluded `test-loader-removed.sh` from
+  criterion 4's file list, the same way `docs/issues/` already is. Confirmed:
+  `bash test-loader-removed.sh` still exits 1, still 18 failures, and no
+  failure line now names `test-loader-removed.sh`.
 
 ## Checkpoints
 

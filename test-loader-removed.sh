@@ -6,10 +6,12 @@
 #
 # Which acceptance criterion each block covers:
 #
-#   Criterion 1 — the loader files are absent
-#     Case: install.sh, hooks/session-start.sh, hooks/hooks.json,
-#     skills/bootstrap/, test-install.sh, and the two suites nested under
-#     skills/bootstrap/assets/ that guard only the loader are all gone.
+#   Criterion 1 — the loader files are absent, the plugin's own hook stays
+#     Case: install.sh, .claude/hooks/session-start.sh (the installed loader
+#     copy), skills/bootstrap/, test-install.sh, and the two suites nested
+#     under skills/bootstrap/assets/ that guard only the loader are all gone.
+#     hooks/session-start.sh and hooks/hooks.json — the plugin's own hook,
+#     out of this issue's scope — are asserted still present.
 #   Criterion 2 — this repository's own settings declare no SessionStart hook
 #     Case: .claude/settings.json either has no "hooks" key at all, or a
 #     "hooks" key without a "SessionStart" entry in it.
@@ -25,7 +27,11 @@
 #   Criterion 4 — no reference to the removed paths anywhere in the tree
 #     Case: grepping the tracked tree, excluding docs/issues/ (historical
 #     Log entries there are allowed to mention these paths), for
-#     "install.sh", "bootstrap", or "session-start.sh" finds nothing.
+#     "install.sh", "bootstrap", or the loader script's own path
+#     (".claude/hooks/session-start.sh" or
+#     "skills/bootstrap/assets/session-start.sh") finds nothing. A bare
+#     mention of "hooks/session-start.sh" (the plugin's own, retained hook)
+#     or of "hooks/hooks.json"'s own command string is not a hit.
 #   Criterion 5 — test.sh names only what remains
 #     Case: `bash test.sh` exits 0, every suite it names exists on disk, and
 #     none of the named suites is test-install.sh or either of the two
@@ -46,8 +52,7 @@ pass() { echo "ok:   $1"; }
 # --- Criterion 1: the loader files are absent -------------------------------
 removed_paths=(
   "install.sh"
-  "hooks/session-start.sh"
-  "hooks/hooks.json"
+  ".claude/hooks/session-start.sh"
   "skills/bootstrap"
   "test-install.sh"
   "skills/bootstrap/assets/test-session-start-core.sh"
@@ -57,7 +62,15 @@ prior=$failures
 for p in "${removed_paths[@]}"; do
   [ ! -e "$repo_root/$p" ] || fail "still present: $p"
 done
-[ $failures -eq $prior ] && pass "loader files and suites are absent (criterion 1)"
+# The plugin's own SessionStart hook is out of this issue's scope and must stay.
+retained_paths=(
+  "hooks/session-start.sh"
+  "hooks/hooks.json"
+)
+for p in "${retained_paths[@]}"; do
+  [ -e "$repo_root/$p" ] || fail "missing (should be retained, plugin's own hook): $p"
+done
+[ $failures -eq $prior ] && pass "loader files and suites are absent, plugin's own hook stays (criterion 1)"
 
 # --- Criterion 2: this repo's settings declare no SessionStart hook --------
 prior=$failures
@@ -94,14 +107,14 @@ check_doc_points_at_plugin "AGENTS.md"
 
 # --- Criterion 4: no reference to the removed paths anywhere in the tree ---
 prior=$failures
-tracked=$(git -C "$repo_root" ls-files | grep -v '^docs/issues/')
-for pattern in 'install\.sh' 'bootstrap' 'session-start\.sh'; do
+tracked=$(git -C "$repo_root" ls-files | grep -v '^docs/issues/' | grep -v '^test-loader-removed\.sh$')
+for pattern in 'install\.sh' 'bootstrap' '\.claude/hooks/session-start\.sh' 'skills/bootstrap/assets/session-start\.sh'; do
   hits=$(printf '%s\n' "$tracked" | xargs -I{} sh -c 'grep -lE "$1" "$2" 2>/dev/null' _ "$pattern" "$repo_root"/{} 2>/dev/null)
   if [ -n "$hits" ]; then
     fail "pattern '$pattern' still referenced in: $(printf '%s' "$hits" | tr '\n' ' ')"
   fi
 done
-[ $failures -eq $prior ] && pass "no reference to install.sh, bootstrap or session-start.sh outside docs/issues/ (criterion 4)"
+[ $failures -eq $prior ] && pass "no reference to install.sh, bootstrap or the loader script's own path outside docs/issues/ (criterion 4)"
 
 # --- Criterion 5: test.sh names only what remains ---------------------------
 prior=$failures
