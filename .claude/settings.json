@@ -14,8 +14,9 @@
   "extraKnownMarketplaces": {
     "metis": {
       "source": {
-        "source": "directory",
-        "path": "."
+        "source": "github",
+        "repo": "artkoenig/metis",
+        "ref": "claude/metis-plugin-0022"
       }
     }
   },
