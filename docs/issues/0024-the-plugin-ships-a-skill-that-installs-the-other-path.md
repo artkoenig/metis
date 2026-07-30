@@ -1,7 +1,7 @@
 ---
-status: backlog
+status: done
 branch:
-pr:
+pr: https://github.com/artkoenig/metis/pull/31
 ---
 
 # The plugin ships a skill that installs the other path
@@ -66,6 +66,13 @@ Acceptance criteria:
   from a real install. The finding is outside 0022's acceptance criteria — and
   in fact forced by two of them — so it goes to its own run. The human decided
   to file it.
+- Resolved as moot by issue 0031 (criterion 6): the human decided to remove
+  the loader path entirely, which took the first option this issue's own
+  Decisions section had named — "drop `bootstrap` once criterion 6 of issue
+  0022 is settled and the loader path goes away." `skills/bootstrap/SKILL.md`,
+  the file this issue's finding is about, no longer exists in the repository.
+  No production change was made for this issue directly; the deletion is
+  issue 0031's.
 
 ## Checkpoints
 

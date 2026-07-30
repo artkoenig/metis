@@ -26,17 +26,22 @@
 #     the absence of "install.sh" — it is not required to newly gain plugin
 #     install instructions it never had.
 #   Criterion 4 — no reference to the removed paths anywhere in the tree
-#     Case: grepping the tracked tree, excluding docs/issues/ (historical
-#     Log entries there are allowed to mention these paths), for
-#     "install.sh", "bootstrap", or the loader script's own path
-#     (".claude/hooks/session-start.sh" or
+#     Case: grepping the tracked tree, excluding docs/issues/ (historical Log
+#     entries there are allowed to mention these paths), this test's own file
+#     (it necessarily contains the path strings it searches for) and
+#     test-plugin.sh (whose own case checks these exact paths are absent, and
+#     so must name them too), for "install.sh", "bootstrap", or the loader
+#     script's own path (".claude/hooks/session-start.sh" or
 #     "skills/bootstrap/assets/session-start.sh") finds nothing. A bare
 #     mention of "hooks/session-start.sh" (the plugin's own, retained hook)
 #     or of "hooks/hooks.json"'s own command string is not a hit.
 #   Criterion 5 — test.sh names only what remains
-#     Case: `bash test.sh` exits 0, every suite it names exists on disk, and
-#     none of the named suites is test-install.sh or either of the two
-#     bootstrap suites this issue removes.
+#     Case: every suite test.sh names exists on disk, and none of them is
+#     test-install.sh or either of the two bootstrap suites this issue
+#     removes. Whether `bash test.sh` itself exits 0 is not re-checked here:
+#     this file is one of the suites test.sh runs, so re-invoking test.sh
+#     from inside it would recurse into itself. test.sh's own runner already
+#     establishes that fact by summing every suite's exit code.
 #
 # Criterion 6 (closing issues 0023/0024 as moot) is bookkeeping, not
 # behaviour, and has nothing to run here.
@@ -113,7 +118,7 @@ fi
 
 # --- Criterion 4: no reference to the removed paths anywhere in the tree ---
 prior=$failures
-tracked=$(git -C "$repo_root" ls-files | grep -v '^docs/issues/' | grep -v '^test-loader-removed\.sh$')
+tracked=$(git -C "$repo_root" ls-files | grep -v '^docs/issues/' | grep -v '^test-loader-removed\.sh$' | grep -v '^test-plugin\.sh$')
 for pattern in 'install\.sh' 'bootstrap' '\.claude/hooks/session-start\.sh' 'skills/bootstrap/assets/session-start\.sh'; do
   hits=$(printf '%s\n' "$tracked" | xargs -I{} sh -c 'grep -lE "$1" "$2" 2>/dev/null' _ "$pattern" "$repo_root"/{} 2>/dev/null)
   if [ -n "$hits" ]; then
@@ -145,11 +150,8 @@ else
     esac
   done
 
-  run_output=$(bash "$repo_root/test.sh" 2>&1)
-  run_exit=$?
-  [ "$run_exit" -eq 0 ] || fail "test.sh exited $run_exit, not 0"
 fi
-[ $failures -eq $prior ] && pass "test.sh exits 0 and names only surviving suites (criterion 5)"
+[ $failures -eq $prior ] && pass "test.sh names only existing, surviving suites (criterion 5)"
 
 echo
 if [ $failures -eq 0 ]; then

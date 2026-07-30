@@ -65,12 +65,14 @@
 #     to main against a scratch bare remote is refused by exit code, the
 #     remote branch is not created, and a push to a non-default branch still
 #     succeeds.
-#   Criterion 7 — while criterion 6 does not hold, the per-project
-#   machinery stays in the repository
-#     Case 19: install.sh, the bootstrap skill, the loader, the core and the
-#     suites that only guard them are all present. Which branch of the
-#     criterion is in force is a record in the issue; that criterion 6 is
-#     open is the premise of this case.
+#   Criterion 7 — the per-project machinery is gone (issue 0031)
+#     Case 19: install.sh, the bootstrap skill, the installed loader and the
+#     suites that only guarded them are all absent. Issue 0022's criterion 7
+#     had kept this machinery for as long as criterion 6 stayed unmet; issue
+#     0031 removed it anyway, on the human's explicit, recorded decision to
+#     accept the resulting loss of reach. The plugin's own SessionStart hook
+#     (hooks/session-start.sh, hooks/hooks.json — covered by criteria 3-5
+#     above) is untouched by this and stays.
 #   Criterion 8 — test.sh names existing suites
 #     Case 15: every path in test.sh's `suites` list exists, and no listed
 #     suite is still pinned to the nested agent layout that this change
@@ -744,10 +746,10 @@ printf 'A "quoted" word, a backslash \\ and a\ttab.\nLast line.\n' \
   >"$base/rulebook-escapes.md"
 hostile_rulebook 'quote, backslash and tab in AGENTS.md' "$base/rulebook-escapes.md" exact
 
-# --- Case 19: the machinery criterion 7 keeps while criterion 6 is open ----
-# Criterion 6 does not hold yet, so the criterion's second branch is in
-# force: install.sh, the bootstrap skill, the per-project loader, the core it
-# execs and the suites that only guard them all remain in the repository.
+# --- Case 19: the per-project machinery is gone (issue 0031) --------------
+# Issue 0031 removed install.sh, the bootstrap skill, the installed loader
+# and the suites that only guarded them, on the human's explicit decision to
+# accept the resulting loss of reach for cloud sessions that relied on them.
 prior=$failures
 for p in install.sh \
          skills/bootstrap/SKILL.md \
@@ -756,10 +758,10 @@ for p in install.sh \
          test-install.sh \
          skills/bootstrap/assets/test-session-start-core.sh \
          skills/bootstrap/assets/test-session-start-loader.sh; do
-  [ -f "$repo_root/$p" ] \
-    || fail "criterion 7: $p is missing, but criterion 6 does not hold — it must remain"
+  [ ! -e "$repo_root/$p" ] \
+    || fail "criterion 7: $p is still present, but issue 0031 removed it"
 done
-[ $failures -eq $prior ] && pass "the per-project machinery is still in the repository"
+[ $failures -eq $prior ] && pass "the per-project machinery is gone (issue 0031)"
 
 # --- Case 20: test.sh names every suite the tree holds --------------------
 # Case 15 checks that what test.sh names exists; this is the other direction.

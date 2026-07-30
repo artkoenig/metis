@@ -1,7 +1,7 @@
 ---
 status: active
 branch: claude/metis-remove-loader-0031
-pr:
+pr: https://github.com/artkoenig/metis/pull/31
 ---
 
 # The repository still ships a loader that duplicates the plugin
@@ -50,8 +50,9 @@ Acceptance criteria:
    that installs the loader; `AGENTS.md` (which never carried install
    instructions of either kind) names no step that installs the loader
    either.
-4. Searching the repository's current tree — excluding `docs/issues/`, and
-   excluding the plugin's own retained `hooks/session-start.sh` and
+4. Searching the repository's current tree — excluding `docs/issues/`, the
+   test files whose own job is to name these paths while checking their
+   absence, and the plugin's own retained `hooks/session-start.sh` and
    `hooks/hooks.json` — for `install.sh`, the `bootstrap` skill, or the
    loader script (`.claude/hooks/session-start.sh`,
    `skills/bootstrap/assets/session-start.sh`) finds no reference.
@@ -60,8 +61,10 @@ Acceptance criteria:
    `test-plugin.sh`'s own case that asserted the loader's presence for issue
    0022's criterion 7 — that assertion no longer holds unconditionally once
    this issue lands and must be updated, not merely left to fail.
-6. Issues 0023 and 0024 — both findings against code this issue removes — are
-   marked resolved as moot, noting the file each described no longer exists.
+6. Issue 0024 — a finding against `skills/bootstrap/SKILL.md`, which this
+   issue deletes — is marked resolved as moot, noting the file it described no
+   longer exists. Issue 0023 targets `hooks/session-start.sh`, the plugin's
+   own hook this issue retains unchanged, so it stays open and untouched.
 
 ## Plan
 
@@ -149,6 +152,48 @@ Acceptance criteria:
   `claude plugin install metis@metis`, matching issue 0022's own decision
   record. `bash test-loader-removed.sh` now shows 15 failures, not 18 — both
   criterion-3 cases already pass.
+- **Direct implementation** (by me, not a subagent, per the human's
+  "implementiere selbst"): deleted `install.sh`, `.claude/hooks/session-start.sh`,
+  `skills/bootstrap/` (all five files under it), `test-install.sh`, and the
+  untracked `.claude/hooks/session-start.log`. Rewrote `.claude/settings.json`
+  to drop the `hooks.SessionStart` block, keeping only the plugin declaration.
+  Reduced `test.sh`'s suites array to `test-plugin.sh` and
+  `test-loader-removed.sh`. Rewrote `test-plugin.sh`'s case 19 (issue 0022
+  criterion 7) to assert the loader paths are now absent instead of present,
+  and its header comment to explain the override. Rewrote README.md's install
+  section to `claude plugin marketplace add artkoenig/metis` /
+  `claude plugin install metis@metis`.
+- **A fourth test bug, this one a real infinite recursion, not a
+  false-positive grep**: `test-loader-removed.sh`'s criterion 5 case
+  re-invoked `bash test.sh` to check its own exit code — but `test.sh` runs
+  `test-loader-removed.sh` as one of its two suites, so that suite's own
+  criterion-5 case spawned another full `test.sh` run, which spawned another,
+  unbounded. Caught live: a backgrounded `bash test.sh` run produced no output
+  for several minutes while 29 `test.sh`/`test-plugin.sh`/
+  `test-loader-removed.sh` processes accumulated (`ps aux | grep -c`), killed
+  with `pkill -9`. Fixed directly: removed the recursive
+  `bash "$repo_root/test.sh"` call from criterion 5; the suite-existence and
+  no-removed-suite checks (already in the same block) are what criterion 5 is
+  actually about, and whether the overall run exits 0 is already established
+  by `test.sh`'s own top-level runner summing every suite's exit code — a
+  suite re-running the whole thing to prove that fact about itself is both
+  circular and redundant. Updated the case's header comment and pass message
+  to match. Re-verified: `bash test-loader-removed.sh` standalone exits 0
+  (6/6 cases), and a plain `timeout 60 bash test.sh` (no longer at risk of
+  hanging) exits 0 with both suites fully green — `test-plugin.sh` 27 cases,
+  `test-loader-removed.sh` 6 cases.
+- **Criterion 6 was wrong about issue 0023, checked before acting on it**:
+  criterion 6 as first written treated both 0023 and 0024 as findings against
+  code this issue removes. `cat docs/issues/0023-...md` shows its acceptance
+  criteria are about the hook that overwrites a project's `core.hooksPath`
+  unconditionally — that is `hooks/session-start.sh`, the plugin's own hook,
+  which this issue explicitly keeps. `grep -n hooksPath hooks/session-start.sh`
+  confirms the unconditional write is still there at line 93, unchanged by
+  this issue's diff. So 0023 is not moot; only 0024 is (its subject,
+  `skills/bootstrap/SKILL.md`, is deleted by this issue, and 0024's own
+  Decisions section already named "drop bootstrap once the loader path goes
+  away" as one of its options — this issue is that decision). Corrected
+  criterion 6 above to close only 0024; 0023 is left open and untouched.
 
 ## Checkpoints
 
@@ -173,5 +218,21 @@ Acceptance criteria:
   check before deleting anything.
 
 ### Before the PR
+
+- **Does this match what was asked?** Yes: the loader and everything that
+  existed only to support it are gone; the plugin's own hook and its skills
+  other than `bootstrap` are untouched; `test.sh` is green.
+- **What surprised me?** That criterion 6, which I myself drafted, was wrong
+  for issue 0023 — I had bundled a still-live bug in retained code together
+  with a genuinely moot one, without first re-reading 0023 against what this
+  issue actually touches. Caught before acting on it, not after. Also: a
+  criterion 5 case I let the test-author write turned out to recurse
+  `test.sh` into itself once wired into `test.sh`'s own suite list — a defect
+  that only a real run surfaced, not a reading of the text.
+- **What am I assuming without having verified it?** That no other project's
+  `.claude/settings.json` in this GitHub account still points at the removed
+  `.claude/hooks/session-start.sh` — this issue only changes what is in the
+  metis repository itself, and any project that already ran `install.sh`
+  keeps its own installed copy regardless of what this repository does next.
 
 ## Retro
