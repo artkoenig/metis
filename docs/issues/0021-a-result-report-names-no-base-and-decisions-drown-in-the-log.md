@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/metis-plugin-config-jstgt0
-pr:
+pr: https://github.com/artkoenig/metis/pull/24
 ---
 
 # A result report names no base and decisions drown in the log
@@ -170,8 +170,20 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes, with one criterion fewer than it
+  started with. The human scoped the writing rule to replies mid-run, which
+  withdrew the criterion that had the rulebook obeying it. Three rulebook
+  edits that only that criterion required stay in the change and are recorded
+  as a default, not as something asked for.
+- **What surprised me?** Twice the change broke the rule it was introducing.
+  The reviewer's page demanded a state its own read-only rule forbids it to
+  produce, and this issue's Decisions section narrated the reading it had
+  replaced — the exact thing the new sentence in the tracker skill forbids
+  there. Both were caught by a fresh context, not by me.
+- **What am I assuming without having verified it?** Two things, neither
+  measured. That fetching and merging the default branch before every review
+  costs little — untried on a repository with a slow suite or a real
+  conflict. And that a reviewer given the new instruction actually checks the
+  remote instead of the local copy; the instruction has never run.
 
 ## Retro
