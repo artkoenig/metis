@@ -354,6 +354,8 @@ lands in steps with a commit each.
   `git ls-files '*.js' '*.ts' '*.py' '*.mjs'` returns nothing). Verdicts:
   criteria 1, 2, 3, 5, 7, 8 met; 4 **not met**; 6 not met and open.
 - **Criterion 4 is not met, and round 2's dismissal of it was wrong.**
+  *(Superseded by the round-4 entry below: the per-part comparison was
+  implemented in `b2abb11` and the criterion is met.)*
   `hooks/session-start.sh:85` treats "count greater than zero" as success, so
   it detects total loss and never partial loss. Reproduced: remove
   `skills/plan/SKILL.md` from a copy of the tree and the status says
@@ -380,7 +382,8 @@ lands in steps with a commit each.
   means parked on a question and nothing else — this is a deliberate stop, and
   `active` is the state that makes the next session orient here and read this
   entry. Recorded as the judgment call it is.
-- **The branch's suite is red, by design, and that is where it stops.** The
+- **The branch's suite is red, by design, and that is where it stops.**
+  *(Superseded: `bash test.sh` exits 0 at `b2abb11`, 61 cases.)* The
   `test-author` run for criterion 4 had finished writing its cases before it
   was stopped, so `test-plugin.sh` carries them: 71 lines, seven failing
   assertions across three cases — a skill directory without its `SKILL.md` not
@@ -394,7 +397,8 @@ lands in steps with a commit each.
   `bash test.sh` exit 0. That was wrong — it was written from the run before
   the test cases landed, and the commit message was amended to say exit 1 with
   this reason.
-- **What a next session finds open.** Criterion 4 needs a per-part comparison
+- **What a next session finds open.** *(Superseded by the round-4 entry: only
+  criterion 6 is still open.)* Criterion 4 needs a per-part comparison
   in `hooks/session-start.sh`; its tests already exist and are red.
   Criterion 6 still needs its exit code from a real cloud session, and the
   sharpest question behind it is whether the GitHub proxy's repository scoping
@@ -445,7 +449,11 @@ lands in steps with a commit each.
   the release-on-request decision live in this issue's Decisions and Log, not
   in `README.md`.
   What remains in the diff, per criterion: `.claude-plugin/*` and the quoted
-  YAML in `agents/researcher.md` (1); the flat `agents/<name>.md` layout (2);
+  YAML in `agents/researcher.md` and `skills/clean-room/SKILL.md` (1) — round 4
+  measured the second one: restore it from `origin/main` and
+  `claude plugin validate .claude-plugin/plugin.json --strict` exits 1 with
+  `frontmatter: YAML frontmatter failed to parse`; the flat `agents/<name>.md`
+  layout (2);
   `hooks/hooks.json` and `hooks/session-start.sh` (3, 4, 5); the plugin
   declaration and the restored loader entry in `.claude/settings.json` (2-6,
   and 7's "all of them remain"); the flat-agent support in
