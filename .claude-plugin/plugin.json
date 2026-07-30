@@ -1,7 +1,7 @@
 {
   "name": "metis",
   "description": "An AI agent workflow built on judgment, not rules: the metis rulebook, its subagents and its skills, delivered to every session.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Artjom König",
     "email": "artkoenig@gmail.com",
