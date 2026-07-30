@@ -10,8 +10,16 @@
 # Which acceptance criterion each block covers:
 #
 #   Criterion 1 — `claude plugin validate --strict` exits 0
-#     Cases 1-3: the two manifests are the documented shape, and the
-#     validator accepts the repository with --strict.
+#     Cases 1-2: the two manifests are the documented shape.
+#     Cases 3a-3c: the validator accepts this repository with --strict, at
+#     both of its targets. The two targets check different things and the
+#     criterion covers both: the repository root target reads
+#     `.claude-plugin/marketplace.json` and stops, while the
+#     `.claude-plugin/plugin.json` target walks the components — every
+#     skills/<name>/SKILL.md and every agents/<name>.md. 3a pins the
+#     marketplace target, 3b the component-walking one, and 3c proves 3b is
+#     the target with teeth: an agent whose frontmatter does not parse is
+#     rejected there.
 #   Criterion 2 — the exposed component inventory equals what is in the tree
 #     Case 4: the layout the plugin's own discovery needs (agents flat, one
 #     `.md` file each, because discovery does not recurse and takes the name
@@ -220,18 +228,84 @@ else
 fi
 [ $failures -eq $prior ] && pass "marketplace manifest offers exactly one plugin: metis at ./"
 
-# --- Case 3: the validator accepts the repository under --strict -----------
+# --- Case 3a: the marketplace-manifest target under --strict ---------------
+# `claude plugin validate <repo root>` validates .claude-plugin/marketplace.json
+# and nothing else — it prints "Validating marketplace manifest:" and stops. It
+# never opens a skill or an agent, so it cannot stand in for case 3b; keep both.
 prior=$failures
 if have_claude; then
   cfg=$(mktemp -d "$base/XXXXXX")
   if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$repo_root" --strict \
       >"$base/validate.log" 2>&1; then
-    pass "claude plugin validate --strict exits 0"
+    pass "claude plugin validate <repo root> --strict exits 0 (marketplace manifest target)"
   else
-    fail "claude plugin validate --strict exited non-zero: $(tr '\n' ' ' <"$base/validate.log" | cut -c1-400)"
+    fail "claude plugin validate <repo root> --strict exited non-zero: $(tr '\n' ' ' <"$base/validate.log" | cut -c1-400)"
   fi
 else
-  skip "claude plugin validate --strict: no claude binary on PATH"
+  skip "claude plugin validate <repo root> --strict: no claude binary on PATH"
+fi
+
+# --- Case 3b: the component-walking target under --strict ------------------
+# `claude plugin validate .claude-plugin/plugin.json` visits every
+# skills/<name>/SKILL.md and every agents/<name>.md. This is the target that
+# sees a component's frontmatter at all; case 3c is its proof.
+prior=$failures
+if have_claude; then
+  cfg=$(mktemp -d "$base/XXXXXX")
+  if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$plugin_manifest" --strict \
+      >"$base/validate-components.log" 2>&1; then
+    pass "claude plugin validate .claude-plugin/plugin.json --strict exits 0 (walks every skill and agent)"
+  else
+    fail "claude plugin validate .claude-plugin/plugin.json --strict exited non-zero: $(tr '\n' ' ' <"$base/validate-components.log" | cut -c1-400)"
+  fi
+else
+  skip "claude plugin validate .claude-plugin/plugin.json --strict: no claude binary on PATH"
+fi
+
+# --- Case 3c: that target rejects unparseable component frontmatter --------
+# The defect this suite has to catch: an agent's `description:` written as an
+# unquoted YAML scalar that holds ": ". The whole frontmatter then parses as
+# nothing and the agent reaches a model with no description to select it by.
+# On a scratch copy of the tree — the real agents/ is never touched — the same
+# copy must validate clean before the break and be rejected after it, so a
+# non-zero exit can only come from the broken frontmatter. If this case ever
+# passes while 3b's target is swapped for the repository-root one, the swap has
+# removed the only check that reads a component.
+prior=$failures
+if have_claude; then
+  cfg=$(mktemp -d "$base/XXXXXX")
+  broken_plug=$(copy_plugin)
+  broken_agent="$broken_plug/agents/researcher.md"
+  [ -f "$broken_agent" ] || broken_agent=$(ls "$broken_plug"/agents/*.md 2>/dev/null | head -1)
+  if [ ! -f "$broken_agent" ]; then
+    fail "component validation: the scratch copy has no agents/<name>.md to break"
+  elif ! CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$broken_plug/.claude-plugin/plugin.json" \
+      --strict >"$base/validate-clean-copy.log" 2>&1; then
+    fail "component validation: the untouched scratch copy was already rejected: $(tr '\n' ' ' <"$base/validate-clean-copy.log" | cut -c1-400)"
+  else
+    python3 -c '
+import sys
+p = sys.argv[1]
+lines = open(p, encoding="utf-8").read().split("\n")
+for i, l in enumerate(lines):
+    if l.startswith("description:"):
+        lines[i] = "description: a scalar that holds a colon: and a space, so YAML gives up"
+        break
+else:
+    sys.exit("no description: line in %s" % p)
+open(p, "w", encoding="utf-8").write("\n".join(lines))' "$broken_agent" 2>"$base/break.err" \
+      || fail "component validation: could not break the copy: $(tail -1 "$base/break.err")"
+    if [ $failures -eq $prior ]; then
+      if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$broken_plug/.claude-plugin/plugin.json" \
+          --strict >"$base/validate-broken.log" 2>&1; then
+        fail "component validation: --strict accepted $(basename "$broken_agent") with unparseable frontmatter: $(tr '\n' ' ' <"$base/validate-broken.log" | cut -c1-400)"
+      fi
+    fi
+  fi
+  [ $failures -eq $prior ] \
+    && pass "claude plugin validate .claude-plugin/plugin.json --strict rejects an agent whose frontmatter does not parse"
+else
+  skip "component validation under --strict: no claude binary on PATH"
 fi
 
 # --- Case 4: the layout plugin discovery needs -----------------------------
