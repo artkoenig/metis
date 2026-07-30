@@ -89,8 +89,7 @@ restated is left out.
 
 **A reply is understandable from the conversation alone.** Naming a document,
 a rule, an issue or a project term is allowed only when the sentence carries
-its content: not "this violates the facts rule", but "the status message
-claims more than it measured".
+its content.
 
 ## The shelf
 

@@ -73,6 +73,10 @@ Acceptance criteria:
   justification is the answer itself when the human asks "why". The second is
   expressed once, by the word "unasked" in the prohibition, not twice. Source:
   reviewer round 2, findings 2 and 3; round 3, finding 4.
+- The contrast example — not "this violates the facts rule", but "the status
+  message claims more than it measured" — is dropped; the rule states the
+  requirement without it. Source: the human's answer, 2026-07-30, "kannst du
+  weglassen".
 - The `grill` skill's "one question per turn" stays untouched: it constrains a
   turn addressed to the human, but the change's intent is the content of a
   reply, not how many questions one may hold. Outside the intent, so it goes
