@@ -52,13 +52,38 @@ Acceptance criteria:
 
 ## Tasks
 
+The change both adds a plugin and removes the machinery it replaces, so it
+lands in steps with a commit each.
+
+1. Flatten `agents/<name>/agent.md` to `agents/<name>.md`.
+2. Add the plugin manifest, the marketplace manifest, and the plugin's
+   `SessionStart` hook with its script — rulebook text, self-check status and
+   push guard.
+3. Wire this repository to its own plugin: `.claude/settings.json` declares the
+   marketplace and enables the plugin, and the dogfooded loader copy goes.
+4. Remove what the plugin replaces: `install.sh`, the `bootstrap` skill, the
+   loader, the core, and the three suites that only guard them.
+5. Rewrite `README.md` for the plugin installation.
+6. Establish criterion 6 by exit code from a fresh cloud session on this
+   branch, and record the output.
+
 ## Decisions
 
-- **The plugin is added; the hook path stays.** Source: the human's answer to
-  "replace the hook, or stand beside it?" — *"replace, but only after proof"*,
-  with the explicit fallback of landing the additive variant and reporting it
-  when the proof fails. Criterion 6's proof failed (see the Log), so the
-  additive variant is what lands.
+- **The plugin replaces the hook path.** Source: the human's answer to
+  "replace the hook, or stand beside it?" — *"replace, but only after proof"*.
+  The first reading of the measurements said the proof failed; the human
+  challenged it and the documentation settled it the other way (see the Log).
+  A cloud session installs a plugin declared in the repository's
+  `.claude/settings.json` before the session starts, so the loader, the core,
+  the installer and the bootstrap skill have nothing left to do.
+- **This repository is its own marketplace**, and registering it is an
+  accepted prerequisite for installing the plugin. Source: the human, asked
+  nothing — they said so unprompted after seeing the measurements: if a
+  marketplace is the precondition, that is the way, since one can register
+  one's own. So `claude plugin marketplace add artkoenig/metis` followed by
+  `claude plugin install metis@metis` is the documented installation, and the
+  loader hook survives only for the cloud case, whose blocker is startup
+  ordering rather than the marketplace.
 - **The rulebook reaches a session as `additionalContext` from the plugin's
   own `SessionStart` hook.** Source: the plugin documentation — a `CLAUDE.md`
   at a plugin root is explicitly not loaded, and instructions are to be
@@ -111,8 +136,27 @@ Acceptance criteria:
      Plugin discovery happens before `SessionStart` hooks, so a plugin created
      by a hook takes effect one session late. In an ephemeral cloud container
      that is one session too late.
-  Conclusion: a plugin cannot replace the loader hook for cloud sessions.
-  Criterion 7's second branch applies.
+  Conclusion drawn at the time: a plugin cannot replace the loader hook for
+  cloud sessions. **That conclusion was wrong** — see the next entry.
+- **Course correction, prompted by the human**, who found the conclusion
+  implausible and asked for the official documentation. The cloud-environment
+  documentation states it in its table of what carries over: *"Plugins declared
+  in `.claude/settings.json` — Yes — Installed at session start from the
+  marketplace you declared. Requires network access to reach the marketplace
+  source"*, and immediately below, plugins enabled only in user settings do not
+  carry over and are to be declared *"in the repo's `.claude/settings.json`
+  instead"*. A cloud session therefore installs a repo-declared plugin before
+  the session begins, which is exactly the same-session guarantee measurement 3
+  found missing from a hook.
+  The error in the measurement: a plain `claude -p` inside this container is not
+  the cloud session's startup path. Measurement 1 failed at the workspace-trust
+  gate — the marketplace was not even registered — not at the mechanism, and I
+  read a trust failure as an absent feature. What the three measurements do
+  establish stands: `enabledPlugins` alone installs nothing, and a hook that
+  places a plugin acts one session late. Neither is the cloud path.
+  Criterion 7's first branch applies, and criterion 6 still owes an exit code:
+  the documentation is not a fact by exit code. A fresh cloud session on this
+  branch, reporting `claude plugin list`, is what settles it.
 - Two corrections to guesses made along the way, both by measurement:
   `SKIP_PLUGIN_MARKETPLACE=true`, which this cloud environment sets, does
   **not** stop an installed plugin from loading — a run with and a run without
@@ -124,25 +168,26 @@ Acceptance criteria:
 
 ### Before implementation
 
-- **Does this match what was asked?** Partly, and the gap is recorded. The ask
-  was to make metis a Claude Code plugin; that lands in full. The human chose
-  to retire the hook machinery only on proof that a plugin carries a cloud
-  session, and that proof failed, so the machinery stays — which the human
-  authorised as the fallback.
-- **What surprised me?** Three things, all facts documentation would not have
-  given me. Plugin agent discovery does not recurse, and the manifest field
-  that looks like the way around it silently loads nothing. A plugin dropped
-  into `~/.claude/skills/` needs no marketplace and no install at all. And
-  plugin discovery runs *before* `SessionStart` hooks, which is what kills the
-  hook-installs-the-plugin idea.
-- **What am I assuming without having verified it?** That the interactive
-  Claude Code web session behaves like the headless `-p` run I measured in
-  this same container — both find no installed plugin in a fresh container, so
-  neither loads one. I have not driven the web UI itself. Also that flattening
-  the agent layout leaves the loader working: `~/.claude/agents` is scanned
-  recursively for `.md` files, so a symlinked file should be found where a
-  symlinked directory was before. The core's own harness will establish that
-  by exit code rather than my reading.
+- **Does this match what was asked?** Yes. The ask was to make metis a Claude
+  Code plugin; it becomes one, installed from its own marketplace, and the
+  machinery that existed only to load it goes away.
+- **What surprised me?** Three measured facts, then one of my own conclusions.
+  Plugin agent discovery does not recurse, and the manifest field that looks
+  like the way around it silently loads nothing. A plugin dropped into
+  `~/.claude/skills/` needs no marketplace and no install at all. Plugin
+  discovery runs before `SessionStart` hooks. And the surprise that mattered
+  most: I turned three negative measurements into a conclusion about cloud
+  sessions that the documentation flatly contradicts, and it took the human
+  saying "that seems unlikely" to catch it. The measurements were sound; the
+  inference from them to a startup path I had not measured was not.
+- **What am I assuming without having verified it?** That a cloud session
+  really performs the install the documentation promises — this is the whole of
+  criterion 6 and it is still owed an exit code; a fresh cloud session on this
+  branch has to show it. That the marketplace source can name this repository
+  before the change is merged, which needs a `ref` pointing at this branch and
+  is therefore a temporary value that must not survive the merge. And that
+  flattening the agent layout costs nothing, since after this change nothing
+  but plugin discovery reads it.
 
 ### Before the PR
 
