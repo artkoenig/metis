@@ -637,6 +637,18 @@ lands in steps with a commit each.
   from the marketplace you declared") and this gate read as in tension for
   the github source specifically; which one describes the actual cloud
   bootstrap path is not resolved by anything measured so far.
+- **`SKIP_PLUGIN_MARKETPLACE` cannot be overridden through the documented
+  mechanism.** The human set it to `false` as an environment variable in the
+  environment dialog at claude.ai/code — the place the settings
+  documentation says session environment variables are configured — and a
+  new cloud session still reported it as `true`, with the same negative
+  result as every prior measurement. Either something in this account's
+  environment forces the value regardless of the per-environment
+  configuration, or a different, unidentified layer sets it after the
+  session's own environment copy runs. Either way, the variable is not
+  something this investigation can toggle to test its effect, so the
+  directory-source case (measurement 4) stays open with `SKIP_PLUGIN_MARKETPLACE`
+  as an unconfirmed, now unfalsifiable-from-here candidate.
 
 ## Checkpoints
 
