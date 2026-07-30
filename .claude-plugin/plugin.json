@@ -1,0 +1,19 @@
+{
+  "name": "metis",
+  "description": "An AI agent workflow built on judgment, not rules: the metis rulebook, its subagents and its skills, delivered to every session.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Artjom König",
+    "email": "artkoenig@gmail.com",
+    "url": "https://github.com/artkoenig"
+  },
+  "homepage": "https://github.com/artkoenig/metis",
+  "repository": "https://github.com/artkoenig/metis",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "workflow",
+    "agents",
+    "skills",
+    "rulebook"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "metis",
+  "description": "The home marketplace of the metis plugin: the metis rulebook, its subagents and its skills, released from the repository that grows them.",
+  "owner": {
+    "name": "Artjom König",
+    "email": "artkoenig@gmail.com",
+    "url": "https://github.com/artkoenig"
+  },
+  "plugins": [
+    {
+      "name": "metis",
+      "source": "./",
+      "description": "An AI agent workflow built on judgment, not rules: the metis rulebook, its subagents and its skills, delivered to every session."
+    }
+  ]
+}

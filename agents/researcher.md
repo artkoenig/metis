@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Read-only research into the codebase and domain — "how does this actually work today?" Use it to ground acceptance criteria, decisions, and plans in facts instead of assumptions: which modules a change touches, what the existing behaviour is, where a planned change would collide with reality. Returns a written briefing, never file dumps. It designs nothing and decides nothing.
+description: 'Read-only research into the codebase and domain — "how does this actually work today?" Use it to ground acceptance criteria, decisions, and plans in facts instead of assumptions: which modules a change touches, what the existing behaviour is, where a planned change would collide with reality. Returns a written briefing, never file dumps. It designs nothing and decides nothing.'
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 color: cyan
 ---

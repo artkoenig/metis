@@ -106,5 +106,6 @@ never receives a self-check status (`additionalContext`) from the loader.
 Run it before landing any change to the loader.
 
 `test.sh` at the repo root runs both harnesses together with the
-installer's suite (`test-install.sh`) and exits 0 only when every case in
-every suite passes — the one command behind "the suite is green".
+installer's suite (`test-install.sh`) and the plugin's (`test-plugin.sh`),
+and exits 0 only when every case in every suite passes — the one command
+behind "the suite is green".
