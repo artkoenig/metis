@@ -45,9 +45,10 @@ tool on the shelf, picked by judgment, never fired by a condition.
 records what got in the way and what should change. A rule that misfired
 becomes a proposal: a pull request against this repository, decided by the
 human like any other. And because every project gets the rulebook from this
-repository rather than from a copy of its own, an accepted rule change
-reaches all of them with their next plugin update. The rulebook is not
-maintained — it is grown, run by run, out of its own failures.
+repository rather than from a copy of its own, an accepted rule change can
+reach all of them — through the plugin it takes a released version, see
+below. The rulebook is not maintained — it is grown, run by run, out of its
+own failures.
 
 ## Installing it
 
@@ -79,11 +80,20 @@ from the start — commit this as `.claude/settings.json`:
 ```
 
 This repository declares its own plugin the same way, but from
-`{"source": "directory", "path": "."}`: a session on a branch then works with
-that branch's rulebook, agents and skills instead of the released ones.
+`{"source": "directory", "path": "."}`, so a session here works with the
+checked-out tree rather than a release.
 
-Whether a cloud session really performs that install before it starts is
-documented but not yet shown by an exit code. Until it is, the older path
+**Installing does not track this repository.** `claude plugin install` copies
+the tree into the plugin cache under the version in
+`.claude-plugin/plugin.json`. Measured with a github source:
+`claude plugin marketplace update metis` followed by
+`claude plugin update metis@metis` answers `already at the latest version`
+and the cache keeps the old files; only a changed `version` in the manifest
+delivers the new ones. So a rule change reaches installed projects when it is
+released with a version bump, not when it is merged.
+
+Whether a cloud session really performs the declared install before it starts
+is documented but not yet shown by an exit code. Until it is, the older path
 stays in this repository and keeps working:
 
 ```
@@ -92,9 +102,16 @@ curl -fsSL https://raw.githubusercontent.com/artkoenig/metis/main/install.sh | b
 
 It installs and commits a `SessionStart` hook that clones this repository and
 links the rulebook, subagents and skills into `~/.claude` — the mechanism the
-plugin is meant to replace. A project already running it needs to change
-nothing. Install one or the other, not both: each sets the project's
-`core.hooksPath`, and the last one to run wins.
+plugin is meant to replace, and the one that always carries the current
+`main`. A project already running it needs to change nothing.
+
+Running both is what this repository itself does while the plugin path is
+unproven, and it has two costs worth knowing. Each path sets the project's
+`core.hooksPath`, so the hook that runs last decides which push guard is
+used. And both deliver the rulebook and every skill and agent — the plugin
+into the session's context, the loader into `~/.claude` — so a session holds
+each twice, from two trees that need not agree. For any project other than
+this one, pick one.
 
 To own the feedback loop — retros landing as rule changes in *your* rulebook
 — fork this repository and install the plugin from your fork.

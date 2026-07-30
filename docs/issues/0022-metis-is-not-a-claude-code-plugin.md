@@ -185,9 +185,12 @@ lands in steps with a commit each.
   `test-plugin.sh`, 16 cases, exit 0. `claude plugin validate . --strict` —
   exit 0, but it validates the *marketplace* manifest only.
   `claude plugin validate .claude-plugin/plugin.json --strict` — exit 0, and
-  this is the one that walks all four skills and all four agents. (Corrected
-  from "five skills" by review round 1: `ls -d skills/*/` counts four —
-  clean-room, grill, issue, plan.)
+  this is the one that walks the skills and all four agents. (The count moved
+  twice: five when this was first written, four after `skills/bootstrap/` was
+  deleted — the correction review round 1 asked for — and five again from
+  commit 077eaaf, which restored it for criterion 7. At HEAD
+  `ls -d skills/*/` counts five: bootstrap, clean-room, grill, issue, plan.
+  Review round 2 caught the stale correction.)
 - The second validate target failed with exit 1 until two frontmatter
   descriptions were quoted. `skills/clean-room/SKILL.md` and
   `agents/researcher.md` carried unquoted YAML scalars containing `": "`, so
@@ -259,6 +262,60 @@ lands in steps with a commit each.
     the loader is not replaceable at all. This is now the sharpest open
     question behind criterion 6, ahead of the directory-vs-github distinction
     recorded above.
+
+- **Review round 2** (fresh context, whole intent): nine findings, up from
+  six. Per criterion — 1: 1, 4: 1, no criterion: 7; total 9. Two of the new
+  ones were caused by round 1's own fixes, which is the rulebook's
+  *regression* signal; recorded here rather than absorbed into a third round
+  unremarked. Facts the round established itself: `bash test.sh` 4 suites,
+  55 cases, exit 0, nothing skipped; `bash -n` over all 10 tracked `*.sh`
+  plus `.githooks/pre-push` exit 0; `jq empty` over all 4 tracked `*.json`
+  exit 0; both validate targets exit 0; no linter exists (`shellcheck`,
+  `shfmt`, `markdownlint`, `yamllint` all missing, no CI, no lint config).
+  Verdicts: criteria 1, 2, 3, 5, 7, 8 met; 4 partly; 6 open, and the round
+  could not produce its exit code either. Triage:
+  - *This repository was the one already-wired project the change unwired* —
+    fixed. `.claude/settings.json` had lost its `hooks.SessionStart` entry, so
+    metis's only mechanism was the unproven plugin path: no rulebook, no
+    status, `core.hooksPath` unset, a direct push to `main` no longer refused.
+    Both are declared again.
+  - *`AGENTS.md` claimed a missing status means the hook did not run* — fixed.
+    The loader is deliberately silent in local sessions and
+    `test-session-start-loader.sh` asserts exactly that, so the text this
+    branch wrote would have every local loader session open by reporting a
+    failure that did not happen. Regression from round 1's fix.
+  - *The Log's own skill-count correction had gone stale* — fixed. Commit
+    077eaaf restored `skills/bootstrap/`, so five again. Regression from
+    round 1's fix.
+  - *A rule change never reaches an installed plugin* — documented, not
+    fixed in code. Measured by the round: `claude plugin install` copies the
+    tree into the cache under the manifest's `version`;
+    `marketplace update` + `plugin update` answer `already at the latest
+    version` and keep the old files; only a bumped `version` delivers new
+    ones. `README.md` claimed the opposite and now states the measurement.
+    Releasing is a decision for the human, not something to invent here — see
+    the question below.
+  - *The plugin ships the `bootstrap` skill, whose page said this repo
+    dogfoods the loader* — fixed by the same settings restoration, which makes
+    the claim true again; the page now also says both paths run here on
+    purpose and that this is metis's exception.
+  - *Coexistence duplicates the rulebook and every component, and `README`
+    warned only about `core.hooksPath`* — fixed in `README.md`.
+  - *The suite's criterion-1 case pins `claude plugin validate .`, which
+    checks the marketplace manifest only* — open, and the next thing to do.
+    The round reproduced it: reintroduce the unquoted-YAML defect in
+    `agents/researcher.md` and `bash test.sh` stays exit 0 while
+    `claude plugin validate .claude-plugin/plugin.json --strict` exits 1. The
+    defect class this change had to fix can return with the suite green. Needs
+    a test change, so it goes to the `test-author`, not to a fix here.
+  - *The self-check reports "no problems" for a component that is present but
+    unparseable* — dismissed with reason. Criterion 4 names the case "a part
+    is missing"; a file that exists is not missing, and the gap it really
+    points at is the validator missing from the suite, which the item above
+    fixes. Filed as a note, not carried as a defect.
+  - *Plugin root = repo root ships `docs/` and the suites to every consumer* —
+    dismissed: it is the recorded cost of a recorded default, and the round
+    says so itself.
 
 ## Checkpoints
 

@@ -95,6 +95,12 @@ This repo dogfoods the same hook in its own `.claude/hooks/`, copied from
 `assets/`. When the asset changes, update every copy by re-running this
 skill — don't hand-edit.
 
+This repo also declares the metis plugin in the same `.claude/settings.json`,
+so both paths run here on purpose while the plugin's cloud install is
+unproven. That is this repository's exception, not a pattern to spread: in any
+other project, install one or the other. `README.md` says what running both
+costs.
+
 The core has a test harness: `assets/test-session-start-core.sh`. It runs
 the core against scratch directories only (never the real `~/.claude` or the
 real repo's git config) and exits 0 when all cases pass. Run it before
