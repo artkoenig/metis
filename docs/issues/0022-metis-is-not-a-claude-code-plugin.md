@@ -579,6 +579,18 @@ lands in steps with a commit each.
   tells consumers to use — untested. The human caught the premature
   conclusion that this contradicted the documentation before it was
   recorded as such.
+- **`.claude/settings.json` switched to the github source for the next
+  measurement**, commit `52ba613`: `{"source": "github", "repo":
+  "artkoenig/metis", "ref": "claude/metis-plugin-0022"}`, matching the
+  schema `github: {repo, ref?, sha?}` from the plugin-marketplaces
+  reference. The `ref` names this branch so the marketplace can be found
+  before the merge — a temporary value, per the assumption already
+  recorded in checkpoint 1, and it must be dropped or changed once
+  criterion 6 is settled and this branch is ready to merge. `bash test.sh`
+  still exits 0, 4 suites, after the change. Needs one more fresh cloud
+  session on this commit, reporting `claude plugin marketplace list` and
+  `claude plugin list`, to settle criterion 6 for the source consumers
+  actually use.
 
 ## Checkpoints
 
