@@ -158,7 +158,10 @@ reproduction is dismissed by default — the rulebook already dismisses it. A
 finding that names a criterion keeps the three-way choice: fix now, dismiss
 with a recorded reason, or file for later. A finding that violates no
 criterion has one outcome only: file it as its own issue, named in the
-record. The diff never carries a fix for it, however reproducible.
+record — except a finding that this change's own diff made a documentation
+statement false, which the documentation rule below still fixes in the same
+change, bounded to what it falsified. Outside that one exception, the diff
+never carries a fix for an off-criterion finding, however reproducible.
 
 After every review round, show the human the trend as a table: one row per
 acceptance criterion — plus one row for findings that violate no criterion —

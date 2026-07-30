@@ -72,6 +72,15 @@ Acceptance criteria:
 
 ## Log
 
+- Round 1 (fresh context). 1 finding: `AGENTS.md`'s triage paragraph made
+  filing the only, unconditional outcome for an off-criterion finding, which
+  contradicted the bookkeeping rule that a documentation statement the change
+  itself falsifies is still fixed in the same change (criterion 3) — the exact
+  tension flagged in checkpoint 1. Violates criterion 5. Fixed now: the
+  triage paragraph now carves out that one exception and points at the
+  bookkeeping rule for its bound. No findings filed as their own issues this
+  round.
+
 - Filed after issue 0022's run, on the human's request, out of the token
   measurements taken during it, then sharpened by their instruction that no
   scope drift may happen at all — which moved this issue from "drift is
