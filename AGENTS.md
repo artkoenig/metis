@@ -136,7 +136,8 @@ idea → issue with acceptance criteria      (grilling only if unclear)
      → implementer                         (plans, implements, makes the
                                             tests pass without editing them)
      → reviewer                            (diff vs. intent, facts by exit
-                                            code, repro per finding)
+                                            code, repro and criterion per
+                                            finding)
      → checkpoint 2
      → commit, push, PR → human merges
      → retro
@@ -146,10 +147,21 @@ A run opens with the issue in front of the human: its title and its
 numbered acceptance criteria, as a table. What "done" means is visible
 before implementation starts — not on request.
 
-Triage the reviewer's findings by judgment: fix now, dismiss with a recorded
-reason, or file for later. A finding without a reproduction is dismissed by
-default. A finding outside the issue's intent — however reproducible — goes
-to the human instead of being fixed by default.
+The acceptance criteria are fixed once implementation starts. A finding, a
+review round or any other feedback may not add, edit or reinterpret one —
+at the pull request they read word for word as they did before
+implementation began.
+
+The reviewer names, for every finding, the acceptance criterion it violates
+— or states that it violates none. Triage by that name. A finding without a
+reproduction is dismissed by default — the rulebook already dismisses it. A
+finding that names a criterion keeps the three-way choice: fix now, dismiss
+with a recorded reason, or file for later. A finding that violates no
+criterion has one outcome only: file it as its own issue, named in the
+record — except a finding that this change's own diff made a documentation
+statement false, which the documentation rule below still fixes in the same
+change, bounded to what it falsified. Outside that one exception, the diff
+never carries a fix for an off-criterion finding, however reproducible.
 
 After every review round, show the human the trend as a table: one row per
 acceptance criterion — plus one row for findings that violate no criterion —
@@ -183,9 +195,11 @@ judgment call.
   `~/.claude` skill and agent links resolve? how does
   `.claude/hooks/session-start.log` end?) and report those instead.
 - `README.md` and the rest of the documentation mirror the current state. A
-  change that makes a document wrong updates it in the same change. Documents
-  may repeat what a rule or skill says, but the rule or skill is where it is
-  defined — when they disagree, the document is out of date.
+  change that makes a document wrong updates it in the same change, bounded
+  to the statements it falsified — content no criterion asks for is drift
+  like any other and is filed, not written. Documents may repeat what a rule
+  or skill says, but the rule or skill is where it is defined — when they
+  disagree, the document is out of date.
 - Branch each new issue from the current default branch, never on top of an
   unmerged predecessor.
 - Everything checked in — texts, commit messages — and every pull request is
