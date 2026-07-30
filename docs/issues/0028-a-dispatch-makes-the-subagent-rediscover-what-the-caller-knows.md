@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/subagenten-anfragen-optimieren-seqel6
-pr:
+pr: https://github.com/artkoenig/metis/pull/28
 ---
 
 # A dispatch makes the subagent rediscover what the caller already knows
@@ -219,3 +219,30 @@ Acceptance criteria:
   because this run made none.
 
 ## Retro
+
+**What got in the way.** Twice I removed something the human had not asked me
+to remove. The reviewer's record check went because I reasoned it had lost its
+input, without checking whether the record was already in front of it — it was,
+as a file in the diff. The human caught it with one question: "why should that
+go? I see no collision." The pattern behind it: I treated a *narrowed handover*
+as a *narrowed capability*, when the receiver still had the material by another
+route. Before removing a check, establish what the receiver can still reach.
+
+**The rule broke in my own hands on its first run.** Round 3's finding is the
+whole run in one line: the dispatch that carried the new rule also carried my
+account of the fixes and my reading of a file the reviewer existed to judge.
+Writing a rule does not install the habit. This is not a rulebook defect — the
+rule catches it exactly as written — so nothing is proposed for it beyond the
+record.
+
+**What should change.** Nothing in the rulebook, on this run's evidence. Two
+gaps it exposed are filed instead of patched: `0029`, a session registering
+subagents from a pre-update clone, and `0030`, a thin handed intent with
+nothing to catch it — the latter created by this very change, which is worth
+saying plainly: narrowing what a receiver fetches moves the risk to the caller.
+
+**What worked.** The continuing reviewing context earned its keep: round 3's
+finding came from comparing its own three dispatches against each other, which
+a fresh round could not have seen. And the byte-for-byte check of the copied
+intent — `diff -u`, exit 0 — turned a criterion that invites hand-waving into
+a fact.
