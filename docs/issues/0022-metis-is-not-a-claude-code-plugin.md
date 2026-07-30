@@ -560,6 +560,25 @@ lands in steps with a commit each.
   to `origin/claude/metis-plugin-0022`. Criterion 6 is still open and needs
   one fresh cloud session opened on this branch, reporting `claude plugin
   list`'s exit code, to settle it.
+- **Criterion 6, fourth measurement** — a genuine fresh cloud session,
+  confirmed via `git rev-parse HEAD` == `d5fbc16114cfc64a285a0daee9710f6d70c988fb`
+  (this branch's actual pushed tip, not a self-probe from inside a
+  container): `claude plugin marketplace list` reported "No marketplaces
+  configured", and `claude plugin list` showed four plugins from the
+  claude.ai registry (`artkoenig-skills`, `engineering`, `data`,
+  `cowork-plugin-management`), none of them `metis`. This repeats
+  measurement 1's result, but this time from a real cloud-session bootstrap,
+  so it can no longer be dismissed as a workspace-trust artifact of probing
+  from inside a container. It does not contradict the cloud-environment
+  documentation: the documentation's guarantee is qualified — "Installed at
+  session start from the marketplace you declared. Requires network access
+  to reach the marketplace source" — and this repository's own
+  `.claude/settings.json` declares a directory source (`path: "."`), not a
+  network source. So this measurement settles the directory-source case
+  negatively, and leaves the github source — the one `README.md` actually
+  tells consumers to use — untested. The human caught the premature
+  conclusion that this contradicted the documentation before it was
+  recorded as such.
 
 ## Checkpoints
 
