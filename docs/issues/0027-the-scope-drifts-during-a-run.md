@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/offene-probleme-fivte0
 pr:
 ---
 
@@ -87,9 +87,20 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: freeze the criteria at checkpoint 1,
+  make every finding name a criterion or state it violates none, make filing
+  the only outcome for an off-criterion finding, and bound the standing
+  documentation-mirror rule to what the change itself falsified.
+- What surprised me? The documentation-mirror exception in criterion 3 is not
+  the same rule as "off-criterion findings get filed" in criterion 2 — a
+  document the diff itself made false is still fixed in the same change, just
+  bounded, while every other off-criterion finding is filed and left unfixed.
+  Conflating the two would silently reopen the unbounded README-growth this
+  issue exists to close.
+- What am I assuming without having verified it? That this is a prose-only
+  change to `AGENTS.md` and `agents/reviewer/agent.md` with nothing to run —
+  no test suite or static analysis applies, so invariant 2 means there is
+  nothing to write a failing test for, and review is the change's only check.
 
 ### Before the PR
 
