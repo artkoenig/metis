@@ -52,21 +52,65 @@ Acceptance criteria:
 - The human's three example sentences stay in this issue as evidence and are
   not copied into the rulebook; the rule is stated in general terms so it also
   covers examples nobody has seen yet. Source: default, unanswered.
+- The older list — "Cut every reply to the essentials: the finding, the
+  decision, the change" — is replaced, not kept beside the new one, so one
+  list governs what a reply may contain. The new list is the wider of the two
+  and adds "the answer that was asked for", the gap issue 0008 recorded in its
+  checkpoint 2. Source: reviewer round 1, finding 1.
+- The prohibition keeps "only" ("a sentence whose only content is …"), so a
+  sentence that carries a fact and a justification stays permitted. Source:
+  reviewer round 1, finding 3.
+- The `grill` skill's "one question per turn" stays untouched: it constrains a
+  turn addressed to the human, but the change's intent is the content of a
+  reply, not how many questions one may hold. Outside the intent, so it goes
+  to the human instead of being fixed here. Source: reviewer round 1,
+  finding 4.
 
 ## Log
+
+- Facts before the review: `./test.sh` — 3 suites, exit 0. It covers the
+  installer and the session-start hook; `grep -rn 'AGENTS.md'` over the
+  harnesses shows the rulebook only as a file that is copied or must exist, so
+  no exit code covers the changed text. No static analysis exists in the
+  repository: no `.github/`, no lint config in `git ls-files`, `shellcheck` not
+  installed. This review is the change's only check.
+- Criterion 4, established by
+  `grep -rniE 'informal|\bdu\b|talk to (them|the human)|repl(y|ies)|tone|concise|terse|short words|plain words|prose|greet' README.md AGENTS.md agents/ skills/ .claude/ install.sh`
+  — hits only in `AGENTS.md` (lines 12, 81-85, 160) — and by reading
+  `README.md` whole: its paragraph on the human lists the three steering
+  points and no reply style. No document had to change.
+- Review round 1 (fresh context): 5 findings plus one style note. Triage:
+  findings 1 and 3 fixed by merging the two lists into one and keeping "only"
+  in the prohibition; finding 2 fixed by recording the commands here;
+  finding 5 fixed by writing the checkpoint 1 answers into this file;
+  finding 4 handed to the human as outside the intent; the style note on the
+  rulebook's own justification sentences was acted on anyway — those sentences
+  are now gone, which shortens the rule.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes: the human named two defects in the
+  replies — background knowledge the conversation does not hold, and sentences
+  that only justify — and both became a criterion.
+- **What surprised me?** Reply style is defined in exactly one place,
+  `AGENTS.md`; nothing else in the repository states one.
+- **What am I assuming without having verified it?** That the human's two
+  quoted example sentences are typical of the problem, and that a rule stated
+  in general terms catches the rest.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes. The rule now holds both halves and
+  is shorter than the paragraph it replaces; one finding — the `grill` skill's
+  "one question per turn" — is outside the intent and is the human's call.
+- **What surprised me?** The reviewer found the new list colliding with the
+  old one seven lines above; the change was meant to add a rule and instead
+  had to replace one.
+- **What am I assuming without having verified it?** That no session reads the
+  removed sentence "Cut every reply to the essentials" from a cached copy —
+  wired projects reload the rulebook at session start, which I have not
+  re-verified in this run.
 
 ## Retro
