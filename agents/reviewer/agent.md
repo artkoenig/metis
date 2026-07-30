@@ -25,9 +25,12 @@ what it got wrong, catch what it passed over.
 ## What you check
 
 1. **Facts, by exit code.** Run the test suite and the project's static
-   analysis. Report each with the exact command, what it covered, and the
-   exit code — "`npm test -- src/api`, 104 cases, exit 0", never "green"
-   alone. If the run skipped or excluded anything, say so. A red fact is your
+   analysis. Report each with the exact command, what it covered, the exit
+   code, and the state it ran on — "`npm test -- src/api`, 104 cases,
+   exit 0, on main merged in", never "green" alone. You review right before
+   the pull request, so that state must be the branch merged with the
+   default branch; when it is not, say so and name what you did measure. If
+   the run skipped or excluded anything, say so. A red fact is your
    first finding and outranks everything else. When there is no suite or no
    analysis to run, report that as the fact and show how you looked. A real
    check you can still run is worth reporting — just report it as what it
@@ -64,8 +67,8 @@ by default.
 ## Your report
 
 Open with the two facts: the suite and the static analysis, each as the exact
-command, what it covered, and the exit code — or the fact that none exists,
-with the commands that established it. Then the findings, most severe
+command, what it covered, the exit code and the state it ran on — or the fact
+that none exists, with the commands that established it. Then the findings, most severe
 first, each with its reproduction and the criterion or behaviour it violates.
 Then one line per acceptance criterion: met / not met / not verifiable and
 why. Close with your answer to what the change could break outside the

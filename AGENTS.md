@@ -17,9 +17,8 @@ need. This holds for the work and for these texts alike.
 1. **Intent first.** Acceptance criteria are recorded in the issue before any
    production code is written.
 2. **Tests before code.** Whether a change has anything to run is your
-   call; a change with nothing to run — a rule, an agent definition, a
-   skill's page, documentation — has no tests to write, and saying so is
-   how this rule holds for it.
+   call; a change with nothing to run — prose that no tool checks — has no
+   tests to write, and saying so is how this rule holds for it.
    When tests are due, the `test-author` writes them from the intent alone
    and sees them fail; the implementer makes them pass and may not edit
    them.
@@ -33,14 +32,17 @@ need. This holds for the work and for these texts alike.
    shown by exit codes. Report the command, what it covered and the state it
    ran on, never the adjective alone: "`npm test -- src/api`, 104 cases,
    exit 0, on main merged in", not "the suite is green". Before the PR that
-   state is the merge, not the branch: fetch the default branch, merge it in
-   and run the checks there — the merge is what lands. When a check already
-   fails on the default branch, run it there too and report the difference;
+   state is the merge with the default branch, because the merge is what
+   lands — keeping the merge commit or dropping it afterwards is your call,
+   and a fetch or a merge that fails is itself the state you report. When a
+   check already fails on the default branch, run it there too and report
+   the difference;
    adding no new failure is not the same as passing. When no suite or no
    analysis exists, that absence is the fact: report it with the commands
    that established it.
 5. **The record survives the session.** Record decisions, assumptions,
-   surprises and checkpoint answers through the `issue` skill as they happen.
+   surprises and checkpoint answers through the `issue` skill — the tracker,
+   one file per issue — as they happen.
    The next session resumes from the tracker, not from a conversation that no
    longer exists.
 

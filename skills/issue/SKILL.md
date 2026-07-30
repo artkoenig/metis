@@ -28,7 +28,7 @@ what they are.
 | operation | what the caller hands it |
 | --- | --- |
 | **file an issue** | the problem and the observable behaviour it wants, plus the acceptance criteria |
-| **record a decision** | what was settled, and the source it derives from — a document, a human's answer, or "default, unanswered" |
+| **record a decision** | what was settled, and the source it derives from — a document, a human's answer, or "default, unanswered". What led up to it is an observation, not part of the decision |
 | **record an observation** | what happened in the run: a review round and its triage, a failed attempt, a surprise |
 | **record a plan** | handed whole to the `plan` skill, which owns it — see below |
 | **record checkpoint answers** | the rulebook's three answers, and which of the two checkpoints they belong to |

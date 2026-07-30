@@ -68,8 +68,32 @@ Acceptance criteria:
   orienting a session read two. Source: default, unanswered — the human was
   asked and did not answer.
 
+- The rule criterion 5 adds stays inside the paragraph on talking to the
+  human, although a session about to write a skill page has no reason to look
+  under a heading about the human. Source: the human's request named that
+  section as the place for it.
+- The reviewer names the state its checks ran on but does not produce it: the
+  fetch and the merge belong to the session that dispatches it, because a
+  reviewer that merges is no longer read-only. Source: default, unanswered.
+
 ## Log
 
+- Review round 1: seven findings, six fixed in this run, one dismissed.
+  1. The two agent pages that actually run the checks — reviewer and
+     implementer — still asked for command, coverage and exit code with no
+     state, so an agent following its own page reports exactly what the new
+     invariant forbids. Reproduced by the reviewer against its own
+     instructions. 2. The merge step named no branch for a failing fetch or a
+     conflicting merge, while every other clause of that invariant names its
+     fallback. 3. The new writing rule sits under the heading about the human
+     — dismissed, see Decisions. 4. The rulebook used "the `issue` skill"
+     before explaining it, breaking the rule it had just added. 5. Removing
+     the reference to an invariant's number left two copies of one class list
+     that already differed ("a rule" against "the rulebook"); invariant 2 now
+     names the class instead of listing it. 6. "Merge it in" left open
+     whether the merge commit stays in the branch. 7. The new sentence about
+     decision entries sat behind the skill's interface line, where a caller
+     reading only the operations table would not see it.
 - This branch carried a different change first: an idempotent session-start
   loader, filed as issue 0021 with five further issues around it, seventeen
   commits, suite green. The human dropped it in favour of these three retro
