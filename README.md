@@ -44,21 +44,43 @@ tool on the shelf, picked by judgment, never fired by a condition.
 **The workflow corrects itself through the retro.** After every PR the agent
 records what got in the way and what should change. A rule that misfired
 becomes a proposal: a pull request against this repository, decided by the
-human like any other. And because every wired project loads metis fresh at
-session start, an accepted rule change reaches all of them with their next
-session. The rulebook is not maintained — it is grown, run by run, out of
-its own failures.
+human like any other. And because every project gets the rulebook from this
+repository rather than from a copy of its own, an accepted rule change
+reaches all of them with their next plugin update. The rulebook is not
+maintained — it is grown, run by run, out of its own failures.
 
 ## Installing it
 
-Run this in the root of your project (a git repository):
+Metis is a Claude Code plugin, and this repository is the marketplace that
+offers it. In your project:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/artkoenig/metis/main/install.sh | bash
+claude plugin marketplace add artkoenig/metis
+claude plugin install metis@metis
 ```
 
-It installs and commits a `SessionStart` hook that loads the current
-rulebook, subagents and skills into every Claude Code cloud session of the
-project — updates included, no re-installation. To own the feedback loop —
-retros landing as rule changes in *your* rulebook — fork this repository and
-point the installed hook (and `METIS_SOURCE`) at your fork.
+The plugin carries the rulebook, the four subagents and the skills. Its
+`SessionStart` hook puts the rulebook text into every session, reports a
+self-check status, and points the project's git hooks at the push guard that
+refuses a direct push to the default branch.
+
+A cloud session installs the plugin before it starts when the project
+declares it — commit this as `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "metis": {
+      "source": { "source": "github", "repo": "artkoenig/metis" }
+    }
+  },
+  "enabledPlugins": { "metis@metis": true }
+}
+```
+
+This repository declares its own plugin the same way, but from
+`{"source": "directory", "path": "."}`: a session on a branch then works with
+that branch's rulebook, agents and skills instead of the released ones.
+
+To own the feedback loop — retros landing as rule changes in *your* rulebook
+— fork this repository and install the plugin from your fork.

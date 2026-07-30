@@ -1,0 +1,96 @@
+#!/bin/bash
+set -u
+
+# ---------------------------------------------------------------------------
+# The plugin's SessionStart hook. It does two things a plugin cannot do by
+# itself: it puts the rulebook text into the session's context — a CLAUDE.md
+# at a plugin root is not loaded, and a skill is model-invoked and therefore
+# optional — and it points the project's git hooks at the push guard shipped
+# with the plugin.
+#
+# Skills and agents need nothing from here: plugin discovery exposes
+# skills/<name>/SKILL.md and agents/<name>.md on its own. What this script
+# adds for them is the self-check status, which counts what is actually
+# reachable in the plugin tree, so a session sees an incomplete install
+# instead of silently missing half the workflow.
+#
+# stdout carries the hook JSON and nothing else.
+# ---------------------------------------------------------------------------
+
+plugin_root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+plugin_root="$(cd "$plugin_root" 2>/dev/null && pwd || echo "$plugin_root")"
+project_dir="${CLAUDE_PROJECT_DIR:-.}"
+rulebook="${plugin_root}/AGENTS.md"
+guard_dir="${plugin_root}/.githooks"
+
+# JSON-encode stdin as the body of a JSON string: drop the control bytes a
+# JSON string cannot carry anyway, escape the two delimiters and the tab,
+# then fold the newlines. Multibyte UTF-8 passes through untouched.
+json_body() {
+  LC_ALL=C tr -d '\000-\010\013\014\016-\037\177' \
+    | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\t/\\t/g' \
+    | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' \
+    | tr -d '\n'
+}
+
+problems=""
+
+# 1. What the plugin actually exposes. Count, do not assume: a skill
+#    directory without its SKILL.md and an agent that is not a flat .md file
+#    are invisible to plugin discovery, so neither may be counted.
+skills=0
+for dir in "${plugin_root}/skills"/*/; do
+  [ -f "${dir}SKILL.md" ] && skills=$((skills + 1))
+done
+agents=0
+for file in "${plugin_root}/agents"/*.md; do
+  [ -f "$file" ] && agents=$((agents + 1))
+done
+[ "$skills" -gt 0 ] || problems="${problems} no skills reachable;"
+[ "$agents" -gt 0 ] || problems="${problems} no agents reachable;"
+
+# 2. The rulebook itself, verbatim — a pointer to the file would leave the
+#    session free to skip it.
+if [ -f "$rulebook" ]; then
+  rulebook_state="rulebook delivered"
+else
+  rulebook_state="rulebook missing (no AGENTS.md at the plugin root)"
+  problems="${problems} ${rulebook_state};"
+fi
+
+# 3. The push guard: point the project's git hooks at the plugin's, so
+#    pre-push refuses a direct push to the default branch. A project that is
+#    no git repository cannot be pushed from, so an absent guard there is a
+#    note; anywhere else it means an unguarded push is possible, and that is
+#    a failure. Report the end state, not the step that was attempted.
+if ! git -C "$project_dir" rev-parse --git-dir >/dev/null 2>&1; then
+  guard_state="push guard n/a (project is not a git repository)"
+elif [ ! -d "$guard_dir" ]; then
+  guard_state="push guard not set (no .githooks at the plugin root)"
+  problems="${problems} ${guard_state};"
+else
+  git -C "$project_dir" config core.hooksPath "$guard_dir" >/dev/null 2>&1
+  if [ "$(git -C "$project_dir" config core.hooksPath 2>/dev/null)" = "$guard_dir" ]; then
+    guard_state="push guard set"
+  else
+    guard_state="push guard not set (could not write core.hooksPath)"
+    problems="${problems} ${guard_state};"
+  fi
+fi
+
+status="Metis self-check: ${skills} skills and ${agents} agents reachable; ${rulebook_state}; ${guard_state};"
+if [ -z "$problems" ]; then
+  status="${status} no problems."
+else
+  status="${status} FAILED:${problems} the plugin at ${plugin_root} is incomplete."
+fi
+
+# 4. Hand the rulebook and the status to the session, in that order.
+{
+  printf '{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "'
+  {
+    [ -f "$rulebook" ] && cat "$rulebook"
+    printf '\n%s\n' "$status"
+  } | json_body
+  printf '"}}\n'
+}

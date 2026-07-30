@@ -6,9 +6,7 @@ set -u
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 suites=(
-  test-install.sh
-  skills/bootstrap/assets/test-session-start-core.sh
-  skills/bootstrap/assets/test-session-start-loader.sh
+  test-plugin.sh
 )
 
 failed=0
