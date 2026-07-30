@@ -81,6 +81,14 @@ lands in steps with a commit each.
   proof. So the two paths coexist for now: the plugin is added, the loader,
   the core, the installer and the bootstrap skill stay until criterion 6
   holds. Criterion 7's second branch, not its first.
+- **Releases happen on request.** Source: the human, asked whether every
+  accepted rule change should bump `.claude-plugin/plugin.json`'s `version` —
+  *"veröffentlichung auf anfrage"*. So a merged PR does not release: installed
+  projects keep the version they have until a release is asked for, and the
+  version is bumped then. The loader path is unaffected — its clone always
+  carries the current default branch — so while both paths exist, the loader
+  is the one that delivers a rule change immediately and the plugin is the one
+  that delivers it on release.
 - **This repository is its own marketplace**, and registering it is an
   accepted prerequisite for installing the plugin. Source: the human, asked
   nothing — they said so unprompted after seeing the measurements: if a

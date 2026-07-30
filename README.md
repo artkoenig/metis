@@ -90,7 +90,10 @@ the tree into the plugin cache under the version in
 `claude plugin update metis@metis` answers `already at the latest version`
 and the cache keeps the old files; only a changed `version` in the manifest
 delivers the new ones. So a rule change reaches installed projects when it is
-released with a version bump, not when it is merged.
+released with a version bump, not when it is merged — and releases happen on
+request, not per merge. A project that wants every accepted rule change at
+once uses the loader path below instead, whose clone always carries the
+current default branch.
 
 Whether a cloud session really performs the declared install before it starts
 is documented but not yet shown by an exit code. Until it is, the older path
