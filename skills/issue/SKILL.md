@@ -77,8 +77,8 @@ Read nothing else to get oriented.
 | `## Intent` | the problem and the wanted observable behaviour, solution-free, then the numbered acceptance criteria — observable and falsifiable, "when X, then Y" |
 | `## Plan` | optional content, and the `plan` skill writes it — that skill says what belongs in it |
 | `## Tasks` | optional content, and the rulebook says when a change gets one |
-| `## Decisions` | what was settled and why, each with its source; questions to the human and their answers. Nothing else — a mid-run reader must find the decisions without wading through process |
-| `## Log` | the run as it happened, oldest first: observations, review rounds and their triage, failed attempts. Keeping this out of Decisions keeps Decisions readable |
+| `## Decisions` | what was settled and why, each with its source; questions to the human and their answers. An entry says what holds now, not how it came to hold — the round that found it and the reading it replaced go in the Log. Nothing else: a mid-run reader must find the decisions without wading through process |
+| `## Log` | the run as it happened, oldest first: observations, review rounds and their triage, failed attempts, and the history behind each decision. Keeping this out of Decisions keeps Decisions readable |
 | `## Checkpoints` | `### Before implementation` and `### Before the PR`, the rulebook's three questions answered under each |
 | `## Retro` | written after the pull request; the rulebook says what goes in one |
 
