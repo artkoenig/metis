@@ -45,10 +45,12 @@ Acceptance criteria:
 
 ## Decisions
 
-- The change touches the rulebook's `How to talk to them` paragraph and
-  nothing else that defines reply style: a grep over `agents/`, `skills/` and
-  `README.md` for style wording found no second definition. Source: the human
-  named only the main-conversation replies as the problem.
+- The change lands in the rulebook's `The human` section, as two rules that
+  follow the `How to talk to them` paragraph and are each led by a bold phrase —
+  the form that section's neighbours already use for an independent rule. It
+  touches nothing else that defines reply style. Source: the human named only
+  the main-conversation replies as the problem; the placement wording corrected
+  after reviewer round 4, finding 2.
 - The human's three example sentences stay in this issue as evidence and are
   not copied into the rulebook; the rule is stated in general terms so it also
   covers examples nobody has seen yet. Source: default, unanswered.
@@ -86,10 +88,13 @@ Acceptance criteria:
   repository: no `.github/`, no lint config in `git ls-files`, `shellcheck` not
   installed. This review is the change's only check.
 - Criterion 4, established by
-  `grep -rncE 'repl(y|ies)|talk to (them|the human)|informal|tone\b|concise|terse' README.md AGENTS.md install.sh test-install.sh test.sh $(git ls-files 'agents/*' 'skills/*' '.claude/*')`
-  — one file with hits, `AGENTS.md`, 4 of them, exit 0 — and by reading
-  `README.md` whole: its paragraph on the human lists the three steering points
-  and no reply style. No document had to change.
+  `grep -rlicE 'repl(y|ies)|talk to (them|the human)|informal|tone\b|concise|terse' $(git ls-files)`
+  over all 45 tracked files, exit 0: four files match — `AGENTS.md`, this issue,
+  and the records of issues 0008 and 0009. The two records document what was
+  true when they were written and are not documents that mirror the current
+  state, so nothing outside `AGENTS.md` had to change. `README.md` was also read
+  whole: its paragraph on the human lists the three steering points and no reply
+  style.
 - Repetition signal: the evidence above was recorded twice with line numbers,
   and both times a later edit to the same paragraph made them wrong (reviewer
   round 2, finding 4; round 3, finding 3). Approach changed rather than
@@ -120,6 +125,15 @@ Acceptance criteria:
   finding 3 (the criterion-4 evidence carried line numbers that a same-commit
   edit had already invalidated) fixed in this file, the second by dropping line
   numbers from the record for good.
+- Review round 4 (fresh context): 2 findings, both against the record, none
+  against the rule. Finding 1 — the criterion-4 sweep skipped 24 tracked files
+  (`docs/issues/`, `.githooks/pre-push`, `.gitignore`, `LICENSE`) — fixed by
+  running it over `$(git ls-files)` and recording what all 45 files show.
+  Finding 2 — a decision claimed the change stays inside the `How to talk to
+  them` paragraph while the diff adds two bold-led rules after it — fixed by
+  correcting the decision. Both fixes touch this file only, no file the criteria
+  are about, so the repeat round is waived under the rulebook's waiver clause;
+  the trend is 5 → 5 → 4 → 2.
 
 ## Checkpoints
 
@@ -145,9 +159,11 @@ Acceptance criteria:
 - **What surprised me?** Every round found a defect the previous round's fix
   had introduced, not one the original change had: a list colliding with the
   old one, a deleted length limit, a prohibition that outgrew its own unit.
-- **What am I assuming without having verified it?** That no session reads the
-  removed sentence "Cut every reply to the essentials" from a cached copy —
-  wired projects reload the rulebook at session start, which I have not
-  re-verified in this run.
+- **What am I assuming without having verified it?** Nothing left on the
+  distribution path: reviewer round 4 read `session-start-core.sh` and found the
+  copy of `AGENTS.md` over `~/.claude/CLAUDE.md` unconditional at every session
+  start, so no cached copy of the removed sentence survives. What stays
+  unverified is the effect: whether the rule actually changes how the next
+  session's replies read, which only the next runs can show.
 
 ## Retro
