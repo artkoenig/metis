@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/metis-claude-plugin-anmted
-pr:
+pr: 26
 ---
 
 # Metis is not a Claude Code plugin
@@ -455,6 +455,35 @@ lands in steps with a commit each.
   Fact after the revert: `bash test.sh` exits 1 with the same seven criterion-4
   assertions as before and 58 cases passing, so nothing the revert touched was
   load-bearing for the rest.
+- **Pull request 26 was opened by the human** from the Claude Code UI at commit
+  `522370d`, while the run was halted. `status` therefore moves to `done`, which
+  the `issue` skill defines as "the pull request is opened" — not as "the
+  criteria are met". Two of them are not: 4 and 6, with 8 failing as a
+  consequence of 4.
+  The generated body claimed the self-check "reports missing parts by name",
+  which is exactly the part criterion 4 does *not* do, so the body was rewritten
+  to carry the state per criterion, the suite's exit 1 with its reason, the
+  static-analysis facts, and what is deliberately absent. A body that reads as
+  finished in front of a red suite is the kind of claim invariant 4 exists
+  against.
+  No review round has read the current diff: round 3 read the tree before the
+  scope restoration, which reverted three files afterwards. The rulebook's
+  waiver covers a fix that touches only the tracker, and this one touched files
+  the criteria are about, so a round is owed before the merge. Recorded as the
+  open gap it is; the merge is the human's.
+- **A fresh cloud session was reported by the human**, and it does not settle
+  criterion 6. Its greeting carried the loader's status format — five skills,
+  four agents, push guard, `commit 8064945`, no errors — and the plugin hook's
+  format names no commit, so the plugin hook did not run in that session. Two
+  readings remain open and the greeting cannot separate them: the plugin was not
+  installed, or the session did not sit on this branch and never had the
+  declaration in its tree at all. `8064945` is `main`'s tip and the loader
+  clones `main` in any case, so it distinguishes nothing. What criterion 6 needs
+  from such a session is `claude plugin list` with its exit code, plus the
+  session's branch and the presence of `enabledPlugins` in its
+  `.claude/settings.json`. The fact the greeting does establish: the loader path
+  works in a fresh cloud session, which is why criterion 7's second branch keeps
+  it.
 
 ## Checkpoints
 
@@ -483,8 +512,74 @@ lands in steps with a commit each.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+Recorded after the pull request was opened, not before it: the human opened
+pull request 26 from the Claude Code UI while the run was halted. The answers
+are the state at that moment.
+
+- **Does this match what was asked?** In part, and the parts are named. Metis
+  is a plugin: a session that loads it has the rulebook text, five skills, four
+  agents and the push guard, each shown by a suite case. Two of the eight
+  criteria are not met — the self-check still reports success when one part of
+  many is unreachable (4), and no exit code establishes the cloud install (6) —
+  so nothing was removed and the loader path stays, which is what criterion 7's
+  second branch prescribes. Criterion 8 fails only as a consequence of 4. The
+  pull request body states all of this, so the state is visible before the
+  merge rather than after it.
+- **What surprised me?** That the criteria were never what made this run long.
+  Of 21 findings across three rounds, 13 belonged to no criterion, and
+  repairing them was what produced the next round each time. Two regressions
+  came out of my own round-1 fixes. My round-2 dismissal of criterion 4 was
+  wrong and round 3 proved it with three reproductions. And the smallest
+  surprise with the longest reach: a documentation claim I wrote into
+  `## Decisions` as a flat fact deleted the loader path for a while.
+- **What am I assuming without having verified it?** That the seven failing
+  assertions are the whole distance between criterion 4 and a green suite —
+  nobody has implemented the per-part check, so that is an estimate, not a
+  fact. That the current diff would survive a review round: round 3 read a
+  different diff, because the scope restoration afterwards reverted three
+  files. Two assumptions from checkpoint 1 are now settled facts and no longer
+  assumed: `.claude-plugin/marketplace.json` carries `"source": "./"` and no
+  branch `ref`, so nothing temporary survives the merge, and the manifest's
+  `"license": "GPL-3.0-or-later"` matches the repository's `LICENSE`.
 
 ## Retro
+
+**What got in the way, biggest first.**
+
+- *The scope moved while the run was in progress.* 13 of 21 findings across
+  three rounds belonged to no criterion, and repairing several of them produced
+  the diff the next round then reviewed. `README.md` grew by 76 lines nobody had
+  asked for. The rule against this already existed in the rulebook and I broke
+  it. Filed as issue 0027, then applied to this branch retroactively on the
+  human's instruction, which removed 95 lines.
+- *A documented claim entered `## Decisions` as a flat fact*, and the loader
+  path was deleted on it while criterion 6 was open. The `issue` skill already
+  asks for a decision's source, and this one had a source — a document. What is
+  missing is that a document is not an exit code, so a decision resting on one
+  cannot license an irreversible step. This is the run's most expensive single
+  mistake and the only retro item not yet filed as an issue.
+- *Every review round paid for a whole fresh context.* Four rounds, 277 model
+  steps, 15.9M cache-read tokens, 60% of everything the run's ten subagent
+  dispatches consumed, and round 3 cost as much as round 2 while finding a third
+  as many things. Filed as issue 0026, with the human's decision on how far to
+  go.
+- *What a run costs was invisible* until it was measured by hand from the
+  session's own transcripts. Filed as issue 0025.
+- *One reviewer result never reached the dispatching session*, so 74 steps and
+  4.5M cache-read tokens bought nothing and the round was relaunched. Recorded
+  in issue 0026, where a continued reviewer changes what such a loss costs.
+- *Two regressions came out of my own round-1 fixes*, and my round-2 dismissal
+  of criterion 4 was wrong — round 3 proved it with three reproductions. The
+  rulebook's repetition and regression signals both fired and both worked; what
+  they did not do is stop the growth of the diff, which is issue 0027's subject.
+
+**What should change, beyond the issues already filed.**
+
+- A decision whose source is documentation is marked as such and may not
+  license a deletion. The proof is criterion 6's shape — it demands an exit code
+  and says an assumption recorded as a fact fails it — and that shape belongs in
+  the rulebook or the `issue` skill rather than in one issue's criteria. Not yet
+  filed; it needs the human's word on where it belongs.
+- Chain a verification and the commit that reports it with `&&`, never `;`. This
+  run committed a red suite with a message claiming exit 0 because of that one
+  character, and the message had to be amended.
