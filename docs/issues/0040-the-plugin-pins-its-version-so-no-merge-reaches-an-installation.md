@@ -39,8 +39,8 @@ Acceptance criteria:
    anywhere.
 3. `claude plugin validate` over this repository's marketplace manifest and
    over `.claude-plugin/plugin.json` exits 0.
-4. Each of those two validations still exits 1 when an agent's frontmatter
-   fails to parse.
+4. `claude plugin validate .claude-plugin/plugin.json` still exits 1 when an
+   agent's frontmatter fails to parse.
 5. When `test.sh` runs, it exits 0, and every suite it names exists.
 6. `README.md` describes what an installation receives in a way that matches
    criterion 2, and names no version bump or release step as a condition for
@@ -66,6 +66,25 @@ Acceptance criteria:
   the same commands without `--strict` exit 0. Criterion 4 exists so that
   dropping the flag is not a silent loss of coverage.
 
+- **Criterion 4 covers the plugin-manifest validation only.** Its first
+  wording asked both validations to reject a broken agent. The `test-author`
+  measured that the marketplace-manifest validation never opens an agent: with
+  `agents/researcher.md`'s `description` made unparseable,
+  `claude plugin validate <repo root>` and
+  `claude plugin validate .claude-plugin/marketplace.json` both exit 0, while
+  `claude plugin validate .claude-plugin/plugin.json` exits 1 on the
+  frontmatter. A case built on the marketplace half would have passed on a
+  defect-free tree, so the criterion was narrowed before implementation
+  started. Source: the `test-author`'s measurement.
+
+- **`README.md` need not name the update commands.** Criterion 6 asks the
+  README to match criterion 2 and to name no version bump as a condition; it
+  does not ask it to spell out `claude plugin marketplace update` and
+  `claude plugin update`. "Updates included, no re-installation" is the
+  promise the human's text already makes, and naming a command is not part of
+  what this issue fixes. Source: default, unanswered — recorded rather than
+  put to the human, because it changes no observable behaviour of the plugin.
+
 ## Log
 
 - The version resolution was measured against a local marketplace fixture,
@@ -88,6 +107,23 @@ Acceptance criteria:
   reports `frontmatter: YAML frontmatter failed to parse` and exits 1. The
   defect class issue 0022 cared about survives the flag's removal; only the
   missing-version warning does not.
+
+- The `test-author` wrote the cases into `test-plugin.sh` and proved them red:
+  `bash test-plugin.sh` exits 1 with `FAIL: 2 case(s)` — criterion 1
+  (*"version pin: plugin.json declares version '0.2.0'"*) and criterion 2
+  (*"the installed AGENTS.md does not carry the change committed after the
+  install: metis is already at the latest version (0.2.0)"*). Criteria 3–6 are
+  preserve criteria and pass today by construction. Reachability was shown on
+  a scratch copy with only the `version` key deleted: `bash test-plugin.sh`
+  exits 0, `bash test.sh` exits 0 over all 3 suites.
+
+- A user-scope install of the plugin into this container's real home
+  (`claude plugin install metis@metis`, exit 0) resolves to
+  `cache/metis/metis/0.2.0` at `gitCommitSha a305f334` and contains no
+  `install.sh` and no `skills/bootstrap/`, but does contain `skills/cost/`.
+  So a *fresh* install under a pinned version does carry current `main`; only
+  an install that already exists stays frozen. That refines issue 0037, whose
+  observation came from a cache written before the loader was removed.
 
 ## Checkpoints
 
