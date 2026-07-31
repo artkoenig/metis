@@ -139,6 +139,25 @@ Acceptance criteria:
 | No criterion | 1 | 0 |
 | **Total** | **1** | **0** |
 
+- **What this run cost, by `python3 skills/cost/assets/token-cost.py`**, exit
+  0, taken after this issue reached `status: done` and its pull request was
+  opened:
+
+  | agent | dispatched for | steps | cache-write | cache-read | output (unreliable) |
+  | --- | --- | --- | --- | --- | --- |
+  | main session | the run itself | 103 | 234,065 | 13,100,203 | ~68,430 |
+  | metis:reviewer | Review issue 0032's implementation | 67 | 217,030 | 4,713,584 | ~2,317 |
+  | metis:test-author | Write failing tests for issue 0032 | 41 | 258,282 | 3,669,616 | ~506 |
+  | metis:implementer | Implement issue 0032 | 40 | 78,269 | 2,277,194 | ~1,525 |
+
+  The reviewer row covers both review rounds: they ran in the same resumed
+  dispatch (invariant 3's "same context continues" after a fix), so the
+  transcript carries one subagent, not two. Main session's largest single
+  items were the three plugin-discovery attachments re-injected at step 1
+  (skill_listing 19,042, SessionStart:startup 15,616, agent_listing_delta
+  10,675) — the pattern issue 0033 is already tracking — plus a 10,459-token
+  re-read of issue 0025's own record while answering this question.
+
 ## Checkpoints
 
 ### Before implementation
