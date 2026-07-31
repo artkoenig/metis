@@ -85,6 +85,18 @@ Acceptance criteria:
   what this issue fixes. Source: default, unanswered — recorded rather than
   put to the human, because it changes no observable behaviour of the plugin.
 
+- **Criterion 6's first half is not covered by the suite, on purpose.**
+  Whether the README's prose "matches criterion 2" is a judgement, and two
+  attempts to mechanise it failed in opposite directions within one round of
+  each other — a README saying *"is not updated … never arrives … delete the
+  plugin and add it back"* passed, while re-wrapping the unchanged promise
+  across a line break failed. The negative half stays tested, because "names
+  no version, release, bump or publish step" is a word blocklist and a
+  blocklist is the right instrument for it. The first half is established by
+  the fresh-context review, which is what invariant 3 exists for and which
+  has now confirmed the shipped README twice. Source: default, unanswered —
+  it changes no behaviour of the plugin, only what the suite claims to check.
+
 ## Log
 
 - The version resolution was measured against a local marketplace fixture,
@@ -158,6 +170,28 @@ Acceptance criteria:
   `AGENTS.md` shortening) and was merged into this branch; `bash test.sh`
   exits 0 over 3 suites on the merged tree. Issue numbers do not collide —
   `main` still ends at `0039`.
+
+- **Review round 2** (same context continued, `a305f33..9d1b4d7`): 3 findings.
+  It re-established `bash test.sh` exit 0 over 3 suites and 57 cases, re-ran
+  the mutation on cases 25 and 26, confirmed round-1 finding 2 fixed (the
+  counter-README now exits 1 naming lines 61 and 62), and confirmed the merge
+  of `a305f33` leaves nothing in this diff stale — the rulebook rewrite
+  changed no issue template, and `README.md` still matches the new
+  `AGENTS.md`. Triage:
+
+  - *Case 27's replacement accepts a README stating criterion 2's opposite,
+    and fails on a pure reflow* — two findings, one cause. See the decision
+    below: the approach changed instead of the regex.
+  - *The criterion-5 comment gives a false reason* — `test-loader-removed.sh`
+    does run `bash test.sh` from inside a `test.sh` run; what stops
+    `test-plugin.sh` doing the same is the `METIS_TEST_SH_NESTED` guard not
+    exempting it. Sent back with the above.
+
+- **Repetition signal, and the approach changed.** Two rounds in a row found
+  the same defect class in the same check: a regex deciding whether prose
+  "matches criterion 2". Round 1 found it too permissive, round 2 found it
+  both too permissive *and* too strict. The finding count did not decrease
+  (3, then 3), one round short of the rulebook's stop-and-ask.
 
 ## Checkpoints
 
