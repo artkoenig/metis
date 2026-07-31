@@ -222,8 +222,11 @@ Acceptance criteria:
   | reviewer | Review issue 0031 change | 15 | 34,796 | 284,118 | ~247 |
   | reviewer | Probe subagent baseline context | 1 | 9,589 | 0 | ~1 |
 
-  The main session carries 71% of the cache-read. Every proposal this session
-  made for cutting subagent cost was aimed at the smaller share.
+  The main session carries 11,660,572 of the run's 16,827,102 cache-read
+  tokens — 69%. Every proposal this session made for cutting subagent cost was
+  aimed at the smaller share. (The share was first written here as 71%, which
+  was the figure for the implementer's earlier snapshot, not for this table.
+  Corrected before the review round returned.)
 - **Work found mid-run, to be filed separately**: the reviewer dispatched for
   this measurement found that pull request 31 left issue 0031 largely
   unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only
