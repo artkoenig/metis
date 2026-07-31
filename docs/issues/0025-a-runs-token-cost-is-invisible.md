@@ -97,9 +97,12 @@ Acceptance criteria:
   quintuple exactly the field this issue's Log calls unreliable, and they come
   from a prompt, not from a price list. Source: the human's answer, upholding
   the recorded cache-read decision above.
-- Rows sort by cache-read, since without a weighted column it is the only
-  metric this issue has already settled on. Source: default, derived from the
-  decision above, unanswered.
+- Rows sort by cache-read, descending — the most expensive first, since the
+  point of the output is to find where the money went. Without a weighted
+  column cache-read is the only metric this issue has already settled on. The
+  direction was left undecided when the criteria were written and the
+  `test-author` returned it as a question rather than guessing an expectation;
+  it stays out of the criteria and is not tested. Source: default, unanswered.
 - The command ships as a skill's asset rather than as a script in this
   repository's root, because criterion 10 requires it to work in projects that
   install metis as a plugin. Precedent: `skills/bootstrap/assets/`. Source:
@@ -174,6 +177,29 @@ Acceptance criteria:
   a document's header during exploration and fetching the body on demand. File
   reads were 9.2% of that dispatch, and its largest read entered at step 11 of
   15, where deferral saves almost nothing while costing an extra request.
+- **The `test-author` wrote 14 cases into
+  `skills/cost/assets/test-token-cost.sh` and registered the suite in
+  `test.sh`.** `bash skills/cost/assets/test-token-cost.sh` exits 1 with all
+  14 failing, each for the missing behaviour rather than a broken test. It
+  established the suite is satisfiable by writing a throwaway implementation
+  outside the repository — 14/14 — and then broke that implementation nine
+  ways, one per intended trap: counting records instead of calls, summing
+  `output_tokens` across a call's records, dropping the unreliability
+  markers, printing a combined total, reading every session in the project
+  directory, writing a report file, marking every figure estimated, dropping
+  the grouped breakdown, and hard-coding a path inside the working tree. Each
+  mutation was caught by exactly the case meant to catch it. That throwaway
+  implementation is deliberately not handed to the implementer: the context
+  that wrote the tests must not also write the code that satisfies them.
+- **Two suites now fail for a reason the implementer must clear**:
+  `skills/cost/` exists without a `SKILL.md`, which `test-plugin.sh` and
+  `skills/bootstrap/assets/test-session-start-core.sh` both check.
+- **The `test-author` dispatch cost 34 model calls, 128,311 cache-write,
+  2,749,268 cache-read and 52,891 output** — roughly ten times the reviewer
+  dispatch's cache-read. Its baseline share fell to 7.5% against the
+  reviewer's 33.5%, because the baseline is carried linearly while the
+  accumulated material grows faster: the fixed overhead matters most in short
+  dispatches, not long ones.
 - **Work found mid-run, to be filed separately**: the reviewer dispatched for
   this measurement found that pull request 31 left issue 0031 largely
   unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only

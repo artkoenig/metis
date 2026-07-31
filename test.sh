@@ -10,6 +10,7 @@ suites=(
   test-install.sh
   skills/bootstrap/assets/test-session-start-core.sh
   skills/bootstrap/assets/test-session-start-loader.sh
+  skills/cost/assets/test-token-cost.sh
 )
 
 failed=0
