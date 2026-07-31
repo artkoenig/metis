@@ -118,18 +118,26 @@ Acceptance criteria:
   skill/agent availability, the facts a plugin-only session can actually
   check. `bash test.sh` re-run after the fix: still exit 0, all 54 cases
   across the 3 suites pass.
+- **Review round 2 (same context continuing)**, against `origin/main..HEAD`
+  (`fb67c9a..3b0a1da`). Re-checked the whole intent, not only round 1's own
+  finding. Re-established `bash test.sh`, `bash test-plugin.sh` and
+  `bash test-loader-removed.sh` all exit 0 (54/54 cases) itself, re-derived
+  criterion 3 independently again, and confirmed `claude plugin list` — what
+  the round-1 fix now points the fallback diagnostic at — is a real, working
+  command already used the same way elsewhere in this repository's own
+  record. No findings.
 
-| | Round 1 |
-| --- | --- |
-| Criterion 1 | 0 |
-| Criterion 2 | 0 |
-| Criterion 3 | 0 |
-| Criterion 4 | 0 |
-| Criterion 5 | 0 |
-| Criterion 6 | 0 |
-| Criterion 7 | 0 |
-| No criterion | 1 |
-| **Total** | **1** |
+| | Round 1 | Round 2 |
+| --- | --- | --- |
+| Criterion 1 | 0 | 0 |
+| Criterion 2 | 0 | 0 |
+| Criterion 3 | 0 | 0 |
+| Criterion 4 | 0 | 0 |
+| Criterion 5 | 0 | 0 |
+| Criterion 6 | 0 | 0 |
+| Criterion 7 | 0 | 0 |
+| No criterion | 1 | 0 |
+| **Total** | **1** | **0** |
 
 ## Checkpoints
 
@@ -166,8 +174,32 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes. All seven acceptance criteria are
+  met, verified independently by the reviewer (not just reported by the
+  implementer): `bash test.sh`, `bash test-plugin.sh` and
+  `bash test-loader-removed.sh` all exit 0, 54 cases total. The two review
+  rounds converged (1 finding → 0), so this run did not hit the three-round
+  stop rule.
+- **What surprised me?** Three things, in the order they showed up. First,
+  fixing criterion 3's self-exemption bug exposed a genuine structural
+  conflict: the two verification scripts must contain the very strings
+  criterion 3 forbids elsewhere, so an unqualified reading of the criterion
+  could never be satisfied — resolved by the human softening it to name an
+  explicit, bounded exemption. Second, wiring `test-loader-removed.sh` into
+  `test.sh`'s own suite list created literal infinite recursion (that suite's
+  criterion-4 check runs `bash test.sh`, which would run that suite again) —
+  the implementer's `METIS_TEST_SH_NESTED` guard fixed it, and the reviewer
+  independently reproduced both a broken-suite scenario to confirm the guard
+  doesn't mask a real failure. Third, the tracker's four states have no
+  "closed as moot" state for issue 0024 — resolved with a recorded default
+  (`status: done`, riding this issue's own PR) rather than asked, since it
+  changes no user-visible behaviour.
+- **What am I assuming without having verified it?** That issue 0024's `pr`
+  field, left blank by the implementer, should be filled in with this same
+  pull request once it is opened — done as part of opening the PR, not
+  separately verified by the reviewer. That the criterion-3 grep-based
+  search, run against the tracked git tree, is a sufficient check for "no
+  reference" — it would not catch a reference in an untracked file, but
+  untracked files are outside what any tracked-tree criterion could mean.
 
 ## Retro
