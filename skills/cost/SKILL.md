@@ -21,7 +21,11 @@ Wherever this page sits — plugin cache, `~/.claude/skills`, a checkout — the
 command sits next to it in `assets/`, and it works from any project. It reads
 the running session's transcript and the transcript of every subagent that
 session dispatched, under `~/.claude/projects/`. It creates and modifies no
-file, and it reads no session's transcripts but the current one's.
+file, and it reads no session's transcripts but the current one's. Which
+session that is comes from `CLAUDE_SESSION_ID` or `CLAUDE_CODE_SESSION_ID`;
+where neither names one, the command reports that it cannot identify the
+running session and exits non-zero rather than guessing a transcript that may
+belong to another session.
 
 It prints one row per dispatch plus one row for the main session — agent
 type, what it was dispatched for, model steps, cache-write, cache-read,
@@ -55,7 +59,8 @@ lands in the record.
 
 ## What it is not
 
-Not a budget and not a limit — it reports, it never refuses. And not a live
+Not a budget and not a limit — whatever the figures are, it reports them and
+never refuses over them. And not a live
 meter: it reads what the transcripts hold at the moment it runs, so the last
 few calls of the running turn are not in it yet.
 

@@ -13,7 +13,9 @@ row's cache-write went - grouped by the kind of thing that entered the
 context, and as the individually most expensive items.
 
 It creates and modifies nothing, and it reads no transcript but the current
-session's.
+session's. `CLAUDE_SESSION_ID` or `CLAUDE_CODE_SESSION_ID` says which session
+that is; where neither names one, it reports that it cannot identify the
+running session and exits non-zero instead of guessing a transcript.
 
 What the numbers mean:
 
@@ -88,41 +90,23 @@ def env_session_id():
     return None
 
 
-def newest_transcript(directory):
-    best, best_mtime = None, None
-    try:
-        names = os.listdir(directory)
-    except OSError:
-        return None
-    for name in names:
-        if not name.endswith(".jsonl"):
-            continue
-        path = os.path.join(directory, name)
-        if not os.path.isfile(path):
-            continue
-        mtime = os.stat(path).st_mtime
-        if best_mtime is None or mtime > best_mtime:
-            best, best_mtime = name[: -len(".jsonl")], mtime
-    return best
+def projects_root():
+    return os.path.join(home_dir(), ".claude", "projects")
 
 
-def locate():
-    """Returns (project directory under ~/.claude/projects, session id)."""
-    root = os.path.join(home_dir(), ".claude", "projects")
-    session = env_session_id()
+def locate(session):
+    """The directory under ~/.claude/projects holding this session's files.
+
+    Only a directory carrying this session's own transcript counts. Nothing
+    else identifies the running session, so nothing else is opened.
+    """
+    root = projects_root()
     for path in project_candidates():
         for name in sanitisations(path):
             directory = os.path.join(root, name)
-            if not os.path.isdir(directory):
-                continue
-            if session:
-                if os.path.isfile(os.path.join(directory, session + ".jsonl")):
-                    return directory, session
-                continue
-            found = newest_transcript(directory)
-            if found:
-                return directory, found
-    return None, session
+            if os.path.isfile(os.path.join(directory, session + ".jsonl")):
+                return directory
+    return None
 
 
 def read_records(path):
@@ -495,17 +479,20 @@ def print_notes():
 
 
 def main():
-    directory, session = locate()
-    if directory is None:
+    session = env_session_id()
+    if not session:
         sys.stderr.write(
-            "token-cost: no transcript found for this session under "
-            + os.path.join(home_dir(), ".claude", "projects") + "\n")
+            "token-cost: cannot identify the running session - neither "
+            "CLAUDE_SESSION_ID nor CLAUDE_CODE_SESSION_ID names one. "
+            "Reporting the newest transcript instead would report a session "
+            "nobody asked about, so nothing is read.\n")
+        return 1
+    directory = locate(session)
+    if directory is None:
+        sys.stderr.write("token-cost: no transcript for session " + session
+                         + " under " + projects_root() + "\n")
         return 1
     transcript = os.path.join(directory, session + ".jsonl")
-    if not os.path.isfile(transcript):
-        sys.stderr.write("token-cost: no transcript file for session "
-                         + session + "\n")
-        return 1
 
     main_records = [r for r in read_records(transcript)
                     if not r.get("isSidechain")]
