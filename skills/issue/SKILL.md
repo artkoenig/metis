@@ -35,7 +35,7 @@ what they are.
 | **record a retro** | what got in the way, what should change |
 | **record a task list** | the steps a change is being landed in — the rulebook says when one is due |
 | **set the state** | which state the issue is now in, and the branch or the pull request if one now exists |
-| **orient a session** | nothing. Returns which issue is running and everything the previous session knew about it |
+| **orient a session** | nothing. Returns which issue is running and everything the previous session knew about it — or, when none is running, the unfinished issues and how they depend on each other |
 
 Four parts are owned elsewhere, each by one owner, and this page does not
 repeat what an owner says. The plan's content belongs to the `plan` skill.
@@ -62,11 +62,26 @@ filenames, the template, the sections. It can change without anything outside
 
 ## Orienting a session
 
-Scan the `status:` lines of the files under `docs/issues/` and open the
-`active` one — or, if none is `active`, the one whose `branch:` matches the
-branch checked out. Read it whole: the filled sections are the progress, and
-Decisions, Log and Checkpoints hold everything the previous session knew.
+Scan the `status:` lines of every file under `docs/issues/`. That scan decides
+which of two paths you are on.
+
+**An issue is running** — one is `active`, or one carries the `branch:` checked
+out. Open that file and read it whole: the filled sections are the progress,
+and Decisions, Log and Checkpoints hold everything the previous session knew.
 Read nothing else to get oriented.
+
+**Nothing is running.** Read the `## Intent` of every issue whose status is not
+`done` — that section only, no other, and no file outside `docs/issues/`. Then
+work out which of those issues depend on each other: one whose intent another's
+criteria presuppose comes before the issue that presupposes it. Return the
+unfinished issues with that dependency in view. What the session does with it —
+proposing one to the human, and what happens when no answer comes — is the
+rulebook's, not this skill's.
+
+A `status:` that says `active` is not proof: check that its `pr:` is empty
+before you take it for the running one. An issue whose pull request is merged
+is finished whatever its status line says, and the wrong path here costs the
+session its whole orientation.
 
 ## The shape
 
