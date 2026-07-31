@@ -50,10 +50,11 @@ Acceptance criteria:
 2. This repository's `.claude/settings.json` declares no `SessionStart` hook
    pointing at the removed loader script, and its `extraKnownMarketplaces`
    and `enabledPlugins` entries are unchanged from before this issue.
-3. Searching the tracked tree — excluding `docs/issues/` and the two retained
-   plugin-hook files — for `install.sh`, the `bootstrap` skill or the loader
-   script finds no reference, and the check that establishes this exempts no
-   tracked file from its own search.
+3. Searching the tracked tree — excluding `docs/issues/`, the two retained
+   plugin-hook files, and this issue's own verification scripts
+   (`test-loader-removed.sh` and `test-plugin.sh`) — for `install.sh`, the
+   `bootstrap` skill or the loader script finds no reference, and the check
+   that establishes this exempts no other tracked file from its own search.
 4. `bash test.sh` exits 0, it names every suite present in the tree, and it
    names no suite that guarded a removed part.
 5. `test-plugin.sh` contains no case asserting that the loader, `install.sh`,
@@ -71,6 +72,18 @@ Acceptance criteria:
 ## Tasks
 
 ## Decisions
+
+- **Criterion 3 softened.** Excluded from its tree-wide search, alongside
+  `docs/issues/` and the two retained plugin-hook files: this issue's own
+  verification scripts, `test-loader-removed.sh` and `test-plugin.sh`. Both
+  must contain the literal strings `install.sh`/`bootstrap` in their own
+  source to check for their absence elsewhere, so without this exemption the
+  criterion could never be met by any implementation. This is bounded to the
+  two files whose sole purpose is checking these paths' absence, recorded
+  here rather than hidden inside the test — unlike the original bug the
+  criterion targets, where the check silently excluded itself by name with no
+  such record. Source: the human's answer, "weiche 3 auf, das issue selbst,
+  die dazugehörigen skripte und tests sind ausgeschlossen".
 
 ## Log
 
