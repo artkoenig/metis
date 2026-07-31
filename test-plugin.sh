@@ -7,19 +7,27 @@
 # `claude plugin validate|marketplace|install|details` are shell-level.
 # Nothing leaves the machine. Exit 0 = all cases pass.
 #
-# Which acceptance criterion each block covers:
+# Which acceptance criterion each block covers. The criteria come from two
+# issues and their numbers collide, so every block below names its issue.
 #
+# Issue 0022 — the repository ships as a Claude Code plugin:
 #   Criterion 1 — `claude plugin validate --strict` exits 0
+#     Superseded by issue 0040: with no `version` key in plugin.json (issue
+#     0040 criterion 1) both validations warn "No version specified", and
+#     --strict turns that warning into an error. The flag is gone from the
+#     cases below; what it was kept for is pinned without it, as issue 0040's
+#     criteria 3 and 4.
 #     Cases 1-2: the two manifests are the documented shape.
-#     Cases 3a-3c: the validator accepts this repository with --strict, at
-#     both of its targets. The two targets check different things and the
-#     criterion covers both: the repository root target reads
+#     Cases 3a-3b: the validator accepts this repository at both of its
+#     targets (issue 0040 criterion 3). The two targets check different
+#     things and the criterion covers both: the repository root target reads
 #     `.claude-plugin/marketplace.json` and stops, while the
 #     `.claude-plugin/plugin.json` target walks the components — every
 #     skills/<name>/SKILL.md and every agents/<name>.md. 3a pins the
-#     marketplace target, 3b the component-walking one, and 3c proves 3b is
-#     the target with teeth: an agent whose frontmatter does not parse is
-#     rejected there.
+#     marketplace target, 3b the component-walking one.
+#     Case 3c: issue 0040 criterion 4 — 3b is the target with teeth, and it
+#     keeps its teeth without --strict: an agent whose frontmatter does not
+#     parse is rejected there.
 #   Criterion 2 — the exposed component inventory equals what is in the tree
 #     Case 4: the layout the plugin's own discovery needs (agents flat, one
 #     `.md` file each, because discovery does not recurse and takes the name
@@ -65,7 +73,9 @@
 #     to main against a scratch bare remote is refused by exit code, the
 #     remote branch is not created, and a push to a non-default branch still
 #     succeeds.
-#   Criterion 7 — while criterion 6 does not hold, the per-project
+#   Criterion 6 — a measurement recorded in issue 0022, not behaviour: no
+#     case here, because there is nothing to run.
+#   Criterion 7 — while issue 0022's criterion 6 does not hold, the per-project
 #   machinery stays in the repository
 #     Case 19 used to assert install.sh, the bootstrap skill, the loader,
 #     the core and the suites that only guard them were all present — the
@@ -83,10 +93,77 @@
 #     once agents are flat files, so test.sh could not exit 0 either.
 #     Case 20: the other direction — every suite file in the tree is named
 #     in test.sh, so a suite nobody wired in cannot hide behind a green
-#     `test.sh`.
+#     `test.sh`. These same two cases carry issue 0040's criterion 5; see
+#     the issue 0040 block below.
 #
-# Criterion 6 is a measurement recorded in the issue, not behaviour, and has
-# nothing to run here.
+# Issue 0040 — a merged change reaches an installation, no version pinned:
+#   Criterion 1 — neither manifest declares a version
+#     Case 25: plugin.json has no `version` key and the metis entry in
+#     marketplace.json has none either. A resolved version that never changes
+#     is what makes an installation keep its cached copy.
+#   Criterion 2 — an update delivers a change merged after the install
+#     Case 26: a throwaway git repository holding this tree is added as a
+#     marketplace and installed into a scratch config and a scratch HOME; a
+#     further commit changes one tracked file the plugin ships;
+#     `claude plugin marketplace update` and then `claude plugin update` must
+#     leave the installed plugin directory — the installPath the CLI records
+#     — carrying the changed content. The second commit touches that one file
+#     and nothing under .claude-plugin/, so no version string is edited
+#     anywhere on the way.
+#   Criterion 3 — the two validations exit 0 (cases 3a-3b, above)
+#   Criterion 4 — they still exit 1 on unparseable agent frontmatter
+#     (case 3c, above)
+#   Criterion 5 — test.sh exits 0 and every suite it names exists
+#     Cases 15 and 20, above: case 15 is the "every suite it names exists"
+#     half (and rejects a suite pinned to the removed nested agent layout),
+#     case 20 the other direction. The "exits 0" half is asserted, but not
+#     here: test-loader-removed.sh (lines 201-203) runs `bash test.sh` and
+#     checks its exit code, from inside the very test.sh run that invoked
+#     it. What makes that possible is the METIS_TEST_SH_NESTED guard
+#     (test.sh:23-30), which drops test-loader-removed.sh — and only that
+#     suite — from a nested run. The guard does not exempt test-plugin.sh,
+#     so a `bash test.sh` from this file would re-enter this file and
+#     recurse without end. That is why the case sits there, not here.
+#   Criterion 6 — README.md matches what an installation receives
+#     Case 27 covers the second half only: the README names no version,
+#     release, bump or publishing step at all, so none can stand as a
+#     condition for a merged change to arrive. A word blocklist with nothing
+#     exempted is the right instrument for that, and it bites: "a merged
+#     change arrives after the next release" fails it.
+#     The blocklist used to exempt any line carrying a denial word ("no",
+#     "not", "never"), so that "no version bump is needed" could pass. That
+#     exemption was a hole: "a merged change arrives after the next release,
+#     with no re-installation needed" — a release named as the condition, in
+#     the shape a re-pinned README would most naturally take — passed,
+#     because the "no" of a different clause exempted the whole line. The
+#     exemption is gone. The cost is deliberate: a future README that wants
+#     to say "no version bump is needed" will fail this case, and that run
+#     has to weigh the sentence rather than get silent coverage. Do not
+#     re-add an exemption to make such a sentence pass.
+#     The first half — that the README's prose "matches criterion 2" — is
+#     deliberately *not* covered here, and must not be re-added as a regex.
+#     Two rounds of trying produced the same defect class in both
+#     directions, reproduced on copies of the tree:
+#       - False pass: replacing the promise in README.md with "A session
+#         with the plugin active is not updated: it keeps the commit it was
+#         installed from ... Delete the plugin and add it back to move to a
+#         newer `main`." — the exact opposite of criterion 2 — still exited
+#         0. Every denial word ("not", "never") exempted the whole line,
+#         and no term covered "delete ... add it back", while the word
+#         "updated" inside the sentence that *denies* the update satisfied
+#         the positive check.
+#       - False fail: re-wrapping the unchanged, truthful promise so that
+#         "no" ended one line and "re-installation." began the next exited
+#         1, because denial and trigger had to share a physical line. So
+#         did a truthful sentence about the fork path the README already
+#         describes: "Switching to your own fork means pointing the
+#         marketplace at it and installing metis again."
+#     Whether the README's promise is true is established by the
+#     fresh-context review against the written intent, which has confirmed
+#     it twice; the suite stops pretending prose is mechanically checkable.
+#     The README is also *not* required to name `claude plugin marketplace
+#     update` or `claude plugin update` (decision recorded in issue 0040),
+#     so no case here looks for a command name.
 #
 # Wording the status assertions rely on, since "says so instead of reporting
 # success" needs a token to test: a status that reports a problem contains
@@ -245,38 +322,41 @@ else
 fi
 [ $failures -eq $prior ] && pass "marketplace manifest offers exactly one plugin: metis at ./"
 
-# --- Case 3a: the marketplace-manifest target under --strict ---------------
+# --- Case 3a: the marketplace-manifest target ------------------------------
 # `claude plugin validate <repo root>` validates .claude-plugin/marketplace.json
 # and nothing else — it prints "Validating marketplace manifest:" and stops. It
 # never opens a skill or an agent, so it cannot stand in for case 3b; keep both.
+# No --strict: without a `version` key the validator warns "No version
+# specified", and --strict would turn that warning into an error (issue 0040).
 prior=$failures
 if have_claude; then
   cfg=$(mktemp -d "$base/XXXXXX")
-  if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$repo_root" --strict \
+  if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$repo_root" \
       >"$base/validate.log" 2>&1; then
-    pass "claude plugin validate <repo root> --strict exits 0 (marketplace manifest target)"
+    pass "claude plugin validate <repo root> exits 0 (marketplace manifest target)"
   else
-    fail "claude plugin validate <repo root> --strict exited non-zero: $(tr '\n' ' ' <"$base/validate.log" | cut -c1-400)"
+    fail "claude plugin validate <repo root> exited non-zero: $(tr '\n' ' ' <"$base/validate.log" | cut -c1-400)"
   fi
 else
-  skip "claude plugin validate <repo root> --strict: no claude binary on PATH"
+  skip "claude plugin validate <repo root>: no claude binary on PATH"
 fi
 
-# --- Case 3b: the component-walking target under --strict ------------------
+# --- Case 3b: the component-walking target ---------------------------------
 # `claude plugin validate .claude-plugin/plugin.json` visits every
 # skills/<name>/SKILL.md and every agents/<name>.md. This is the target that
-# sees a component's frontmatter at all; case 3c is its proof.
+# sees a component's frontmatter at all; case 3c is its proof. No --strict,
+# for the reason case 3a gives.
 prior=$failures
 if have_claude; then
   cfg=$(mktemp -d "$base/XXXXXX")
-  if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$plugin_manifest" --strict \
+  if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$plugin_manifest" \
       >"$base/validate-components.log" 2>&1; then
-    pass "claude plugin validate .claude-plugin/plugin.json --strict exits 0 (walks every skill and agent)"
+    pass "claude plugin validate .claude-plugin/plugin.json exits 0 (walks every skill and agent)"
   else
-    fail "claude plugin validate .claude-plugin/plugin.json --strict exited non-zero: $(tr '\n' ' ' <"$base/validate-components.log" | cut -c1-400)"
+    fail "claude plugin validate .claude-plugin/plugin.json exited non-zero: $(tr '\n' ' ' <"$base/validate-components.log" | cut -c1-400)"
   fi
 else
-  skip "claude plugin validate .claude-plugin/plugin.json --strict: no claude binary on PATH"
+  skip "claude plugin validate .claude-plugin/plugin.json: no claude binary on PATH"
 fi
 
 # --- Case 3c: that target rejects unparseable component frontmatter --------
@@ -287,7 +367,8 @@ fi
 # copy must validate clean before the break and be rejected after it, so a
 # non-zero exit can only come from the broken frontmatter. If this case ever
 # passes while 3b's target is swapped for the repository-root one, the swap has
-# removed the only check that reads a component.
+# removed the only check that reads a component. Without --strict, so that
+# dropping the flag (issue 0040) is not a silent loss of this coverage.
 prior=$failures
 if have_claude; then
   cfg=$(mktemp -d "$base/XXXXXX")
@@ -297,7 +378,7 @@ if have_claude; then
   if [ ! -f "$broken_agent" ]; then
     fail "component validation: the scratch copy has no agents/<name>.md to break"
   elif ! CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$broken_plug/.claude-plugin/plugin.json" \
-      --strict >"$base/validate-clean-copy.log" 2>&1; then
+      >"$base/validate-clean-copy.log" 2>&1; then
     fail "component validation: the untouched scratch copy was already rejected: $(tr '\n' ' ' <"$base/validate-clean-copy.log" | cut -c1-400)"
   else
     python3 -c '
@@ -314,15 +395,15 @@ open(p, "w", encoding="utf-8").write("\n".join(lines))' "$broken_agent" 2>"$base
       || fail "component validation: could not break the copy: $(tail -1 "$base/break.err")"
     if [ $failures -eq $prior ]; then
       if CLAUDE_CONFIG_DIR="$cfg" claude plugin validate "$broken_plug/.claude-plugin/plugin.json" \
-          --strict >"$base/validate-broken.log" 2>&1; then
-        fail "component validation: --strict accepted $(basename "$broken_agent") with unparseable frontmatter: $(tr '\n' ' ' <"$base/validate-broken.log" | cut -c1-400)"
+          >"$base/validate-broken.log" 2>&1; then
+        fail "component validation: the validator accepted $(basename "$broken_agent") with unparseable frontmatter: $(tr '\n' ' ' <"$base/validate-broken.log" | cut -c1-400)"
       fi
     fi
   fi
   [ $failures -eq $prior ] \
-    && pass "claude plugin validate .claude-plugin/plugin.json --strict rejects an agent whose frontmatter does not parse"
+    && pass "claude plugin validate .claude-plugin/plugin.json rejects an agent whose frontmatter does not parse"
 else
-  skip "component validation under --strict: no claude binary on PATH"
+  skip "component validation: no claude binary on PATH"
 fi
 
 # --- Case 4: the layout plugin discovery needs -----------------------------
@@ -785,6 +866,163 @@ done <<EOF
 $found_suites
 EOF
 [ $failures -eq $prior ] && pass "test.sh names every one of the $n_found suites in the tree"
+
+# --- Case 25: neither manifest pins a version (issue 0040 criterion 1) -----
+# Claude Code resolves a plugin's version from plugin.json first and falls
+# back to the commit SHA; an installation whose resolved version is unchanged
+# keeps its cached copy, so a declared version pins every installation to the
+# commit that declared it. The marketplace entry can pin the same way.
+prior=$failures
+python3 - "$plugin_manifest" "$market_manifest" <<'PYEOF' 2>"$base/version-pin.err" \
+  || fail "version pin: $(tail -1 "$base/version-pin.err")"
+import json, sys
+plugin_path, market_path = sys.argv[1:3]
+problems = []
+plugin = json.load(open(plugin_path, encoding="utf-8"))
+if "version" in plugin:
+    problems.append("plugin.json declares version %r" % (plugin["version"],))
+market = json.load(open(market_path, encoding="utf-8"))
+entries = [p for p in market.get("plugins", []) if p.get("name") == "metis"]
+if not entries:
+    problems.append("marketplace.json has no plugin entry named metis")
+for e in entries:
+    if "version" in e:
+        problems.append("the metis entry in marketplace.json declares version %r"
+                        % (e["version"],))
+if problems:
+    sys.exit("; ".join(problems))
+PYEOF
+[ $failures -eq $prior ] && pass "neither manifest declares a version key"
+
+# --- Case 26: an update delivers a change merged after the install --------
+# The whole point of issue 0040: a commit that lands after someone installed
+# the plugin has to reach that installation. A throwaway git repository
+# holding this tree plays the role of the published repository; the scratch
+# CLAUDE_CONFIG_DIR and scratch HOME keep the real installation out of it.
+# Nothing here edits a version string — the second commit touches one shipped
+# file and nothing under .claude-plugin/, and that is asserted, not assumed.
+prior=$failures
+if ! have_claude; then
+  skip "an update delivers a merged change: no claude binary on PATH"
+else
+  src=$(copy_plugin)
+  git -C "$src" init --quiet --initial-branch=main
+  git -C "$src" config user.email "test@example.invalid"
+  git -C "$src" config user.name "Test"
+  git -C "$src" add -A
+  git -C "$src" -c commit.gpgsign=false commit --quiet -m "the plugin as this tree has it"
+  cfg=$(mktemp -d "$base/XXXXXX")
+  update_log="$base/update-path.log"
+  marker="metis-update-marker-$$-$(date +%s)"
+  : >"$update_log"
+  if ! CLAUDE_CONFIG_DIR="$cfg" HOME="$base/home" claude plugin marketplace add "$src" \
+       >>"$update_log" 2>&1; then
+    fail "update path: marketplace add failed: $(tr '\n' ' ' <"$update_log" | cut -c1-400)"
+  elif ! CLAUDE_CONFIG_DIR="$cfg" HOME="$base/home" claude plugin install metis@metis \
+       >>"$update_log" 2>&1; then
+    fail "update path: install failed: $(tr '\n' ' ' <"$update_log" | cut -c1-400)"
+  else
+    printf '\n%s\n' "$marker" >>"$src/AGENTS.md"
+    git -C "$src" add -A
+    git -C "$src" -c commit.gpgsign=false commit --quiet -m "change one file the plugin ships"
+    changed=$(git -C "$src" diff --name-only HEAD~1 HEAD | tr '\n' ' ')
+    [ "$changed" = "AGENTS.md " ] \
+      || fail "update path: the commit had to change AGENTS.md alone, it changed: $changed"
+    git -C "$src" diff --quiet HEAD~1 HEAD -- .claude-plugin \
+      || fail "update path: the commit touched .claude-plugin/ — the delivery may not need a manifest edit"
+    CLAUDE_CONFIG_DIR="$cfg" HOME="$base/home" claude plugin marketplace update metis \
+      >>"$update_log" 2>&1 \
+      || fail "update path: marketplace update exited non-zero: $(tr '\n' ' ' <"$update_log" | tail -c 400)"
+    CLAUDE_CONFIG_DIR="$cfg" HOME="$base/home" claude plugin update metis@metis \
+      >>"$update_log" 2>&1 \
+      || fail "update path: plugin update exited non-zero: $(tr '\n' ' ' <"$update_log" | tail -c 400)"
+    install_path=$(python3 - "$cfg/plugins/installed_plugins.json" 2>"$base/installpath.err" <<'PYEOF'
+import json, sys
+doc = json.load(open(sys.argv[1], encoding="utf-8"))
+entries = doc.get("plugins", {}).get("metis@metis")
+if isinstance(entries, dict):
+    entries = [entries]
+if not entries:
+    sys.exit("no metis@metis entry in installed_plugins.json")
+paths = sorted({e.get("installPath") for e in entries if e.get("installPath")})
+if len(paths) != 1:
+    sys.exit("expected one install path for metis@metis, got %r" % (paths,))
+sys.stdout.write(paths[0])
+PYEOF
+    ) || fail "update path: cannot tell where the plugin is installed: $(tail -1 "$base/installpath.err")"
+    if [ -n "${install_path:-}" ]; then
+      if [ ! -f "$install_path/AGENTS.md" ]; then
+        fail "update path: the installed plugin directory $install_path has no AGENTS.md"
+      elif ! grep -qF "$marker" "$install_path/AGENTS.md"; then
+        fail "update path: the installed AGENTS.md ($install_path) does not carry the change committed after the install: $(tr '\n' ' ' <"$update_log" | tail -c 300)"
+      fi
+    fi
+    [ $failures -eq $prior ] \
+      && pass "a commit made after the install reaches the installed plugin directory through marketplace update + plugin update"
+  fi
+fi
+
+# --- Case 27: the README names no version step as a condition -------------
+# Issue 0040 criterion 6, second half only. The README may not mention a
+# version, a release, a bump or publishing at all: a plain word blocklist,
+# nothing exempted. The shipped README contains none of these words, so the
+# blocklist costs it nothing.
+#
+# It used to exempt any line carrying a denial word ("no", "not", "never"),
+# so that "no version bump is needed" could pass while "a merged change
+# arrives after the next release" failed. That exemption was a hole. On a
+# copy of the tree, "a merged change arrives after the next release, with no
+# re-installation needed" — a release named as the condition for a merged
+# change to arrive, in the shape a re-pinned README would most naturally
+# take — exited 0, because the "no" of the second clause exempted the whole
+# line. The blocklist bit only when the offending sentence happened to carry
+# no denial word.
+#
+# The cost of dropping it, stated rather than hidden: a future README that
+# wants to say "no version bump is needed" will fail this case. That is
+# deliberate. The criterion asks that no version step be named *as a
+# condition*; the suite enforces the stricter "not named at all", because a
+# visible failure a future run has to decide about beats a silent hole that
+# reads as coverage. Weigh such a sentence then — do not re-add an exemption
+# to make it pass.
+#
+# The criterion's first half — that the README's description of what an
+# installation receives *matches criterion 2* — is deliberately not checked
+# here. Two rounds of regexes over the prose produced the same defect class in
+# both directions: a README stating criterion 2's exact opposite ("is not
+# updated ... Delete the plugin and add it back") passed, while a pure reflow
+# of the unchanged, truthful promise and a truthful sentence about the fork
+# path ("... installing metis again") failed. See the issue 0040 criterion 6
+# note in the header for the full reproductions. Whether the promise is true
+# is established by the fresh-context review of the diff against the written
+# intent, which has now confirmed it twice. Do not re-add a prose matcher
+# here.
+prior=$failures
+readme="$repo_root/README.md"
+if [ ! -f "$readme" ]; then
+  fail "README: $readme missing"
+else
+  python3 - "$readme" <<'PYEOF' 2>"$base/readme.err" || fail "README: $(tail -1 "$base/readme.err")"
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+lines = text.split("\n")
+problems = []
+
+# No version bump, release or publishing step named at all, so none can stand
+# as a condition for a merged change to arrive. Nothing is exempted: a denial
+# word elsewhere on the line used to exempt it, which let a named condition
+# through whenever the sentence also denied something else.
+condition = re.compile(r"version|release|\bbump|publish", re.I)
+for i, line in enumerate(lines, 1):
+    if condition.search(line):
+        problems.append("line %d names a version/release step (none may be "
+                        "named, denied or not): %r" % (i, line.strip()[:100]))
+if problems:
+    sys.exit("; ".join(problems))
+PYEOF
+fi
+[ $failures -eq $prior ] \
+  && pass "README names no version bump, release or publishing step as a condition for a change to arrive"
 
 echo
 [ $skips -gt 0 ] && echo "note: $skips case(s) skipped"
