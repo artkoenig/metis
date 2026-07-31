@@ -116,20 +116,45 @@
 #   Criterion 5 — test.sh exits 0 and every suite it names exists
 #     Cases 15 and 20, above: case 15 is the "every suite it names exists"
 #     half (and rejects a suite pinned to the removed nested agent layout),
-#     case 20 the other direction. The "exits 0" half is what running
-#     test.sh itself shows by exit code — this suite is one of the suites
-#     test.sh runs, so it cannot run test.sh again to check it.
+#     case 20 the other direction. The "exits 0" half is asserted, but not
+#     here: test-loader-removed.sh (lines 201-203) runs `bash test.sh` and
+#     checks its exit code, from inside the very test.sh run that invoked
+#     it. What makes that possible is the METIS_TEST_SH_NESTED guard
+#     (test.sh:23-30), which drops test-loader-removed.sh — and only that
+#     suite — from a nested run. The guard does not exempt test-plugin.sh,
+#     so a `bash test.sh` from this file would re-enter this file and
+#     recurse without end. That is why the case sits there, not here.
 #   Criterion 6 — README.md matches what an installation receives
-#     Case 27, in two halves. Positive: some passage says what an update
-#     brings to an installation, and no line claims the opposite outcome —
-#     an installation frozen at the commit it was installed from, or
-#     re-installation as the way a newer `main` arrives. Negative: wherever
-#     the README mentions a version, a release, a bump or publishing, it
-#     mentions it as something *not* required. Neither a stale installation
-#     nor a version step may stand as a condition for a merged change to
-#     arrive. The README is *not* required to name `claude plugin
-#     marketplace update` or `claude plugin update` (decision recorded in
-#     issue 0040), so no case here looks for a command name.
+#     Case 27 covers the second half only: wherever the README mentions a
+#     version, a release, a bump or publishing, it mentions it as something
+#     *not* required, so no version step stands as a condition for a merged
+#     change to arrive. A word blocklist is the right instrument for that,
+#     and it bites: "a merged change arrives after the next release" fails
+#     it.
+#     The first half — that the README's prose "matches criterion 2" — is
+#     deliberately *not* covered here, and must not be re-added as a regex.
+#     Two rounds of trying produced the same defect class in both
+#     directions, reproduced on copies of the tree:
+#       - False pass: replacing the promise in README.md with "A session
+#         with the plugin active is not updated: it keeps the commit it was
+#         installed from ... Delete the plugin and add it back to move to a
+#         newer `main`." — the exact opposite of criterion 2 — still exited
+#         0. Every denial word ("not", "never") exempted the whole line,
+#         and no term covered "delete ... add it back", while the word
+#         "updated" inside the sentence that *denies* the update satisfied
+#         the positive check.
+#       - False fail: re-wrapping the unchanged, truthful promise so that
+#         "no" ended one line and "re-installation." began the next exited
+#         1, because denial and trigger had to share a physical line. So
+#         did a truthful sentence about the fork path the README already
+#         describes: "Switching to your own fork means pointing the
+#         marketplace at it and installing metis again."
+#     Whether the README's promise is true is established by the
+#     fresh-context review against the written intent, which has confirmed
+#     it twice; the suite stops pretending prose is mechanically checkable.
+#     The README is also *not* required to name `claude plugin marketplace
+#     update` or `claude plugin update` (decision recorded in issue 0040),
+#     so no case here looks for a command name.
 #
 # Wording the status assertions rely on, since "says so instead of reporting
 # success" needs a token to test: a status that reports a problem contains
@@ -928,25 +953,25 @@ PYEOF
   fi
 fi
 
-# --- Case 27: the README matches what an installation receives ------------
-# Issue 0040 criterion 6. Two halves, each checked the same way: a class of
-# words that would describe the *opposite* of criterion 2's outcome may appear
-# in the README, but only in a sentence that denies it.
-#   Half one — what an installation receives. Criterion 2's outcome is that a
-#   commit merged after the install reaches the installed copy through an
-#   update. A README that instead says the installation is frozen at the
-#   commit it was installed from, or that a newer `main` arrives by removing
-#   the plugin and installing it again, describes the opposite outcome and
-#   must fail here — "no re-installation" is fine, "remove the plugin and
-#   install it again" is not. Beside that, some passage has to say what an
-#   update brings at all, so deleting the promise fails too. What the README
-#   may *not* be required to say is any command name: the human's recorded
-#   decision in issue 0040 is that "updates included, no re-installation" is
-#   the whole promise, so no assertion here looks for `claude plugin
-#   marketplace update` or `claude plugin update`.
-#   Half two — no version bump, release or publishing step as a condition for
-#   a merged change to arrive: "no version bump required" is fine, "after the
-#   next release" is not.
+# --- Case 27: the README names no version step as a condition -------------
+# Issue 0040 criterion 6, second half only. Wherever the README mentions a
+# version, a release, a bump or publishing, it has to mention it as something
+# *not* required: "no version bump is needed" is fine, "a merged change
+# arrives after the next release" is not. A denial word on the same line is
+# what exempts a mention — a blocklist of words with an exemption, which is
+# the right instrument for "this word may not stand as a condition".
+#
+# The criterion's first half — that the README's description of what an
+# installation receives *matches criterion 2* — is deliberately not checked
+# here. Two rounds of regexes over the prose produced the same defect class in
+# both directions: a README stating criterion 2's exact opposite ("is not
+# updated ... Delete the plugin and add it back") passed, while a pure reflow
+# of the unchanged, truthful promise and a truthful sentence about the fork
+# path ("... installing metis again") failed. See the issue 0040 criterion 6
+# note in the header for the full reproductions. Whether the promise is true
+# is established by the fresh-context review of the diff against the written
+# intent, which has now confirmed it twice. Do not re-add a prose matcher
+# here.
 prior=$failures
 readme="$repo_root/README.md"
 if [ ! -f "$readme" ]; then
@@ -959,26 +984,8 @@ lines = text.split("\n")
 problems = []
 denial = re.compile(r"\bno\b|\bnot\b|\bnever\b|without|\bkein|\bohne", re.I)
 
-# Half one: some passage says what an update brings to an installation ...
-paragraphs = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
-if not any(re.search(r"update", p, re.I)
-           and re.search(r"\bmain\b|merged|change|session|install", p, re.I)
-           for p in paragraphs):
-    problems.append("no passage says what an update brings to an installation")
-
-# ... and no line claims the opposite of criterion 2's outcome: an
-# installation frozen at the commit it was installed from, or re-installation
-# as the way a change arrives. Such a phrase may appear only as a denial.
-stale = re.compile(r"\bfroze|\bpinned\b|\bstuck\b|\bre-?install"
-                   r"|\bremove\b[^.\n]*\binstall\b"
-                   r"|\binstall\w*\b[^.\n]*\bagain\b", re.I)
-for i, line in enumerate(lines, 1):
-    if stale.search(line) and not denial.search(line):
-        problems.append("line %d says an installation stays at the commit it "
-                        "was installed from, or needs re-installing to get a "
-                        "change: %r" % (i, line.strip()[:100]))
-
-# Half two: no version bump, release or publishing step as a condition.
+# No version bump, release or publishing step as a condition for a merged
+# change to arrive.
 condition = re.compile(r"version|release|\bbump|publish", re.I)
 for i, line in enumerate(lines, 1):
     if condition.search(line) and not denial.search(line):
@@ -989,7 +996,7 @@ if problems:
 PYEOF
 fi
 [ $failures -eq $prior ] \
-  && pass "README says what an update brings and names no version or release step as a condition"
+  && pass "README names no version bump, release or publishing step as a condition for a change to arrive"
 
 echo
 [ $skips -gt 0 ] && echo "note: $skips case(s) skipped"
