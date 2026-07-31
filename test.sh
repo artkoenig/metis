@@ -7,11 +7,27 @@ set -u
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 suites=(
   test-plugin.sh
-  test-install.sh
-  skills/bootstrap/assets/test-session-start-core.sh
-  skills/bootstrap/assets/test-session-start-loader.sh
+  test-loader-removed.sh
   skills/cost/assets/test-token-cost.sh
 )
+
+# test-loader-removed.sh's own criterion-4 check runs `bash test.sh` to
+# confirm it exits 0. Since test-loader-removed.sh must itself be named
+# above (test-plugin.sh's coverage case requires every suite file in the
+# tree to be listed here), a plain nested run would re-invoke
+# test-loader-removed.sh, which would invoke test.sh again, without end. A
+# run that is already nested inside another test.sh run (signalled by
+# METIS_TEST_SH_NESTED, exported below so children inherit it) drops only
+# the suite that causes the recursion; every other suite still runs for
+# real, so nothing is skipped in the top-level run anyone actually invokes.
+if [ -n "${METIS_TEST_SH_NESTED:-}" ]; then
+  nested=()
+  for s in "${suites[@]}"; do
+    [ "$s" = "test-loader-removed.sh" ] || nested+=("$s")
+  done
+  suites=("${nested[@]}")
+fi
+export METIS_TEST_SH_NESTED=1
 
 failed=0
 for suite in "${suites[@]}"; do

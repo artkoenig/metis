@@ -1,10 +1,20 @@
 ---
-status: backlog
+status: done
 branch:
 pr:
 ---
 
 # The plugin ships a skill that installs the other path
+
+## Resolution
+
+Closed as moot alongside issue 0032: `skills/bootstrap/SKILL.md`, the file
+this issue's intent and acceptance criteria are about, no longer exists —
+issue 0032's criterion 1 removed `skills/bootstrap/` (and the loader path it
+installed) from the repository entirely. With the skill gone, there is
+nothing left for this issue's criteria to apply to. The `pr` field above is
+left blank pending issue 0032's own pull request, which this closure rides
+along with.
 
 ## Intent
 
