@@ -7,8 +7,10 @@
 # `claude plugin validate|marketplace|install|details` are shell-level.
 # Nothing leaves the machine. Exit 0 = all cases pass.
 #
-# Which acceptance criterion each block covers:
+# Which acceptance criterion each block covers. The criteria come from two
+# issues and their numbers collide, so every block below names its issue.
 #
+# Issue 0022 — the repository ships as a Claude Code plugin:
 #   Criterion 1 — `claude plugin validate --strict` exits 0
 #     Superseded by issue 0040: with no `version` key in plugin.json (issue
 #     0040 criterion 1) both validations warn "No version specified", and
@@ -71,7 +73,9 @@
 #     to main against a scratch bare remote is refused by exit code, the
 #     remote branch is not created, and a push to a non-default branch still
 #     succeeds.
-#   Criterion 7 — while criterion 6 does not hold, the per-project
+#   Criterion 6 — a measurement recorded in issue 0022, not behaviour: no
+#     case here, because there is nothing to run.
+#   Criterion 7 — while issue 0022's criterion 6 does not hold, the per-project
 #   machinery stays in the repository
 #     Case 19 used to assert install.sh, the bootstrap skill, the loader,
 #     the core and the suites that only guard them were all present — the
@@ -89,7 +93,8 @@
 #     once agents are flat files, so test.sh could not exit 0 either.
 #     Case 20: the other direction — every suite file in the tree is named
 #     in test.sh, so a suite nobody wired in cannot hide behind a green
-#     `test.sh`.
+#     `test.sh`. These same two cases carry issue 0040's criterion 5; see
+#     the issue 0040 block below.
 #
 # Issue 0040 — a merged change reaches an installation, no version pinned:
 #   Criterion 1 — neither manifest declares a version
@@ -108,14 +113,23 @@
 #   Criterion 3 — the two validations exit 0 (cases 3a-3b, above)
 #   Criterion 4 — they still exit 1 on unparseable agent frontmatter
 #     (case 3c, above)
+#   Criterion 5 — test.sh exits 0 and every suite it names exists
+#     Cases 15 and 20, above: case 15 is the "every suite it names exists"
+#     half (and rejects a suite pinned to the removed nested agent layout),
+#     case 20 the other direction. The "exits 0" half is what running
+#     test.sh itself shows by exit code — this suite is one of the suites
+#     test.sh runs, so it cannot run test.sh again to check it.
 #   Criterion 6 — README.md matches what an installation receives
-#     Case 27: the README says what an update brings to an installation, and
-#     wherever it mentions a version, a release, a bump or publishing, it
-#     mentions it as something *not* required — none of it may stand as a
-#     condition for a merged change to arrive.
-#
-# Criterion 6 is a measurement recorded in the issue, not behaviour, and has
-# nothing to run here.
+#     Case 27, in two halves. Positive: some passage says what an update
+#     brings to an installation, and no line claims the opposite outcome —
+#     an installation frozen at the commit it was installed from, or
+#     re-installation as the way a newer `main` arrives. Negative: wherever
+#     the README mentions a version, a release, a bump or publishing, it
+#     mentions it as something *not* required. Neither a stale installation
+#     nor a version step may stand as a condition for a merged change to
+#     arrive. The README is *not* required to name `claude plugin
+#     marketplace update` or `claude plugin update` (decision recorded in
+#     issue 0040), so no case here looks for a command name.
 #
 # Wording the status assertions rely on, since "says so instead of reporting
 # success" needs a token to test: a status that reports a problem contains
@@ -915,11 +929,24 @@ PYEOF
 fi
 
 # --- Case 27: the README matches what an installation receives ------------
-# Issue 0040 criterion 6. Two halves: the README says what an update brings to
-# an installation, and it names no version bump, release or publishing step as
-# a condition for a merged change to arrive. The second half is checked line by
-# line: such a word may appear, but only in a sentence that says it is *not*
-# needed — "no version bump required" is fine, "after the next release" is not.
+# Issue 0040 criterion 6. Two halves, each checked the same way: a class of
+# words that would describe the *opposite* of criterion 2's outcome may appear
+# in the README, but only in a sentence that denies it.
+#   Half one — what an installation receives. Criterion 2's outcome is that a
+#   commit merged after the install reaches the installed copy through an
+#   update. A README that instead says the installation is frozen at the
+#   commit it was installed from, or that a newer `main` arrives by removing
+#   the plugin and installing it again, describes the opposite outcome and
+#   must fail here — "no re-installation" is fine, "remove the plugin and
+#   install it again" is not. Beside that, some passage has to say what an
+#   update brings at all, so deleting the promise fails too. What the README
+#   may *not* be required to say is any command name: the human's recorded
+#   decision in issue 0040 is that "updates included, no re-installation" is
+#   the whole promise, so no assertion here looks for `claude plugin
+#   marketplace update` or `claude plugin update`.
+#   Half two — no version bump, release or publishing step as a condition for
+#   a merged change to arrive: "no version bump required" is fine, "after the
+#   next release" is not.
 prior=$failures
 readme="$repo_root/README.md"
 if [ ! -f "$readme" ]; then
@@ -928,19 +955,32 @@ else
   python3 - "$readme" <<'PYEOF' 2>"$base/readme.err" || fail "README: $(tail -1 "$base/readme.err")"
 import re, sys
 text = open(sys.argv[1], encoding="utf-8").read()
+lines = text.split("\n")
 problems = []
+denial = re.compile(r"\bno\b|\bnot\b|\bnever\b|without|\bkein|\bohne", re.I)
 
-# Half one: what an installation receives, tied to an update.
+# Half one: some passage says what an update brings to an installation ...
 paragraphs = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
 if not any(re.search(r"update", p, re.I)
            and re.search(r"\bmain\b|merged|change|session|install", p, re.I)
            for p in paragraphs):
     problems.append("no passage says what an update brings to an installation")
 
+# ... and no line claims the opposite of criterion 2's outcome: an
+# installation frozen at the commit it was installed from, or re-installation
+# as the way a change arrives. Such a phrase may appear only as a denial.
+stale = re.compile(r"\bfroze|\bpinned\b|\bstuck\b|\bre-?install"
+                   r"|\bremove\b[^.\n]*\binstall\b"
+                   r"|\binstall\w*\b[^.\n]*\bagain\b", re.I)
+for i, line in enumerate(lines, 1):
+    if stale.search(line) and not denial.search(line):
+        problems.append("line %d says an installation stays at the commit it "
+                        "was installed from, or needs re-installing to get a "
+                        "change: %r" % (i, line.strip()[:100]))
+
 # Half two: no version bump, release or publishing step as a condition.
 condition = re.compile(r"version|release|\bbump|publish", re.I)
-denial = re.compile(r"\bno\b|\bnot\b|\bnever\b|without|\bkein|\bohne", re.I)
-for i, line in enumerate(text.split("\n"), 1):
+for i, line in enumerate(lines, 1):
     if condition.search(line) and not denial.search(line):
         problems.append("line %d names a version/release step as a condition: %r"
                         % (i, line.strip()[:100]))
