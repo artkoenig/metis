@@ -125,12 +125,21 @@
 #     so a `bash test.sh` from this file would re-enter this file and
 #     recurse without end. That is why the case sits there, not here.
 #   Criterion 6 — README.md matches what an installation receives
-#     Case 27 covers the second half only: wherever the README mentions a
-#     version, a release, a bump or publishing, it mentions it as something
-#     *not* required, so no version step stands as a condition for a merged
-#     change to arrive. A word blocklist is the right instrument for that,
-#     and it bites: "a merged change arrives after the next release" fails
-#     it.
+#     Case 27 covers the second half only: the README names no version,
+#     release, bump or publishing step at all, so none can stand as a
+#     condition for a merged change to arrive. A word blocklist with nothing
+#     exempted is the right instrument for that, and it bites: "a merged
+#     change arrives after the next release" fails it.
+#     The blocklist used to exempt any line carrying a denial word ("no",
+#     "not", "never"), so that "no version bump is needed" could pass. That
+#     exemption was a hole: "a merged change arrives after the next release,
+#     with no re-installation needed" — a release named as the condition, in
+#     the shape a re-pinned README would most naturally take — passed,
+#     because the "no" of a different clause exempted the whole line. The
+#     exemption is gone. The cost is deliberate: a future README that wants
+#     to say "no version bump is needed" will fail this case, and that run
+#     has to weigh the sentence rather than get silent coverage. Do not
+#     re-add an exemption to make such a sentence pass.
 #     The first half — that the README's prose "matches criterion 2" — is
 #     deliberately *not* covered here, and must not be re-added as a regex.
 #     Two rounds of trying produced the same defect class in both
@@ -954,12 +963,28 @@ PYEOF
 fi
 
 # --- Case 27: the README names no version step as a condition -------------
-# Issue 0040 criterion 6, second half only. Wherever the README mentions a
-# version, a release, a bump or publishing, it has to mention it as something
-# *not* required: "no version bump is needed" is fine, "a merged change
-# arrives after the next release" is not. A denial word on the same line is
-# what exempts a mention — a blocklist of words with an exemption, which is
-# the right instrument for "this word may not stand as a condition".
+# Issue 0040 criterion 6, second half only. The README may not mention a
+# version, a release, a bump or publishing at all: a plain word blocklist,
+# nothing exempted. The shipped README contains none of these words, so the
+# blocklist costs it nothing.
+#
+# It used to exempt any line carrying a denial word ("no", "not", "never"),
+# so that "no version bump is needed" could pass while "a merged change
+# arrives after the next release" failed. That exemption was a hole. On a
+# copy of the tree, "a merged change arrives after the next release, with no
+# re-installation needed" — a release named as the condition for a merged
+# change to arrive, in the shape a re-pinned README would most naturally
+# take — exited 0, because the "no" of the second clause exempted the whole
+# line. The blocklist bit only when the offending sentence happened to carry
+# no denial word.
+#
+# The cost of dropping it, stated rather than hidden: a future README that
+# wants to say "no version bump is needed" will fail this case. That is
+# deliberate. The criterion asks that no version step be named *as a
+# condition*; the suite enforces the stricter "not named at all", because a
+# visible failure a future run has to decide about beats a silent hole that
+# reads as coverage. Weigh such a sentence then — do not re-add an exemption
+# to make it pass.
 #
 # The criterion's first half — that the README's description of what an
 # installation receives *matches criterion 2* — is deliberately not checked
@@ -982,15 +1007,16 @@ import re, sys
 text = open(sys.argv[1], encoding="utf-8").read()
 lines = text.split("\n")
 problems = []
-denial = re.compile(r"\bno\b|\bnot\b|\bnever\b|without|\bkein|\bohne", re.I)
 
-# No version bump, release or publishing step as a condition for a merged
-# change to arrive.
+# No version bump, release or publishing step named at all, so none can stand
+# as a condition for a merged change to arrive. Nothing is exempted: a denial
+# word elsewhere on the line used to exempt it, which let a named condition
+# through whenever the sentence also denied something else.
 condition = re.compile(r"version|release|\bbump|publish", re.I)
 for i, line in enumerate(lines, 1):
-    if condition.search(line) and not denial.search(line):
-        problems.append("line %d names a version/release step as a condition: %r"
-                        % (i, line.strip()[:100]))
+    if condition.search(line):
+        problems.append("line %d names a version/release step (none may be "
+                        "named, denied or not): %r" % (i, line.strip()[:100]))
 if problems:
     sys.exit("; ".join(problems))
 PYEOF
