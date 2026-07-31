@@ -57,6 +57,37 @@ run_cost() {
   return $status
 }
 
+# Runs the command with the session variables in a chosen state: both are
+# removed from the environment first, then every NAME=value given from $4 on is
+# put back — `CLAUDE_SESSION_ID=` puts it back empty. $1 = script, $2 = HOME,
+# $3 = working directory. Everything else matches run_cost. Prints stdout and
+# stderr together with thousands separators removed, since the report that the
+# session cannot be identified may go to either; stderr also lands in
+# $base/last-stderr. The exit status is the command's own.
+run_cost_session_env() {
+  local script="$1" home="$2" cwd="$3"
+  shift 3
+  local out status
+  out=$( cd "$cwd" && HOME="$home" CLAUDE_PROJECT_DIR="$cwd" \
+         env -u CLAUDE_SESSION_ID -u CLAUDE_CODE_SESSION_ID "$@" \
+         python3 "$script" 2>"$base/last-stderr" )
+  status=$?
+  { printf '%s\n' "$out"; cat "$base/last-stderr"; } | python3 -c \
+    'import re,sys; sys.stdout.write(re.sub(r"(?<=[0-9])[,_](?=[0-9])", "", sys.stdin.read()))'
+  return $status
+}
+
+# Runs the command with neither session variable set — the case where nothing
+# tells it which session is running. $1 = script, $2 = HOME, $3 = working dir.
+run_cost_no_session() { run_cost_session_env "$1" "$2" "$3"; }
+
+# $1 = text. True when some line naming a session reports that the running one
+# cannot be identified.
+reports_no_session() {
+  printf '%s\n' "$1" | grep -i 'session' \
+    | grep -Eqi "cannot|can't|could not|couldn't|unable|unknown|unidentif|not identif|no session|not set|unset|missing|empty|absent|require"
+}
+
 # $1 = text, $2 = number. True when the number stands in the text on its own —
 # not as part of a longer number and not behind a decimal point.
 has_num() { printf '%s' "$1" | grep -Eq "(^|[^0-9.])$2([^0-9]|\$)"; }
@@ -639,6 +670,110 @@ sys.exit(0 if named and rows else 1)
 PY
 fi
 [ $failures -eq $prior ] && pass "the per-dispatch numbers and the command are in the issue's record"
+
+# --- Case 15 (criterion 3): neither session variable is set -----------------
+# Nothing names the running session, so no transcript in the project directory
+# is known to be the current one. Guessing one would report a session the
+# command was not asked about; it says so and fails instead.
+prior=$failures
+build decoys b10
+before_home=$(snapshot "$HOME_DIR")
+before_proj=$(snapshot "$base/b10")
+out=$(run_cost_no_session "$cmd" "$HOME_DIR" "$CWD_DIR") \
+  && fail "no session id: exit status 0, expected non-zero — the session cannot be identified"
+printf '%s\n' "$out" | grep -qi 'session' || fail "no session id: nothing in the output mentions the session"
+reports_no_session "$out" || fail "no session id: nothing reports that the running session cannot be identified"
+printf '%s' "$out" | grep -q 'ghost-agent-a' && fail "no session id: an earlier session of this project was read"
+printf '%s' "$out" | grep -q 'ghost-dispatch-alpha' && fail "no session id: an earlier session's dispatch is reported"
+printf '%s' "$out" | grep -q 'ghost-agent-b' && fail "no session id: another project's session was read"
+printf '%s' "$out" | grep -q 'ghost-dispatch-beta' && fail "no session id: another project's dispatch is reported"
+has_num "$out" 9876543 && fail "no session id: an earlier session's token figure 9876543 is in the output"
+has_num "$out" 8765432 && fail "no session id: another project's token figure 8765432 is in the output"
+has_num "$out" "$MAIN_W" && fail "no session id: a session was guessed — its main cache-write $MAIN_W is reported"
+has_num "$out" "$D1_R" && fail "no session id: a session was guessed — its dispatch's cache-read $D1_R is reported"
+[ "$before_home" = "$(snapshot "$HOME_DIR")" ] || fail "no session id: something under the scratch HOME was created or modified"
+[ "$before_proj" = "$(snapshot "$base/b10")" ] || fail "no session id: something under the project directories was created or modified"
+[ $failures -eq $prior ] && pass "neither session variable set: reports it cannot identify the session, exits non-zero" || show "$out"
+
+# --- Case 16 (criterion 3, boundary): neither variable set, one transcript --
+# The project directory holds a single session's transcript. It is still not
+# known to be the running one, so the answer is the same as with many.
+prior=$failures
+build nodispatch b11
+out=$(run_cost_no_session "$cmd" "$HOME_DIR" "$CWD_DIR") \
+  && fail "no session id, one transcript: exit status 0, expected non-zero"
+reports_no_session "$out" || fail "no session id, one transcript: nothing reports that the running session cannot be identified"
+has_num "$out" "$MAIN_W" && fail "no session id, one transcript: the only session was guessed — its cache-write $MAIN_W is reported"
+has_num "$out" "$MAIN_R" && fail "no session id, one transcript: the only session was guessed — its cache-read $MAIN_R is reported"
+[ $failures -eq $prior ] && pass "neither session variable set with a single transcript: still no guess, exits non-zero" || show "$out"
+
+# --- Case 17 (criterion 3): neither variable set, newest is another session -
+# Same as case 15, but the running session's transcripts are the oldest files
+# in the project directory. Whatever a guess would fall back on, it lands on a
+# session that is not the running one.
+prior=$failures
+build decoys b12
+projdir="$HOME_DIR/.claude/projects/$(printf '%s' "$CWD_DIR" | tr '/' '-')"
+find "$projdir/$SESSION.jsonl" "$projdir/$SESSION" -exec touch -t 199809090909 {} + \
+  || fail "newest is another session: the running session's transcripts could not be aged"
+newest=$(find "$projdir" -name '*.jsonl' -printf '%T@ %p\n' | sort -n | tail -1)
+case "$newest" in
+  *"$SESSION"*) fail "newest is another session: the fixture still has the running session as the newest transcript" ;;
+esac
+out=$(run_cost_no_session "$cmd" "$HOME_DIR" "$CWD_DIR") \
+  && fail "newest is another session: exit status 0, expected non-zero"
+reports_no_session "$out" || fail "newest is another session: nothing reports that the running session cannot be identified"
+printf '%s' "$out" | grep -q 'ghost-agent-a' && fail "newest is another session: an earlier session of this project was read"
+printf '%s' "$out" | grep -q 'ghost-dispatch-alpha' && fail "newest is another session: an earlier session's dispatch is reported"
+has_num "$out" 9876543 && fail "newest is another session: an earlier session's token figure 9876543 is in the output"
+has_num "$out" "$MAIN_W" && fail "newest is another session: a session was guessed — its main cache-write $MAIN_W is reported"
+has_num "$out" "$D1_R" && fail "newest is another session: a session was guessed — its dispatch's cache-read $D1_R is reported"
+[ $failures -eq $prior ] && pass "neither session variable set with a newer foreign transcript: no foreign session read, exits non-zero" || show "$out"
+
+# --- Case 18 (criterion 3, boundary): both variables set but empty ----------
+# An empty id names no session, so it counts as not set: same answer as case 15.
+prior=$failures
+build decoys b13
+before_home=$(snapshot "$HOME_DIR")
+before_proj=$(snapshot "$base/b13")
+out=$(run_cost_session_env "$cmd" "$HOME_DIR" "$CWD_DIR" CLAUDE_SESSION_ID= CLAUDE_CODE_SESSION_ID=) \
+  && fail "empty session ids: exit status 0, expected non-zero — an empty id identifies no session"
+reports_no_session "$out" || fail "empty session ids: nothing reports that the running session cannot be identified"
+printf '%s' "$out" | grep -q 'ghost-agent-a' && fail "empty session ids: an earlier session of this project was read"
+printf '%s' "$out" | grep -q 'ghost-dispatch-alpha' && fail "empty session ids: an earlier session's dispatch is reported"
+printf '%s' "$out" | grep -q 'ghost-agent-b' && fail "empty session ids: another project's session was read"
+has_num "$out" 9876543 && fail "empty session ids: an earlier session's token figure 9876543 is in the output"
+has_num "$out" "$MAIN_W" && fail "empty session ids: a session was guessed — its main cache-write $MAIN_W is reported"
+has_num "$out" "$D1_R" && fail "empty session ids: a session was guessed — its dispatch's cache-read $D1_R is reported"
+[ "$before_home" = "$(snapshot "$HOME_DIR")" ] || fail "empty session ids: something under the scratch HOME was created or modified"
+[ "$before_proj" = "$(snapshot "$base/b13")" ] || fail "empty session ids: something under the project directories was created or modified"
+[ $failures -eq $prior ] && pass "both session variables empty: reports it cannot identify the session, exits non-zero" || show "$out"
+
+# --- Case 19 (criterion 3, boundary): CLAUDE_SESSION_ID empty, the other gone
+# The empty one must not be taken for an id, and there is no second one to fall
+# back to.
+prior=$failures
+build decoys b14
+out=$(run_cost_session_env "$cmd" "$HOME_DIR" "$CWD_DIR" CLAUDE_SESSION_ID=) \
+  && fail "empty CLAUDE_SESSION_ID: exit status 0, expected non-zero"
+reports_no_session "$out" || fail "empty CLAUDE_SESSION_ID: nothing reports that the running session cannot be identified"
+printf '%s' "$out" | grep -q 'ghost-agent-a' && fail "empty CLAUDE_SESSION_ID: an earlier session of this project was read"
+has_num "$out" 9876543 && fail "empty CLAUDE_SESSION_ID: an earlier session's token figure 9876543 is in the output"
+has_num "$out" "$MAIN_W" && fail "empty CLAUDE_SESSION_ID: a session was guessed — its main cache-write $MAIN_W is reported"
+has_num "$out" "$D1_R" && fail "empty CLAUDE_SESSION_ID: a session was guessed — its dispatch's cache-read $D1_R is reported"
+[ $failures -eq $prior ] && pass "CLAUDE_SESSION_ID empty and CLAUDE_CODE_SESSION_ID absent: no guess, exits non-zero" || show "$out"
+
+# --- Case 20 (criterion 3, boundary): the mirror of case 19 -----------------
+prior=$failures
+build decoys b15
+out=$(run_cost_session_env "$cmd" "$HOME_DIR" "$CWD_DIR" CLAUDE_CODE_SESSION_ID=) \
+  && fail "empty CLAUDE_CODE_SESSION_ID: exit status 0, expected non-zero"
+reports_no_session "$out" || fail "empty CLAUDE_CODE_SESSION_ID: nothing reports that the running session cannot be identified"
+printf '%s' "$out" | grep -q 'ghost-agent-a' && fail "empty CLAUDE_CODE_SESSION_ID: an earlier session of this project was read"
+has_num "$out" 9876543 && fail "empty CLAUDE_CODE_SESSION_ID: an earlier session's token figure 9876543 is in the output"
+has_num "$out" "$MAIN_W" && fail "empty CLAUDE_CODE_SESSION_ID: a session was guessed — its main cache-write $MAIN_W is reported"
+has_num "$out" "$D1_R" && fail "empty CLAUDE_CODE_SESSION_ID: a session was guessed — its dispatch's cache-read $D1_R is reported"
+[ $failures -eq $prior ] && pass "CLAUDE_CODE_SESSION_ID empty and CLAUDE_SESSION_ID absent: no guess, exits non-zero" || show "$out"
 
 echo
 if [ $failures -eq 0 ]; then echo "PASS: all cases"; else echo "FAIL: $failures case(s)"; exit 1; fi
