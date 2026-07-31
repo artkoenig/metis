@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/issue-32-overview-anfrh9
 pr:
 ---
 
@@ -83,9 +83,34 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes — the human asked to implement issue
+  0032, whose intent and seven acceptance criteria are already filed. Verified
+  by hand: `bash test.sh` exits 1 (test-plugin.sh's own coverage case fails
+  because test-loader-removed.sh exists but isn't named in test.sh's suite
+  list); `bash test-loader-removed.sh` exits 1 with 15 failures, matching the
+  issue's own count exactly; every file criterion 1 names for deletion
+  (install.sh, .claude/hooks/session-start.sh, skills/bootstrap/,
+  test-install.sh, and the two nested bootstrap test suites) is present, and
+  the two retained plugin-hook files (hooks/session-start.sh, hooks/hooks.json)
+  are present; issues 0023 and 0024 are both still status: backlog as the
+  issue describes.
+- **What surprised me?** Reading test-plugin.sh's own case 19 (lines 747-762)
+  shows it hard-codes the opposite expectation of this issue: it fails unless
+  the loader, install.sh and the bootstrap skill are all still present
+  ("criterion 7: X is missing, but criterion 6 does not hold — it must
+  remain"). Reading issue 0031's own checkpoint record clarified this is not
+  an oversight: the human was told explicitly that removing the loader
+  overrides issue 0022's settled criterion 7, and accepted the loss of reach
+  ("ja"). So this run finishes a change the human already deliberately
+  authorized, not one that silently overrides an earlier decision.
+- **What am I assuming without having verified it?** That fixing
+  test-loader-removed.sh's self-exemption bug (criterion 3) and wiring it into
+  test.sh's suite list falls within the implementer's normal scope even though
+  the file being touched is itself a test file — the acceptance criterion is
+  about that check's own correctness, not about production behaviour it
+  guards. And that issue 0031's own frontmatter being stuck at status: active
+  despite its PR (#31) being merged is out of this issue's seven criteria and
+  not something to fix in this diff.
 
 ### Before the PR
 
