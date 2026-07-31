@@ -104,6 +104,12 @@ Acceptance criteria:
   repository's root, because criterion 10 requires it to work in projects that
   install metis as a plugin. Precedent: `skills/bootstrap/assets/`. Source:
   default, unanswered.
+- The command is `skills/cost/assets/token-cost.py`, invoked as `python3` and
+  guarded by `skills/cost/assets/test-token-cost.sh`, following the layout of
+  `skills/bootstrap/assets/`. Python rather than shell because the transcripts
+  are JSONL and `jq` is not guaranteed to be present, while `python3` is
+  already what every measurement this session used. Source: default,
+  unanswered — a name had to exist before tests could invoke anything.
 - The premise table in the Intent is kept and annotated rather than deleted or
   recomputed. The 0022 transcripts no longer exist in any container reachable
   from here, so the correct figures cannot be established, and the conclusion
