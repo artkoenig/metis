@@ -67,10 +67,15 @@
 #     succeeds.
 #   Criterion 7 — while criterion 6 does not hold, the per-project
 #   machinery stays in the repository
-#     Case 19: install.sh, the bootstrap skill, the loader, the core and the
-#     suites that only guard them are all present. Which branch of the
-#     criterion is in force is a record in the issue; that criterion 6 is
-#     open is the premise of this case.
+#     Case 19 used to assert install.sh, the bootstrap skill, the loader,
+#     the core and the suites that only guard them were all present — the
+#     branch of this criterion that held while issue 0022's own criterion 6
+#     stayed open. That call is superseded: the human decided, recorded in
+#     issue 0031, that the loader path is removed regardless. Case 19 now
+#     asserts the opposite — none of that machinery may be present — which
+#     is issue 0032's criterion 5, not this criterion 7. It is documented
+#     here rather than moved so the supersession stays next to the criterion
+#     it overrides.
 #   Criterion 8 — test.sh names existing suites
 #     Case 15: every path in test.sh's `suites` list exists, and no listed
 #     suite is still pinned to the nested agent layout that this change
@@ -744,22 +749,22 @@ printf 'A "quoted" word, a backslash \\ and a\ttab.\nLast line.\n' \
   >"$base/rulebook-escapes.md"
 hostile_rulebook 'quote, backslash and tab in AGENTS.md' "$base/rulebook-escapes.md" exact
 
-# --- Case 19: the machinery criterion 7 keeps while criterion 6 is open ----
-# Criterion 6 does not hold yet, so the criterion's second branch is in
-# force: install.sh, the bootstrap skill, the per-project loader, the core it
-# execs and the suites that only guard them all remain in the repository.
+# --- Case 19: no case here asserts the removed machinery is present -------
+# (issue 0032 criterion 5). This reverses the case's old assertion: issue
+# 0031's human decision overrides issue 0022's criterion 7, so install.sh,
+# the bootstrap skill, the per-project loader and the suites that only
+# guarded them must all be absent, not present.
 prior=$failures
 for p in install.sh \
-         skills/bootstrap/SKILL.md \
+         skills/bootstrap \
          .claude/hooks/session-start.sh \
-         skills/bootstrap/assets/session-start-core.sh \
          test-install.sh \
          skills/bootstrap/assets/test-session-start-core.sh \
          skills/bootstrap/assets/test-session-start-loader.sh; do
-  [ -f "$repo_root/$p" ] \
-    || fail "criterion 7: $p is missing, but criterion 6 does not hold — it must remain"
+  [ -e "$repo_root/$p" ] \
+    && fail "issue 0032 criterion 5: $p is still present — the loader path was removed"
 done
-[ $failures -eq $prior ] && pass "the per-project machinery is still in the repository"
+[ $failures -eq $prior ] && pass "no loader/install.sh/bootstrap machinery remains in the repository (issue 0032 criterion 5)"
 
 # --- Case 20: test.sh names every suite the tree holds --------------------
 # Case 15 checks that what test.sh names exists; this is the other direction.
