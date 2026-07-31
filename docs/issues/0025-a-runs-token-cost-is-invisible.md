@@ -118,8 +118,11 @@ Acceptance criteria:
   non-zero, rather than guessing the newest transcript in the project
   directory. Criterion 3 forbids reading another session's transcripts and
   says nothing about what to do when the current one cannot be found; guessing
-  was how the violation arose. Source: default, unanswered, taken after review
-  round 1.
+  was how the violation arose. A variable set to the empty string counts as
+  not set: an empty session id identifies nothing, so guessing from it would
+  reopen the same violation. Source: default, unanswered, taken after review
+  round 1; the `test-author` returned the empty-string edge as a question
+  rather than guessing it.
 - The premise table in the Intent is kept and annotated rather than deleted or
   recomputed. The 0022 transcripts no longer exist in any container reachable
   from here, so the correct figures cannot be established, and the conclusion
