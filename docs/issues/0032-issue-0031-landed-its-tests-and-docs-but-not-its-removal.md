@@ -100,6 +100,36 @@ Acceptance criteria:
   measuring a dispatch's cost for issue 0025. Criterion 3 of issue 0031 is the
   only one that change met; this issue carries the rest, plus the two findings
   that a straight deletion would not resolve.
+- **Review round 1 (fresh context)**, against `origin/main..HEAD`
+  (`fb67c9a..2f4a4ad`). All 7 criteria confirmed met, by exit code
+  (`bash test.sh`, `bash test-plugin.sh`, `bash test-loader-removed.sh`, each
+  exit 0) and independent re-derivation (a separate `git grep` for
+  criterion 3, and a scratch copy with an injected failure in each suite in
+  turn to confirm the `METIS_TEST_SH_NESTED` recursion guard in `test.sh`
+  doesn't mask a broken suite at the top level). One finding, violating none
+  of the 7 criteria: `AGENTS.md`'s Bookkeeping section (the fallback
+  self-check diagnostic) told a session to check whether `~/.claude` skill
+  and agent symlinks resolve and how `.claude/hooks/session-start.log` ends —
+  both artifacts only the loader machinery this issue deletes ever produced,
+  so the sentence is now false for every session running only the plugin.
+  Fixed directly in this change (not filed separately), per the documentation
+  rule's own exception for a finding that this diff's removal itself
+  falsified: replaced the fallback question with `claude plugin list` plus
+  skill/agent availability, the facts a plugin-only session can actually
+  check. `bash test.sh` re-run after the fix: still exit 0, all 54 cases
+  across the 3 suites pass.
+
+| | Round 1 |
+| --- | --- |
+| Criterion 1 | 0 |
+| Criterion 2 | 0 |
+| Criterion 3 | 0 |
+| Criterion 4 | 0 |
+| Criterion 5 | 0 |
+| Criterion 6 | 0 |
+| Criterion 7 | 0 |
+| No criterion | 1 |
+| **Total** | **1** |
 
 ## Checkpoints
 
