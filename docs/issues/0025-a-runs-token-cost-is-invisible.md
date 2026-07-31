@@ -113,6 +113,13 @@ Acceptance criteria:
   are JSONL and `jq` is not guaranteed to be present, while `python3` is
   already what every measurement this session used. Source: default,
   unanswered — a name had to exist before tests could invoke anything.
+- When neither `CLAUDE_SESSION_ID` nor `CLAUDE_CODE_SESSION_ID` is set, the
+  command reports that it cannot identify the running session and exits
+  non-zero, rather than guessing the newest transcript in the project
+  directory. Criterion 3 forbids reading another session's transcripts and
+  says nothing about what to do when the current one cannot be found; guessing
+  was how the violation arose. Source: default, unanswered, taken after review
+  round 1.
 - The premise table in the Intent is kept and annotated rather than deleted or
   recomputed. The 0022 transcripts no longer exist in any container reachable
   from here, so the correct figures cannot be established, and the conclusion
@@ -232,15 +239,42 @@ Acceptance criteria:
   unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only
   criterion 3 is met. Filed as issue 0032. This serves no criterion of this
   issue.
-- **Second finding, also to be filed separately, and larger than anything this
+- **Second finding, filed as issue 0033, and larger than anything this
   session proposed**: the first thing the finished command showed is that
   injected context — not tool output — dominates the main session. Hook and
   attachment output is 235,418 of its 381,533 cache-write, 62%, against 37,500
   for all Bash output and 10,025 for all file reads. One item alone, a
   `skill_listing` attachment at step 69, is 141,999 tokens, with further skill
   listings at steps 1, 47 and 65. The skill list is re-injected whole,
-  repeatedly, into the session that carries 71% of the run's cache-read. This
-  serves no criterion of this issue and does not go into its diff.
+  repeatedly, into the session that carries 69% of the run's cache-read. Filed
+  as issue 0033. This serves no criterion of this issue and does not go into
+  its diff.
+
+- **Review round 1 — fresh context, 5 findings.** Trend: criterion 3 → 1,
+  criterion 4 → 1, violates no criterion → 3, total 5. The round confirmed the
+  suite bites by mutating a copy outside the repository eight ways, and
+  recounted the real transcripts independently: printed steps equal distinct
+  `requestId` counts (15/34/30/1) against record counts (31/71/61/1), so
+  criterion 6's falsifier does not fire. Triage:
+  - **Finding 1, criterion 3 — fix now.** With neither session-id variable
+    set, `locate()` picks the newest `.jsonl` in the project directory and
+    reproducibly prints a decoy session's dispatch. The suite always sets both
+    variables, so that branch has no test at all.
+  - **Findings 3 and 4, no criterion — fixed in this diff, bounded.** Both are
+    statements this change's own record made false: commit `9cf0d1c`
+    corrected the cache-read share to 69% in one place and left 71% standing
+    in another, and left "to be filed separately" beside a finding that same
+    commit filed as issue 0033. The rulebook's documentation exception covers
+    exactly this and nothing more.
+  - **Finding 5, criterion 4 — due before the pull request.** The recorded
+    cost table predates the review dispatches; criterion 4 triggers when the
+    run ends, so the table is retaken at checkpoint 2.
+  - **Finding 2, no criterion — filed as issue 0034.** An item whose whole
+    content is the inherited baseline is labelled `prompt:`, which is true of
+    what the transcript records and misleading about what the tokens are.
+  - The round also noted, against no criterion, that adding `skills/cost/`
+    enlarges the `skill_listing` attachment that issue 0033 is about. Every new
+    skill does; recorded, not acted on.
 
 ## Checkpoints
 
