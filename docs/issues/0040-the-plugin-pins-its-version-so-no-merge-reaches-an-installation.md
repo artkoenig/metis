@@ -193,6 +193,44 @@ Acceptance criteria:
   both too permissive *and* too strict. The finding count did not decrease
   (3, then 3), one round short of the rulebook's stop-and-ask.
 
+- **Review round 3** (same context continued, `a305f33..a6ccf17`): 1 finding.
+  It re-established `bash test.sh` exit 0 over 3 suites and 57 cases, verified
+  the corrected criterion-5 comment against the code it cites
+  (`test-loader-removed.sh:201-203`, `test.sh:23-30`), confirmed both of round
+  2's false failures now pass, and read `README.md` against criterion 2
+  itself — met, and `grep -ic "version\|release\|bump\|publish" README.md`
+  returns 0. Triage:
+
+  - *The surviving blocklist is disarmed by any denial word on the same line*
+    — fixed by deleting the `denial` exemption, not by another expression.
+    Reproduction: *"a merged change arrives after the next release, with no
+    re-installation needed"* passed the case, because the `no` in
+    *"no re-installation"* exempted the whole line. The exemption was never
+    load-bearing: the shipped README contains no blocklist word at all. The
+    cost is recorded in the suite — a future README wanting to say *"no
+    version bump is needed"* now fails the case, deliberately.
+
+  Finding count across the rounds: 3, 3, 1. It decreased, so the rulebook's
+  stop-and-ask did not trigger. What repeated three times is the defect class
+  in one case, and each round answered it by removing machinery rather than
+  adding it.
+
+- **The reviewer's judgement on where criterion 6's first half landed**, asked
+  for explicitly: acceptable, because invariant 3 is what a change producing
+  no facts by exit code is checked by, because the surviving half asks a word
+  question a blocklist can answer, and because nothing in the plugin's
+  behaviour depends on it. It named the residual risk: a future run that
+  rewrites `README.md` gets its own reviewer checking that diff against *that*
+  run's intent, and nobody will check it against this issue's criterion 2
+  again. Guarding that mechanically would be its own issue, not a fourth
+  regex.
+
+- One thing the reviewer could not establish by exit code and did not raise as
+  a finding: the CLI's plugin auto-update is asynchronous — it notifies
+  *"Plugins updated: … Run /reload-plugins to apply"* — so the first session
+  after a merge can still be one refresh behind. Criterion 2 does not speak to
+  it, and there is no headless way to reproduce the timing.
+
 ## Checkpoints
 
 ### Before implementation
