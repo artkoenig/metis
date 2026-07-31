@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/offene-issues-4rv8ah
 pr:
 ---
 
@@ -131,19 +131,142 @@ Acceptance criteria:
   ship such a list at all, which turned the change into a skill the human
   invokes. Three observations surfaced during the grilling that this issue's
   criteria do not cover, filed separately as issues 0037, 0038 and 0039.
+- The `test-author` wrote `skills/trim/assets/test-trim-tools.sh` from this
+  intent alone, without seeing an implementation, and named the skill `trim`
+  (`skills/trim/`). One or more cases per testable criterion (1 through 9);
+  criterion 3's "contains only eagerly loaded tools" has no independent
+  oracle to check the positive half against, so only its falsifiable half —
+  a proposal never names a protected tool — is tested. Criterion 9's own
+  case is expected to fail until the implementer runs the finished skill
+  against this repository. Run directly, it fails 7 of 9 cases,
+  `bash skills/trim/assets/test-trim-tools.sh` exits 1 — confirmed myself,
+  not taken on the subagent's word, and confirmed it made no real `claude`
+  calls in that failing run (every case fails immediately because
+  `trim-tools.py` does not exist yet). `test.sh` needs
+  `skills/trim/assets/test-trim-tools.sh` added to its `suites` list — the
+  implementer's job, not the test-author's.
+- The `implementer` built `skills/trim/assets/trim-tools.py` and
+  `skills/trim/SKILL.md`, wired the suite into `test.sh`, and ran the
+  finished skill against this repository for criterion 9: before 38760,
+  after 23703, difference 15057 tokens, denying `Artifact`,
+  `ReportFindings`, `ScheduleWakeup`, `SendUserFile`,
+  `ShowOnboardingRolePicker` and `Workflow` — matching the issue's own
+  measured six almost exactly. `bash skills/trim/assets/test-trim-tools.sh`
+  9/9, `bash test.sh` 63/63, both exit 0 — confirmed myself. The proposal
+  step also named a seventh tool, `Task` (this environment's headless-mode
+  name for subagent dispatch), which the implementer excluded by hand
+  before applying, acting as the human reviewer criterion 4 describes.
+- **Round 1 (fresh context)**, against `git diff e708fd9..HEAD`. Two
+  findings, both with reproductions:
+  - Violates criteria 2, 5 and 8 as literally documented: `SKILL.md`
+    instructs invoking `trim-tools.py probe .` / `apply . ...` (`.` as the
+    directory, run from the project directory), and that invocation
+    crashes — `project_dir_for()`'s sanitisation of the raw, unresolved
+    `"."` argument produces a name that trivially matches the projects
+    root itself, so it returns a false-positive project directory before
+    ever reaching the correctly resolved path. Reproduced independently,
+    not only on the reviewer's word.
+  - Undercuts the stated purpose of criterion 3: `PROTECTED` hardcodes the
+    literal name `Agent`, but a headless `claude -p` session in this
+    environment (the only kind `probe`/`propose` ever spawns) calls the
+    same subagent-dispatch tool `Task` instead — so `propose` offers it
+    for denial, unprotected. Reproduced independently: a fresh `propose`
+    run names `Task` alongside the intended six. No damage landed in this
+    repository's own `.claude/settings.json` only because a human/session
+    caught and removed it by hand during criterion 9's run — exactly the
+    manual step criterion 3's hardcoded list exists to make unnecessary.
+  - Both are in scope (they violate the criteria directly, not drift) and
+    both got a fix-now dispatch back to the `implementer`, rather than
+    being filed separately or dismissed.
+- The `implementer` fixed both: `directory` is now resolved to an absolute
+  path once, in `main()`, before it ever reaches `sanitisations()`; `Task`
+  was added to `PROTECTED` alongside `Agent`. Added a regression case
+  (`probe .` from a relative cwd) and extended the existing protected-name
+  check to cover `Task`. Reproduced both original crashes against the
+  pre-fix code first, then confirmed both are gone against the fix.
+  `bash skills/trim/assets/test-trim-tools.sh` 10/10, `bash test.sh` 4
+  suites exit 0 — confirmed myself.
+- **Round 2 (fresh context)**, against the whole intent, not only round 1's
+  two findings. 0 findings. Independently re-derived both round-1 fixes by
+  extracting the pre-fix script into a scratch copy and reproducing both
+  original crashes there, then confirming the current code no longer
+  reproduces either; ran `propose`/`apply` by hand against several scratch
+  repositories (with and without a pre-existing `settings.json`, with and
+  without this repository's own applied deny list) rather than trusting
+  the automated suite alone. `bash skills/trim/assets/test-trim-tools.sh`
+  10/10, `bash test.sh` all 4 suites, exit 0 — re-confirmed myself
+  afterward, 64 `ok:` lines, clean working tree. Trend: round 1 → 2
+  findings, round 2 → 0. Converged; the three-round stop rule was not hit.
 
 ## Checkpoints
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: the human asked to implement issue
+  0036 as filed. It was already grilled — intent, nine acceptance criteria
+  and their rationale are all recorded — so no further grilling is needed
+  before implementation starts.
+- What surprised me? The skill needs to spawn *new*, separate headless
+  `claude` sessions as its own probe runs (once before proposing a deny
+  list, once after) and read each one's own transcript — this is different
+  from `skills/cost`, which only ever reads the transcript of the session
+  already running it. `claude` (2.1.220, matching the version this issue's
+  measurements were taken against) is available in this environment, so the
+  probe runs and the tests that exercise criteria 2 and 5 can actually
+  invoke it rather than mock it.
+- What am I assuming without having verified it? That `skills/cost/assets/
+  token-cost.py`'s transcript-location and usage-parsing logic is close
+  enough to reusable for finding and reading a *separate* probe session's
+  transcript, rather than needing to be built from scratch. That a fresh
+  headless run is inexpensive and fast enough to run twice per invocation
+  (plus more during the test suite) without making the test suite
+  impractically slow — the implementer's first step should check this
+  before committing to the design.
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: all nine acceptance criteria hold,
+  independently re-derived twice (implementer, then two review rounds),
+  and this repository's own `.claude/settings.json` now actually carries
+  the deny list criterion 9 asked for — the saving is real for Metis's own
+  sessions, not only documented as possible for consumers.
+- What surprised me? How much a headless probe session's tool-naming
+  differs from what I expected reading the issue: no literal `Agent`,
+  `Glob`, `Grep` or `AskUserQuestion` in a headless session's own tool
+  inventory, and the dispatch tool named `Task` instead of `Agent` — which
+  is exactly what round 1's second finding caught. The measured numbers
+  still landed close to the issue's own figures (15,057 tokens against a
+  measured 15,060, the same six tools), which was reassuring given how
+  different the mechanism turned out to be from a first reading of the
+  intent.
+- What am I assuming without having verified it? That `Task` is this
+  environment's stable headless-mode name for the dispatch tool rather
+  than a version-specific accident that a future `claude` release could
+  rename again — the fix keeps both `Agent` and `Task` in `PROTECTED`
+  rather than assuming which one is "correct", but a third name would
+  still slip through unnoticed the same way `Task` did until round 1
+  caught it. That the two probe calls `apply` makes (and the up-to-two
+  more inside the test suite) stay cheap enough in a normal repository
+  that a human running this skill once won't find it slow — measured only
+  in this sandbox, not against a larger real-world repository.
 
 ## Retro
+
+- **What got in the way:** the acceptance criteria were solid, but nothing
+  in the issue or its decisions flagged that a headless probe session's
+  tool names and inventory shape would differ from what reading the
+  intent suggested (no `Agent`, `Glob`, `Grep`, `AskUserQuestion` in
+  `system`/`init`; `Task` instead of `Agent`). The implementer found this
+  by experimentation partway through, and it still slipped into round 1 as
+  a real finding rather than being caught before implementation — the
+  protected-tool list was written against an assumed tool inventory
+  instead of an inspected one.
+- **What should change:** when a change's correctness depends on the shape
+  of a live tool inventory or similar environment-provided data (not just
+  documented behaviour), checkpoint 1's "what am I assuming without having
+  verified it" should name that inventory specifically and check it — with
+  a quick real probe, here — before the protected/allowed list is written,
+  not after a review round catches the mismatch. This run's own checkpoint
+  1 came close (it named the headless-vs-interactive difference as a
+  surprise) but didn't push through to actually inspecting the tool names
+  before implementation started.

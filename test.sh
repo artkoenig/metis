@@ -9,6 +9,7 @@ suites=(
   test-plugin.sh
   test-loader-removed.sh
   skills/cost/assets/test-token-cost.sh
+  skills/trim/assets/test-trim-tools.sh
 )
 
 # test-loader-removed.sh's own criterion-4 check runs `bash test.sh` to

@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/offene-probleme-fivte0
-pr:
+pr: https://github.com/artkoenig/metis/pull/29
 ---
 
 # The scope drifts during a run
@@ -132,5 +132,11 @@ Acceptance criteria:
   contradicts it. The reviewer checked `README.md` and `skills/issue/SKILL.md`
   for exactly this and found neither states the removed rule; I have not
   independently re-checked every remaining file myself.
+- Pull request #29 was opened and merged into `main` (visible as `origin/main`'s
+  merge commit for `claude/offene-probleme-fivte0`), but `status` was never
+  moved off `active`. Corrected during a bookkeeping check run against issues
+  0027 and 0031 together: set to `done` with the `pr` field, per this
+  tracker's own rule that `done` follows the pull request, not a separate
+  step.
 
 ## Retro

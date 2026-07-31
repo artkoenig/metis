@@ -9,5 +9,15 @@
   },
   "enabledPlugins": {
     "metis@metis": true
+  },
+  "permissions": {
+    "deny": [
+      "Artifact",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "SendUserFile",
+      "ShowOnboardingRolePicker",
+      "Workflow"
+    ]
   }
 }
