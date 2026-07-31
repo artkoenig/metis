@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/subagenten-token-verbrauch-cvo3ie
 pr:
 ---
 
@@ -21,23 +21,27 @@ found for that run's ten dispatches:
 | implementer | 2 | 104 | 248,179 | 4,289,743 |
 | **total** | **10** | **545** | **1,652,755** | **26,686,290** |
 
-Cache reads dominate cache writes by 16×, so the cost follows *steps × the
-context each step carries* — and the reviewer, at 60% of the cache reads, is
-where the run's money goes. None of this was knowable while the run happened,
-and none of it will be knowable in the next run either. So every claim about
-what the workflow costs, and every proposal to make it cheaper, is an
-impression — which invariant 4 forbids for a fact.
+These four columns are no longer trusted as counts — see the Log entry on
+records versus requests. They are kept because the conclusion they carry
+survives the doubt: cache reads dominate cache writes by 16×, so the cost
+follows *steps × the context each step carries* — and the reviewer, at 60% of
+the cache reads, is where the run's money goes. None of this was knowable
+while the run happened, and none of it will be knowable in the next run
+either. So every claim about what the workflow costs, and every proposal to
+make it cheaper, is an impression — which invariant 4 forbids for a fact.
 
 Wanted observable behaviour: what a run cost is a fact produced by a command,
-broken down per dispatch, and it lands in the record like any other fact.
+broken down per dispatch and within a dispatch, and it lands in the record
+like any other fact.
 
 Acceptance criteria:
 
 1. When a session has dispatched subagents, one documented command prints, per
    dispatch, the agent type, what it was dispatched for, its model steps and
    its token counts, and exits 0.
-2. When it runs in a session that dispatched no subagent, it says so and exits
-   non-zero instead of printing an empty table as if that were the answer.
+2. When the command runs, it reports the main session's own consumption in the
+   same columns as a dispatch, and when the session has dispatched no
+   subagent it still reports the main session and exits 0.
 3. When the command runs, it creates and modifies no file, and reads no
    session's transcripts but the current one's.
 4. When a run ends, the per-dispatch numbers are in the issue's record together
@@ -45,6 +49,21 @@ Acceptance criteria:
 5. When a token field in the transcripts is unreliable, the command's output
    marks it as such instead of printing it as a count — see the Log for the
    case that motivates this.
+6. When the command counts model steps, one step is one API request. Shown
+   false by any session whose printed step count exceeds the number of
+   distinct requests in its transcript.
+7. When the command reports a session or a dispatch, it prints both a grouped
+   breakdown — what kind of thing put the tokens into the context — and the
+   individually most expensive items, each with the step at which it entered.
+8. When a printed figure was derived by splitting one request's cache-write
+   across several items that entered together, the output marks that figure
+   as estimated; a figure the transcript attributes to a single item is
+   marked as measured.
+9. When the command prints token counts, cache-write, cache-read and output
+   are separate raw columns, and no weighted or combined total is printed.
+10. When the command is invoked from a project that has metis installed but is
+    not this repository, it produces the same output there. Shown false by any
+    invocation that depends on a path inside this repository's working tree.
 
 ## Plan
 
@@ -55,6 +74,38 @@ Acceptance criteria:
 - The metric to optimise is cache-read tokens, not output tokens: in the
   measurement above they outweigh output by roughly 300× and cache writes by
   16×. Source: that measurement.
+- The command covers both the per-dispatch totals and the breakdown of where
+  the tokens went inside a dispatch. Totals alone say whether an optimisation
+  helped; only the breakdown says which one to try. Source: the human's
+  answer.
+- The whole run is measured, main session included — not subagents alone. The
+  main session carries 86k per step against the reviewer's 10.8k, so leaving
+  it out hides the largest single context. This replaced the filed criterion 2,
+  which had required a non-zero exit when no subagent ran. Source: the human's
+  answer.
+- The breakdown is printed both ways: grouped by what kind of thing consumed
+  the tokens, and as the most expensive individual items. The groups say which
+  rule to change, the items say which call went wrong. Source: the human's
+  answer.
+- Where several items enter the context between two requests, their shares are
+  split proportionally and every split figure is marked as estimated rather
+  than dropped. Source: the human's answer.
+- Only raw columns are printed — no weighted or combined total. The weights in
+  Claude Code's own `/explain-usage` (write ×2, read ×0.1, output ×5) would
+  quintuple exactly the field this issue's Log calls unreliable, and they come
+  from a prompt, not from a price list. Source: the human's answer, upholding
+  the recorded cache-read decision above.
+- Rows sort by cache-read, since without a weighted column it is the only
+  metric this issue has already settled on. Source: default, derived from the
+  decision above, unanswered.
+- The command ships as a skill's asset rather than as a script in this
+  repository's root, because criterion 10 requires it to work in projects that
+  install metis as a plugin. Precedent: `skills/bootstrap/assets/`. Source:
+  default, unanswered.
+- The premise table in the Intent is kept and annotated rather than deleted or
+  recomputed. The 0022 transcripts no longer exist in any container reachable
+  from here, so the correct figures cannot be established, and the conclusion
+  the table supports does not depend on them. Source: default, unanswered.
 
 ## Log
 
@@ -74,6 +125,51 @@ Acceptance criteria:
   the earlier ones, so their lower step counts cannot be attributed to the
   prompt change. Recorded as an attempt, not as a result — and as the reason
   this issue comes before any further optimisation.
+- **A reviewer dispatch was measured end to end** before this issue's criteria
+  were settled, to ground them in figures rather than argument. It reviewed the
+  diff of pull request 31 (`61fde90..bf09c04`) against issue 0031's intent
+  copied word for word: 15 API requests, 19 tool calls, 198 s. cache-write
+  34,796; cache-read 284,118; output 2,318 (unreliable, see below). Attribution
+  summed to 34,796 against 34,796 from the step totals.
+- **Several transcript records carry one request, each repeating its usage.**
+  That reviewer wrote 31 assistant records across 15 distinct `requestId`
+  values — one record per content block (thinking, text, tool call), all
+  carrying identical cache figures. Summing per record inflated the totals by
+  2.07× before the bug was found. Criterion 6 exists for this. The hand-written
+  aggregate in the Intent's table predates the finding and may carry the same
+  inflation; it cannot be rechecked, because the 0022 transcripts are gone.
+- **`output_tokens` is a streaming snapshot, not a final count.** Within one
+  request the records disagree — a placeholder of 3 alongside the real 667 —
+  so the largest value seen for a request is the only usable one. This is the
+  mechanism behind the unreliability the Log already recorded for 0022.
+- **The figure the harness reports for a subagent excludes cache-read.** The
+  reviewer dispatch was reported as 35,143 subagent tokens against a measured
+  cache-write of 34,796 — a match within 1%, while the 284,118 cache-read
+  tokens appear nowhere. Anyone reading the reported number sees about 11% of
+  what the dispatch consumed.
+- **Subagents inherit the whole rulebook.** A `reviewer` dispatched with a
+  trivial prompt and told to use no tool quoted invariant 1 verbatim from its
+  context and confirmed it also carries "The shelf" and "The run" — sections
+  describing what the orchestrator does, which a reviewer never uses. Its bare
+  baseline is 9,589 tokens; with issue 0031's intent it was 10,785, and the
+  difference of 1,196 is the intent text.
+- **Where that reviewer's tokens went**, by the grouping criterion 7 asks for:
+  the baseline 33.5% (written once at step 1, then carried 14 more steps),
+  Bash output 40.4%, its own output 10.6%, file reads 9.2%, its own tool calls
+  6.4%.
+- **Only 31% of that dispatch's cache-write is exactly attributable.** One of
+  its 15 steps had a single item entering the context; the other 14 had two to
+  five. The exactly attributable step is the baseline, which is why the 33.5%
+  figure above is measured while the 40.4% is a proportional split. Criterion 8
+  exists for this.
+- **The idea that opened this session was measured and dropped**: reading only
+  a document's header during exploration and fetching the body on demand. File
+  reads were 9.2% of that dispatch, and its largest read entered at step 11 of
+  15, where deferral saves almost nothing while costing an extra request.
+- **Work found mid-run, to be filed separately**: the reviewer dispatched for
+  this measurement found that pull request 31 left issue 0031 largely
+  unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only
+  criterion 3 is met. This serves no criterion of this issue.
 
 ## Checkpoints
 
