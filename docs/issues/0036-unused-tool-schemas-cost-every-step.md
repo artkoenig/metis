@@ -131,6 +131,20 @@ Acceptance criteria:
   ship such a list at all, which turned the change into a skill the human
   invokes. Three observations surfaced during the grilling that this issue's
   criteria do not cover, filed separately as issues 0037, 0038 and 0039.
+- The `test-author` wrote `skills/trim/assets/test-trim-tools.sh` from this
+  intent alone, without seeing an implementation, and named the skill `trim`
+  (`skills/trim/`). One or more cases per testable criterion (1 through 9);
+  criterion 3's "contains only eagerly loaded tools" has no independent
+  oracle to check the positive half against, so only its falsifiable half —
+  a proposal never names a protected tool — is tested. Criterion 9's own
+  case is expected to fail until the implementer runs the finished skill
+  against this repository. Run directly, it fails 7 of 9 cases,
+  `bash skills/trim/assets/test-trim-tools.sh` exits 1 — confirmed myself,
+  not taken on the subagent's word, and confirmed it made no real `claude`
+  calls in that failing run (every case fails immediately because
+  `trim-tools.py` does not exist yet). `test.sh` needs
+  `skills/trim/assets/test-trim-tools.sh` added to its `suites` list — the
+  implementer's job, not the test-author's.
 
 ## Checkpoints
 
