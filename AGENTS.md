@@ -128,12 +128,6 @@ record the waiver like any judgment call.
   to land whole gets a task list.
 - The tracker is the `issue` skill: hand it content and an operation, never a
   path. A subagent that needs it gets the `Skill` tool.
-- A session opens by orienting through that skill, and reads nothing else to
-  get oriented. When an issue is running, it resumes that one. When none is,
-  it works out which of the unfinished issues depend on each other and names
-  one to take next, with a reason for that one over the others. Picking is not
-  a fourth steering point: without an answer the session takes its own proposal
-  and records it as a default.
 - Documentation mirrors the current state. A change that falsifies a statement
   fixes it in the same change, bounded to what it falsified. When a document and
   a rule disagree, the document is out of date.
