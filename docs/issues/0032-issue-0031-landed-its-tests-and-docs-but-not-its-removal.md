@@ -84,6 +84,15 @@ Acceptance criteria:
   criterion targets, where the check silently excluded itself by name with no
   such record. Source: the human's answer, "weiche 3 auf, das issue selbst,
   die dazugehörigen skripte und tests sind ausgeschlossen".
+- **Issue 0024's status on closure.** The tracker's four states
+  (backlog/active/waiting/done) have no dedicated "moot"/"won't do" state.
+  `active` is unavailable (at most one issue at a time, and 0032 holds it);
+  `waiting` means parked on an open question, which this isn't. Default
+  chosen: `status: done`, with the `pr` field pointing at this issue's own
+  pull request once opened — this issue's PR is what settles 0024, even
+  though 0024 gets no implementation of its own. Default, unanswered — not
+  put to the human, since it changes no user-visible behaviour, public
+  contract, data model or dependency footprint.
 
 ## Log
 
