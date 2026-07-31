@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/issue-32-overview-anfrh9
-pr:
+pr: https://github.com/artkoenig/metis/pull/33
 ---
 
 # Issue 0031 landed its tests and docs but not its removal

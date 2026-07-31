@@ -1,7 +1,7 @@
 ---
 status: done
-branch:
-pr:
+branch: claude/issue-32-overview-anfrh9
+pr: https://github.com/artkoenig/metis/pull/33
 ---
 
 # The plugin ships a skill that installs the other path
