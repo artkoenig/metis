@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/subagenten-token-verbrauch-cvo3ie
-pr:
+pr: https://github.com/artkoenig/metis/pull/32
 ---
 
 # A run's token cost is invisible
@@ -382,3 +382,56 @@ Acceptance criteria:
   is a fact in the sense invariant 4 means.
 
 ## Retro
+
+**What got in the way**
+
+- The harness's own subagent token figure excludes cache-read. It reports
+  roughly 11% of what a dispatch actually costs, and the first three turns of
+  this session reasoned from it. Every conclusion drawn before the transcripts
+  were read directly had to be retaken.
+- Two traps in the transcript format cost a full measurement each. Several
+  assistant records share one `requestId` and repeat that request's `usage`
+  verbatim — summing per record inflated the first figure by 2.07×. And
+  `output_tokens` is a streaming snapshot, so records of one request disagree
+  (3 against 667 for the same call). Both are now criteria 6 and 7 and are
+  handled in the command, so the next run does not pay for them again.
+- Criterion 4 asks for the run's own cost in the run's own record. It cannot be
+  met until after the last dispatch, so it was reported as a finding in both
+  review rounds and only closed at checkpoint 2. A criterion about the run
+  itself costs an extra round by construction. Worth knowing before writing
+  another one, not worth a rule.
+
+**What should change — proposed for this repository**
+
+1. *The documentation exception is worded too narrowly.* The rulebook lets a
+   change fix "a documentation statement" its own diff made false. In round 1
+   two such statements were fixed, and both were in the tracker record, not in
+   documentation. The reviewer named the mismatch and the fix went in anyway,
+   which means the rule was followed in spirit and not in words. Proposal: the
+   exception should name any written statement the change's own diff made
+   false, the issue record included.
+2. *The off-criterion rule has no proportional outcome.* A finding that
+   violates no criterion has exactly one outcome — its own issue. Round 2
+   produced a ragged line wrap and a doubled sentence, and the rule turned
+   them into issue 0035 with four acceptance criteria and a run of its own.
+   The rule is right that the diff must not grow; whether the tracker must
+   grow by a whole issue for two lines of prose is the open question.
+3. *The dispatch guidance aims at the smaller half.* The rulebook's advice on
+   handing over what the caller already knows is about making dispatches
+   cheap. The measurement says the main session carries 69.8% of a run's
+   cache-read and 62% of its cache-write is injected context no agent chose.
+   Nothing should change until issue 0033 establishes what causes those
+   injections — but the balance the rulebook implies is not the balance that
+   was measured.
+
+**What worked and should stay**
+
+- The round-2 waiver. Everything after the last review round touched only the
+  tracker, and skipping a round for that is what the rule allows. It saved a
+  reviewer dispatch and the record says so.
+- The `test-author` returning an undecided edge as a question rather than a
+  guess, twice. Both plausible guesses would have been wrong, and the
+  implementer may not edit a test.
+- The premise that started the session — read only headers first — was dropped
+  by measurement rather than by argument: it addresses 9.2% of a dispatch's
+  cost, and the largest read entered at step 11 of 15.
