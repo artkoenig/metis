@@ -49,9 +49,11 @@ Acceptance criteria:
 5. When a token field in the transcripts is unreliable, the command's output
    marks it as such instead of printing it as a count — see the Log for the
    case that motivates this.
-6. When the command counts model steps, one step is one API request. Shown
-   false by any session whose printed step count exceeds the number of
-   distinct requests in its transcript.
+6. The printed step count is the number of model calls, not the number of
+   transcript records: several records of one call repeat that call's token
+   figures, and a count that adds them corrupts both the steps and the
+   tokens. Shown false by any session whose printed step count exceeds the
+   number of distinct requests in its transcript.
 7. When the command reports a session or a dispatch, it prints both a grouped
    breakdown — what kind of thing put the tokens into the context — and the
    individually most expensive items, each with the step at which it entered.
@@ -175,9 +177,29 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** The session opened with a different
+  request — reduce what subagents consume, by reading only a document's header
+  during exploration. Measurement replaced it: file reads were 9.2% of the
+  dispatch measured, and the idea was dropped on that figure. The human
+  approved the pivot across five answers. So the deliverable is a command that
+  makes cost visible, not a saving; the savings this session proposed wait for
+  it, per the Log entry from 0022 that says an unmeasured optimisation is
+  established neither way.
+- **What surprised me?** Two things. The figure the harness reports for a
+  dispatch excludes cache-read entirely — 35,143 reported against 284,118
+  cache-read unreported, so the visible number is about 11% of the real one.
+  And one model call writes several transcript records that each repeat its
+  usage: my own first measurement was 2.07× too high before I noticed, which
+  is exactly the mistake criterion 6 now forbids.
+- **What am I assuming without having verified it?** That the `subagents/`
+  directory layout and the `requestId` field are stable across Claude Code
+  versions — both were seen only on 2.1.220, in this container. That the
+  running session's own transcript is readable from inside that session at the
+  moment the command runs; the main session's file was present and non-empty
+  here, but I have not read it back mid-turn to confirm it is flushed. And
+  criterion 10 has no second metis project in this container to be shown
+  against, so it will have to be established by construction — no path inside
+  this repository — rather than by running it elsewhere.
 
 ### Before the PR
 
