@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/metis-plugin-version-update-o7sgio
-pr:
+pr: 36
 ---
 
 # The plugin pins its version, so no merge reaches an installation
@@ -285,3 +285,51 @@ Acceptance criteria:
   fourth time for a wording nicety is the machinery this run kept removing.
 
 ## Retro
+
+**What got in the way**
+
+- *The session opened on a rulebook from three days earlier, and nothing said
+  so.* No self-check status arrived. The cause: a leftover clone at
+  `~/.claude/metis`, pulled on 2026-07-28 by the loader that issues 0031/0032
+  removed, with `~/.claude/agents`, `~/.claude/skills`, `~/.claude/CLAUDE.md`
+  and `core.hooksPath` all pointing into it. The session therefore had the
+  `bootstrap` skill, which no longer exists, and not `cost`, which does.
+  Nothing recreates or updates that clone — it simply outlived its mechanism,
+  because this environment's home directory survives the container. Cleaning
+  it up and installing the plugin at user scope instead was decided with the
+  human and done; whether a cloud session loads it despite
+  `SKIP_PLUGIN_MARKETPLACE=true` is what the next session's greeting shows.
+
+- *Cleaning it up mid-run unregistered the metis subagents.* Removing the
+  symlinks took `implementer`, `reviewer`, `test-author` and `researcher` out
+  of the agent registry; the implementer dispatch failed outright, and that
+  step was done by hand instead. The registry picked the definitions up again
+  a few minutes later on its own. Nothing to change in the rulebook — but
+  worth knowing that the delivery mechanism is also what makes the run's own
+  organs available, so touching it mid-run costs a step.
+
+- *Three review rounds went to one test case.* Criterion 6 asks whether the
+  README's prose "matches criterion 2", and three successive attempts to
+  decide that with a regex failed: too permissive, then too permissive and too
+  strict at once, then disarmed by any denial word on the line. Each round was
+  answered by removing machinery, which is what eventually converged it. The
+  rulebook's repetition signal did fire and did the work — no rule was
+  missing. What was missing was the instinct to ask, before writing the first
+  case, whether the criterion is mechanisable at all. Filed as issue 0042.
+
+- *The `Stop` hook reported every commit as unverified, wrongly, on almost
+  every turn.* All of them carry a `gpgsig` header; `git log %G?` says `N`
+  only because `gpg.ssh.allowedSignersFile` is unset in this environment and
+  the configured public key is a 0-byte file, so git cannot verify its own
+  signatures locally. The hook listed commits already merged on `main` as
+  unverified too, which is what settled it. It is not a metis hook, so nothing
+  here changes; recorded because the next run will see the same noise.
+
+**What should change**
+
+- Issue 0042: the `test-author` should return a criterion as unmechanisable
+  rather than write a case that only appears to check it.
+- Nothing in `AGENTS.md`. Every rule that fired in this run fired correctly:
+  the repetition signal, the review-round count, filing rather than fixing
+  what the intent did not name, and the human deciding the one outward-facing
+  question.
