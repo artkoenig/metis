@@ -1,6 +1,6 @@
 ---
-status: backlog
-branch:
+status: active
+branch: claude/offene-issues-4rv8ah
 pr:
 ---
 
@@ -136,9 +136,26 @@ Acceptance criteria:
 
 ### Before implementation
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- Does this match what was asked? Yes: the human asked to implement issue
+  0036 as filed. It was already grilled — intent, nine acceptance criteria
+  and their rationale are all recorded — so no further grilling is needed
+  before implementation starts.
+- What surprised me? The skill needs to spawn *new*, separate headless
+  `claude` sessions as its own probe runs (once before proposing a deny
+  list, once after) and read each one's own transcript — this is different
+  from `skills/cost`, which only ever reads the transcript of the session
+  already running it. `claude` (2.1.220, matching the version this issue's
+  measurements were taken against) is available in this environment, so the
+  probe runs and the tests that exercise criteria 2 and 5 can actually
+  invoke it rather than mock it.
+- What am I assuming without having verified it? That `skills/cost/assets/
+  token-cost.py`'s transcript-location and usage-parsing logic is close
+  enough to reusable for finding and reading a *separate* probe session's
+  transcript, rather than needing to be built from scratch. That a fresh
+  headless run is inexpensive and fast enough to run twice per invocation
+  (plus more during the test suite) without making the test suite
+  impractically slow — the implementer's first step should check this
+  before committing to the design.
 
 ### Before the PR
 
