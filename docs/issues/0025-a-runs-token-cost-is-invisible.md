@@ -200,10 +200,44 @@ Acceptance criteria:
   reviewer's 33.5%, because the baseline is carried linearly while the
   accumulated material grows faster: the fixed overhead matters most in short
   dispatches, not long ones.
+- **The implementer wrote `skills/cost/assets/token-cost.py` and
+  `skills/cost/SKILL.md`, and nothing else.**
+  `bash skills/cost/assets/test-token-cost.sh` → exit 0, 14 cases.
+  `bash test.sh` → exit 1 across 5 suites, its only failing case the
+  pre-existing one filed as issue 0032; the 9 cases that had failed on the
+  missing `SKILL.md` now pass. **No static analysis exists in this project**:
+  no `pyproject.toml`, `setup.cfg`, `.flake8`, `.pylintrc`, `ruff.toml`,
+  `.shellcheckrc`, `package.json`, `Makefile` or any `*.yml`/`*.yaml` in the
+  tree, and no `.github` directory. Both figures were reproduced by the caller
+  independently of the implementer's report.
+- **What this run cost, by the command this issue produced** —
+  `python3 skills/cost/assets/token-cost.py`, exit 0, taken after the
+  implementer returned and therefore not counting the review that follows:
+
+  | agent | dispatched for | steps | cache-write | cache-read | output (unreliable) |
+  | --- | --- | --- | --- | --- | --- |
+  | main session | the run itself | 91 | 381,533 | 11,660,572 | ~87,127 |
+  | test-author | Write failing tests for issue 0025 | 34 | 128,311 | 2,749,268 | ~52,891 |
+  | implementer | Implement token-cost command | 30 | 92,333 | 2,133,144 | ~18,757 |
+  | reviewer | Review issue 0031 change | 15 | 34,796 | 284,118 | ~247 |
+  | reviewer | Probe subagent baseline context | 1 | 9,589 | 0 | ~1 |
+
+  The main session carries 71% of the cache-read. Every proposal this session
+  made for cutting subagent cost was aimed at the smaller share.
 - **Work found mid-run, to be filed separately**: the reviewer dispatched for
   this measurement found that pull request 31 left issue 0031 largely
   unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only
-  criterion 3 is met. This serves no criterion of this issue.
+  criterion 3 is met. Filed as issue 0032. This serves no criterion of this
+  issue.
+- **Second finding, also to be filed separately, and larger than anything this
+  session proposed**: the first thing the finished command showed is that
+  injected context — not tool output — dominates the main session. Hook and
+  attachment output is 235,418 of its 381,533 cache-write, 62%, against 37,500
+  for all Bash output and 10,025 for all file reads. One item alone, a
+  `skill_listing` attachment at step 69, is 141,999 tokens, with further skill
+  listings at steps 1, 47 and 65. The skill list is re-injected whole,
+  repeatedly, into the session that carries 71% of the run's cache-read. This
+  serves no criterion of this issue and does not go into its diff.
 
 ## Checkpoints
 
