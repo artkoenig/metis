@@ -221,22 +221,33 @@ Acceptance criteria:
   tree, and no `.github` directory. Both figures were reproduced by the caller
   independently of the implementer's report.
 - **What this run cost, by the command this issue produced** —
-  `python3 skills/cost/assets/token-cost.py`, exit 0, taken after the
-  implementer returned and therefore not counting the review that follows:
+  `python3 skills/cost/assets/token-cost.py`, exit 0, taken after the last
+  dispatch of the run:
 
   | agent | dispatched for | steps | cache-write | cache-read | output (unreliable) |
   | --- | --- | --- | --- | --- | --- |
-  | main session | the run itself | 91 | 381,533 | 11,660,572 | ~87,127 |
-  | test-author | Write failing tests for issue 0025 | 34 | 128,311 | 2,749,268 | ~52,891 |
-  | implementer | Implement token-cost command | 30 | 92,333 | 2,133,144 | ~18,757 |
+  | main session | the run itself | 151 | 662,874 | 25,534,780 | ~126,419 |
+  | reviewer | Review issue 0025 change | 58 | 223,245 | 4,373,779 | ~1,384 |
+  | test-author | Write failing tests for issue 0025 | 34 | 128,311 | 2,749,268 | ~14,593 |
+  | implementer | Implement token-cost command | 30 | 92,333 | 2,133,144 | ~1,062 |
+  | test-author | Test the unguarded session-id branch | 20 | 84,501 | 760,740 | ~512 |
+  | implementer | Fix the unguarded session lookup | 17 | 49,901 | 750,708 | ~1,016 |
   | reviewer | Review issue 0031 change | 15 | 34,796 | 284,118 | ~247 |
   | reviewer | Probe subagent baseline context | 1 | 9,589 | 0 | ~1 |
 
-  The main session carries 11,660,572 of the run's 16,827,102 cache-read
-  tokens — 69%. Every proposal this session made for cutting subagent cost was
-  aimed at the smaller share. (The share was first written here as 71%, which
-  was the figure for the implementer's earlier snapshot, not for this table.
-  Corrected before the review round returned.)
+  What this table cannot include, in the same way every earlier snapshot could
+  not: the turns of the main session that follow the moment it was taken —
+  these checkpoint answers, the commit, the pull request and the retro. Two
+  dispatches of the eight are not this issue's work: the reviewer of issue
+  0031 and the baseline probe, both taken to ground the criteria before they
+  were written.
+
+  The main session carries 25,534,780 of the run's 36,586,537 cache-read
+  tokens — 69.8%. Every proposal this session made for cutting subagent cost was
+  aimed at the smaller share. (An earlier snapshot's share was first written
+  here as 71% and corrected to 69% for that snapshot's own figures; review
+  round 1 found a second occurrence of the 71% still standing and it was
+  corrected too.)
 - **Work found mid-run, to be filed separately**: the reviewer dispatched for
   this measurement found that pull request 31 left issue 0031 largely
   unimplemented — `bash test.sh` exits 1, and of that issue's six criteria only
@@ -279,6 +290,40 @@ Acceptance criteria:
     enlarges the `skill_listing` attachment that issue 0033 is about. Every new
     skill does; recorded, not acted on.
 
+- **Review round 2 — the same context continued, 2 findings.** Trend by
+  criterion, round 1 → round 2: criterion 3 → 1, 0; criterion 4 → 1, 1;
+  violates no criterion → 3, 1. Totals 5 → 2. The round established tests
+  before code by exit code — in a worktree at `3014af1`, the tests-only
+  commit, `bash skills/cost/assets/test-token-cost.sh` exits 1 with 25 checks
+  failing across cases 15–20 and the original 14 passing — and mutated the six
+  new cases three ways, each caught. Triage:
+  - **Finding 1, criterion 4 — the deferral stands, with two conditions the
+    round set**: the cost table is retaken after the last dispatch of the run,
+    and it states what it still cannot include. Criterion 4 is the one
+    criterion whose evidence did not yet exist at the end of this round.
+  - **Finding 2, no criterion — filed as issue 0035.** A half-width line in
+    `skills/cost/SKILL.md` where the rescoped sentence was rewrapped, and one
+    Log bullet naming issue 0033 twice. Neither is false, so the rulebook's
+    documentation exception does not reach them and they are not fixed here.
+  - The round recorded one reservation against this run's own earlier triage,
+    which is kept here rather than resolved: the rulebook's exception speaks
+    of "a documentation statement", and what round 1's findings 3 and 4
+    repaired was the tracker record, not documentation. The round judged the
+    fix right anyway, on the ground that the alternative is filing an issue to
+    correct a self-contradiction the run had just written. The wording belongs
+    in the retro, not in this change.
+  - The round also named a tension it judged harmless: criteria 1 and 2 say
+    "exits 0", while the command now exits 1 when no session id names the run.
+    In that situation criterion 1 cannot be met without violating criterion 3,
+    so refusing is the only consistent resolution, and `CLAUDE_CODE_SESSION_ID`
+    is set under the documented invocation, making the refusing branch
+    unreachable there.
+- **Review round 3 was waived.** Everything after round 2 touches the tracker
+  record only — this Log, the checkpoint answers and the retaken cost table —
+  and no file the acceptance criteria are about. The rulebook allows skipping
+  the round entirely in that case and asks for the waiver to be recorded, as
+  here.
+
 ## Checkpoints
 
 ### Before implementation
@@ -309,8 +354,31 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes for the criteria the human approved:
+  all ten are met, the last of them — criterion 4 — only by the table retaken
+  above, which is why it was the one criterion the review could not mark met
+  while the run was still going. Not for the request the session opened with:
+  the human wanted subagents to consume less, and this change makes
+  consumption visible without reducing it by a single token. The command's
+  first output says why that was the right order — the largest item of the
+  whole run is a `skill_listing` attachment nobody read, in the session nobody
+  was measuring.
+- **What surprised me?** That the biggest cost of a run is not what any agent
+  chooses to do. Injected context is 62% of the main session's cache-write and
+  the main session is 69.8% of the run's cache-read, so the three savings this
+  session reasoned its way to — trimming the inherited rulebook, bounding
+  command output, batching tool calls — were all aimed at a minority of a
+  minority. Second: the `test-author` twice returned an undecided edge as a
+  question instead of guessing, and both guesses would have been plausible and
+  wrong to freeze into a test the implementer may not edit.
+- **What am I assuming without having verified it?** That `subagents/`, the
+  `requestId` field and both session-id variables keep their shape across
+  Claude Code versions — everything here was seen on 2.1.220 alone, in one
+  container. That criterion 10 holds in a real second project: it is
+  established by construction and by a copy of the skill outside the tree, not
+  by a run in another metis project, because none exists here. And that the
+  proportional split behind every figure marked `estimated` is a fair
+  apportionment — it is a character-share, and only the 31% marked `measured`
+  is a fact in the sense invariant 4 means.
 
 ## Retro
