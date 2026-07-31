@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/metis-remove-loader-0031
-pr:
+pr: https://github.com/artkoenig/metis/pull/31
 ---
 
 # The repository still ships a loader that duplicates the plugin
@@ -149,6 +149,22 @@ Acceptance criteria:
   `claude plugin install metis@metis`, matching issue 0022's own decision
   record. `bash test-loader-removed.sh` now shows 15 failures, not 18 — both
   criterion-3 cases already pass.
+- Pull request #31 was opened and merged with only criterion 3 met; the
+  `reviewer`, dispatched against that diff, found the rest unmet and filed
+  issue 0032 for them (its own record: "Of issue 0031's six acceptance
+  criteria only criterion 3 is met"). Issue 0032 then delivered the removal,
+  the `.claude/settings.json` cleanup, the README/AGENTS.md wording, the
+  bounded criterion-4 search, `test.sh`'s suite list, and 0023/0024's
+  closure — merged as pull request #33. Verified now, on the current tree:
+  `bash test.sh` exits 0 (all 3 suites, including `test-loader-removed.sh`'s
+  7 criterion cases), `install.sh`/`.claude/hooks/session-start.sh`/
+  `skills/bootstrap/` are absent, `hooks/session-start.sh` and
+  `hooks/hooks.json` remain, and `.claude/settings.json` carries only the
+  plugin declaration. `status` had stayed `active` through both pull
+  requests despite each being opened and merged — corrected here, together
+  with issue 0027, to `done` with the `pr` field, per this tracker's own
+  rule that `done` follows the pull request being opened, not whether every
+  criterion held on the first one.
 
 ## Checkpoints
 
