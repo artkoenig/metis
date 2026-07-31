@@ -74,6 +74,11 @@
 #   Case 9  - criterion 9: this repository's own .claude/settings.json
 #             already carries a deny list (expected to fail until the
 #             implementer runs the finished skill against this repository).
+#   Case 10 - criteria 2, 5, 8 as SKILL.md literally documents them
+#             (regression for review finding 1): SKILL.md's own instructions
+#             run probe/apply with "." as the directory argument, from a
+#             shell already cd'd into the project directory. A relative "."
+#             must work exactly like an absolute path does.
 #
 # Criterion 3's "contains only eagerly loaded tools" (the positive half) is
 # not independently checkable from outside without either trusting the
@@ -204,7 +209,10 @@ line_num() {
     | grep -Eo -- '-?[0-9][0-9,_]*' | head -1 | tr -d ',_'
 }
 
-protected="Skill Agent AskUserQuestion ToolSearch Read Write Edit Glob Grep Bash"
+# "Task" is included alongside "Agent": in this environment's headless
+# sessions (the only kind propose ever spawns) the subagent-dispatch tool is
+# named "Task", not "Agent" (review finding, issue 0036).
+protected="Skill Agent Task AskUserQuestion ToolSearch Read Write Edit Glob Grep Bash"
 is_protected() {
   local name=$1 p
   for p in $protected; do
@@ -417,6 +425,36 @@ fi
 [ $failures -eq $prior ] \
   && pass "this repository's own .claude/settings.json carries a deny list" \
   || echo "      (expected to fail until the skill has been run against this repository)"
+
+# --- Case 10 (criteria 2, 5, 8 as documented; regression for review finding
+# 1): SKILL.md documents running probe from inside the project directory as
+# `trim-tools.py probe .` — a relative "." argument, not an absolute path.
+# cd into a fresh scratch directory and invoke it exactly that way.
+prior=$failures
+if have_claude; then
+  dir=$(mktemp -d "$base/XXXXXX")
+  out=$(cd "$dir" && python3 "$cmd" probe . 2>"$base/probe-rel.err")
+  status=$?
+  if [ $status -ne 0 ]; then
+    fail "probe . (relative, cwd=DIR): exit status $status, expected 0: $(tr '\n' ' ' <"$base/probe-rel.err" | cut -c1-300)"
+  else
+    [ -e "$dir/.claude" ] && fail "probe . (relative, cwd=DIR): wrote something under $dir — probe must only read"
+    reported=$(line_num "$out" 'before:|step-1 prompt')
+    [ -n "$reported" ] || fail "probe . (relative, cwd=DIR): no reported figure in the output: $(printf '%s' "$out" | head -5)"
+    real=$(step1_of "$dir") || fail "probe . (relative, cwd=DIR): no transcript could be found for $dir under ~/.claude/projects"
+    if [ -n "$real" ] && [ -n "$reported" ]; then
+      [ "$reported" = "$real" ] \
+        || fail "probe . (relative, cwd=DIR): reported $reported but the fresh transcript itself sums to $real"
+      [ "$real" -gt 1000 ] \
+        || fail "probe . (relative, cwd=DIR): the transcript's own figure ($real) is implausibly small for a step-1 prompt"
+    fi
+  fi
+  [ $failures -eq $prior ] \
+    && pass "probe .: the documented relative-path invocation works, figure matches its own transcript" \
+    || show "$out"
+else
+  skip "probe . (relative, cwd=DIR): no claude binary on PATH"
+fi
 
 echo
 [ $skips -gt 0 ] && echo "note: $skips case(s) skipped"

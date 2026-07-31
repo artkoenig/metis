@@ -32,9 +32,10 @@ is this page's job, not the script's.
    `cache_creation` + `cache_read` + `input` tokens of that session's very
    first model call, tool schemas included — followed by one
    `deny: <ToolName> ...` line per tool it proposes denying. Only tools that
-   session eagerly loaded are proposed, and never `Skill`, `Agent`,
+   session eagerly loaded are proposed, and never `Skill`, `Agent`, `Task`,
    `AskUserQuestion`, `ToolSearch`, `Read`, `Write`, `Edit`, `Glob`, `Grep` or
-   `Bash` — the Metis workflow depends on all ten, so they are never
+   `Bash` — the Metis workflow depends on all of these (`Task` is `Agent`'s
+   name in the headless sessions `propose` itself spawns), so they are never
    offered, regardless of what a session loads. Nothing is written yet.
 
 2. **Show the human, let them object.** Before writing anything, present the

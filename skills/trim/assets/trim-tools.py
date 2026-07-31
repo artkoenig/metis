@@ -20,9 +20,10 @@ it from every request in every future session.
         line per tool that probe session showed as eagerly loaded (present
         in the session's own tool set, absent from its own
         "deferred_tools_delta" attachment) and that is not one of the
-        ten protected tools the Metis workflow itself depends on (Skill,
-        Agent, AskUserQuestion, ToolSearch, Read, Write, Edit, Glob, Grep,
-        Bash). Writes nothing under DIR.
+        protected tools the Metis workflow itself depends on (Skill, Agent,
+        Task, AskUserQuestion, ToolSearch, Read, Write, Edit, Glob, Grep,
+        Bash — "Task" is "Agent"'s name in a headless session). Writes
+        nothing under DIR.
 
     python3 trim-tools.py apply <DIR> <BEFORE> <TOOL[,TOOL...]>
         Writes TOOL[,TOOL...] into DIR/.claude/settings.json under
@@ -60,8 +61,13 @@ PROBE_PROMPT = "Reply with exactly the single word: ready"
 
 CLAUDE_BIN = os.environ.get("TRIM_CLAUDE_BIN", "claude")
 
-PROTECTED = {"Skill", "Agent", "AskUserQuestion", "ToolSearch",
+PROTECTED = {"Skill", "Agent", "Task", "AskUserQuestion", "ToolSearch",
              "Read", "Write", "Edit", "Glob", "Grep", "Bash"}
+# "Task" is the subagent-dispatch tool's name in a headless `claude -p`
+# session — the only kind probe/propose ever spawn — even though the same
+# tool is named "Agent" in an interactive session. Both names are kept:
+# "Agent" costs nothing to keep and covers a future/different environment
+# whose headless mode calls it that instead.
 
 PROBE_TIMEOUT_S = 180
 
@@ -334,14 +340,21 @@ def main(argv):
 
     args = parser.parse_args(argv)
 
+    # Resolved once, right where a raw CLI argument enters the code, so that
+    # every downstream use — sanitisation, the probe subprocess's cwd,
+    # settings.json's path — works from one absolute directory and no
+    # relative string (e.g. the "." SKILL.md itself documents) ever reaches
+    # sanitisations() unresolved.
+    directory = os.path.abspath(args.dir)
+
     try:
         if args.command == "probe":
-            return cmd_probe(args.dir)
+            return cmd_probe(directory)
         if args.command == "propose":
-            return cmd_propose(args.dir)
+            return cmd_propose(directory)
         if args.command == "apply":
             before = int(str(args.before).replace(",", "").replace("_", ""))
-            return cmd_apply(args.dir, before, args.tools)
+            return cmd_apply(directory, before, args.tools)
     except RuntimeError as exc:
         sys.stderr.write("trim-tools: %s\n" % exc)
         return 1
