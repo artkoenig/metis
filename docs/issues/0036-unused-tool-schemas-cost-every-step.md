@@ -145,6 +145,39 @@ Acceptance criteria:
   `trim-tools.py` does not exist yet). `test.sh` needs
   `skills/trim/assets/test-trim-tools.sh` added to its `suites` list — the
   implementer's job, not the test-author's.
+- The `implementer` built `skills/trim/assets/trim-tools.py` and
+  `skills/trim/SKILL.md`, wired the suite into `test.sh`, and ran the
+  finished skill against this repository for criterion 9: before 38760,
+  after 23703, difference 15057 tokens, denying `Artifact`,
+  `ReportFindings`, `ScheduleWakeup`, `SendUserFile`,
+  `ShowOnboardingRolePicker` and `Workflow` — matching the issue's own
+  measured six almost exactly. `bash skills/trim/assets/test-trim-tools.sh`
+  9/9, `bash test.sh` 63/63, both exit 0 — confirmed myself. The proposal
+  step also named a seventh tool, `Task` (this environment's headless-mode
+  name for subagent dispatch), which the implementer excluded by hand
+  before applying, acting as the human reviewer criterion 4 describes.
+- **Round 1 (fresh context)**, against `git diff e708fd9..HEAD`. Two
+  findings, both with reproductions:
+  - Violates criteria 2, 5 and 8 as literally documented: `SKILL.md`
+    instructs invoking `trim-tools.py probe .` / `apply . ...` (`.` as the
+    directory, run from the project directory), and that invocation
+    crashes — `project_dir_for()`'s sanitisation of the raw, unresolved
+    `"."` argument produces a name that trivially matches the projects
+    root itself, so it returns a false-positive project directory before
+    ever reaching the correctly resolved path. Reproduced independently,
+    not only on the reviewer's word.
+  - Undercuts the stated purpose of criterion 3: `PROTECTED` hardcodes the
+    literal name `Agent`, but a headless `claude -p` session in this
+    environment (the only kind `probe`/`propose` ever spawns) calls the
+    same subagent-dispatch tool `Task` instead — so `propose` offers it
+    for denial, unprotected. Reproduced independently: a fresh `propose`
+    run names `Task` alongside the intended six. No damage landed in this
+    repository's own `.claude/settings.json` only because a human/session
+    caught and removed it by hand during criterion 9's run — exactly the
+    manual step criterion 3's hardcoded list exists to make unnecessary.
+  - Both are in scope (they violate the criteria directly, not drift) and
+    both got a fix-now dispatch back to the `implementer`, rather than
+    being filed separately or dismissed.
 
 ## Checkpoints
 
