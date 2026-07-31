@@ -252,8 +252,36 @@ Acceptance criteria:
 
 ### Before the PR
 
-- Does this match what was asked?
-- What surprised me?
-- What am I assuming without having verified it?
+- **Does this match what was asked?** Yes. The human reported that plugin
+  versions do not update in claude.ai and chose, from three measured options,
+  to drop the `version` field. The production change is one deleted line;
+  everything else in the diff is the suite that guards it, this record, and
+  issue 0041 for the coverage the change gives up.
+- **What surprised me?** Three rounds in a row found the same defect class in
+  one test case, every time a regex judging prose. Each round answered by
+  removing machinery — the positive half, then the denial exemption — and the
+  count went 3, 3, 1, 0. Also: a *fresh* install under a pinned version does
+  carry current `main`; only an install that already exists freezes. That is
+  not what issue 0037's observation suggested.
+- **What am I assuming without having verified it?** That the commit-SHA
+  fallback behaves for the `github` source the way it did for the local
+  `directory` fixture the suite drives. The documentation states it for both
+  and criterion 2 does not distinguish them, but every exit code in this run
+  came from a `directory` source. The first real update of the installed
+  plugin after this merges is what will settle it.
+
+- **Review round 4** (same context continued, `a305f33..9e37a76`): **0
+  findings** — converged, 3, 3, 1, 0. It re-established `bash test.sh` exit 0
+  over 3 suites and 57 cases, confirmed the round-3 hole closed and neither
+  round-2 false failure resurrected, re-ran the restored-pin mutation on cases
+  25 and 26, checked the accepted cost by exit code (a README saying *"no
+  version bump needed"* now fails, and the failure message states the rule),
+  read `README.md` against criterion 2 a third time, and checked this record
+  against the diff. One optional improvement it raised without making it a
+  finding — the case title and pass message say *"as a condition"* while the
+  check enforces "not named at all" — was **not taken**: the understatement
+  never asserts more than the check established, the failure message states
+  the stricter rule at the moment an author hits it, and re-opening the case a
+  fourth time for a wording nicety is the machinery this run kept removing.
 
 ## Retro
