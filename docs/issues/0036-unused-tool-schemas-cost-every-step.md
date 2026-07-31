@@ -1,7 +1,7 @@
 ---
-status: active
+status: done
 branch: claude/offene-issues-4rv8ah
-pr:
+pr: https://github.com/artkoenig/metis/pull/37
 ---
 
 # Unused tool schemas cost every session about 15,000 tokens per step
