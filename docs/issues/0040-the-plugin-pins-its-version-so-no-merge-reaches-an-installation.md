@@ -105,8 +105,18 @@ Acceptance criteria:
   removed and `agents/researcher.md`'s `description` made unparseable,
   `claude plugin validate .claude-plugin/plugin.json` *without* `--strict`
   reports `frontmatter: YAML frontmatter failed to parse` and exits 1. The
-  defect class issue 0022 cared about survives the flag's removal; only the
-  missing-version warning does not.
+  defect class issue 0022 cared about survives the flag's removal.
+
+  **Superseded by review round 1.** The sentence that followed — *"only the
+  missing-version warning does not"* — was false. `--strict` also caught
+  manifest warnings that nothing else catches: with `repository` misspelled
+  `repositry` in `.claude-plugin/plugin.json`,
+  `claude plugin validate .claude-plugin/plugin.json` exits 0 while
+  `… --strict` exits 1 with *"Unknown field 'repositry'. Claude Code ignores
+  it at load time."*; a removed `description` behaves the same way. On this
+  branch, `repositry` in the manifest lets `bash test-plugin.sh` exit 0.
+  Component frontmatter is unaffected — a broken `SKILL.md` and a broken
+  agent both exit 1 without `--strict`.
 
 - The `test-author` wrote the cases into `test-plugin.sh` and proved them red:
   `bash test-plugin.sh` exits 1 with `FAIL: 2 case(s)` — criterion 1
@@ -124,6 +134,30 @@ Acceptance criteria:
   So a *fresh* install under a pinned version does carry current `main`; only
   an install that already exists stays frozen. That refines issue 0037, whose
   observation came from a cache written before the loader was removed.
+
+- **Review round 1** (fresh context, `86567f6..ae6fd50`): 3 findings, each
+  reproduced. It established `bash test.sh` exit 0 over 3 suites and 57 cases
+  with none skipped, found no static analysis in the repository to run
+  (`shellcheck` is not installable behind the proxy; `bash -n` over all six
+  scripts exits 0), and mutation-verified that cases 25 and 26 are
+  load-bearing for both halves of criterion 1. Triage:
+
+  - *The Log claimed `--strict` only guarded the missing-version warning* —
+    fixed above, and the coverage it really loses is filed as issue 0041. The
+    flag cannot be kept: criterion 1 removes the version, and `--strict` then
+    fails on its absence.
+  - *Case 27 does not falsify criterion 6's first half* — sent back to the
+    `test-author`. A README claiming the opposite outcome ("frozen at the
+    commit you installed, re-install to update") passes the case today.
+  - *A stranded comment in `test-plugin.sh` now makes two contradicting
+    claims about "criterion 6"* — one about issue 0022's, one about this
+    issue's — *and the block names no case for criterion 5* — sent back to
+    the `test-author` with it.
+
+- `main` moved from `004d46e` to `a305f33` during the run (PR #35, the
+  `AGENTS.md` shortening) and was merged into this branch; `bash test.sh`
+  exits 0 over 3 suites on the merged tree. Issue numbers do not collide —
+  `main` still ends at `0039`.
 
 ## Checkpoints
 
