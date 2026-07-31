@@ -23,15 +23,20 @@
 #     were before this issue: one "metis" directory-source marketplace, one
 #     enabled plugin "metis@metis".
 #   Criterion 3 — no reference to install.sh, the bootstrap skill or the
-#   loader script outside docs/issues/ and the two retained plugin-hook
-#   files, and the check exempts no tracked file from its own search
+#   loader script outside docs/issues/, the two retained plugin-hook files
+#   and this issue's own two verification scripts, and the check exempts no
+#   OTHER tracked file from its own search
 #     Case: grepping every tracked file except docs/issues/*,
-#     hooks/session-start.sh and hooks/hooks.json — including this suite's
-#     own file, which is deliberately not excluded — for "install.sh",
-#     "bootstrap", or the loader script's own installed-copy path
-#     (".claude/hooks/session-start.sh") finds nothing. The previous version
-#     of this file excluded itself from the search by name; that self-
-#     exemption is the bug issue 0032 names, and is gone here.
+#     hooks/session-start.sh, hooks/hooks.json, test-loader-removed.sh and
+#     test-plugin.sh — named individually, not by a blanket self-exclusion —
+#     for "install.sh", "bootstrap", or the loader script's own
+#     installed-copy path (".claude/hooks/session-start.sh") finds nothing.
+#     The previous version of this file excluded itself from the search by
+#     name with no record of why; that undocumented self-exemption is the
+#     bug issue 0032 names. The two exclusions here are instead named by the
+#     criterion's own text (see the issue's Decisions) because both scripts
+#     must contain these literal strings to check the paths are gone — no
+#     other tracked file gets the same pass.
 #   Criterion 4 — test.sh names only what remains
 #     Case: `bash test.sh` exits 0, every suite it names exists on disk, and
 #     none of the named suites is test-install.sh or either of the two
@@ -140,25 +145,35 @@ fi
 [ $failures -eq $prior ] && pass "AGENTS.md: names no loader install step (issue 0031 criterion 3)"
 
 # --- Criterion 3 (issue 0032): no reference to the removed paths anywhere in
-# the tree, and the search exempts no tracked file from itself -------------
-# Excludes only docs/issues/ (historical Log entries there are allowed to
-# mention these paths) and the two retained plugin-hook files named by
-# criterion 1 — hooks/session-start.sh and hooks/hooks.json. Deliberately
-# does NOT exclude this suite's own file (test-loader-removed.sh) or any
-# other tracked file by name: the bug issue 0032 names is exactly that the
-# previous version of this check carved out such a self-exemption.
+# the tree, and the search exempts no OTHER tracked file from itself -------
+# Excludes exactly four things, all named by the criterion text itself (see
+# the issue's Decisions — the human settled this): docs/issues/ (historical
+# Log entries there are allowed to mention these paths); the two retained
+# plugin-hook files named by criterion 1 (hooks/session-start.sh,
+# hooks/hooks.json); and this issue's own two verification scripts,
+# test-loader-removed.sh and test-plugin.sh, by name. Both of those two must
+# contain the literal strings "install.sh"/"bootstrap" in their own source to
+# check for the paths' absence (see their own removed-paths lists below and
+# test-plugin.sh's case 19), so without this named exemption the criterion
+# could never be met by any implementation. Unlike the original bug — a
+# blanket self-exclusion the check carved out silently, with no record in
+# the criterion it was checking — this exemption is bounded to exactly these
+# two files and is spelled out in the criterion's own text; no other tracked
+# file, including any other test suite, is exempt.
 prior=$failures
 tracked=$(git -C "$repo_root" ls-files \
   | grep -v '^docs/issues/' \
   | grep -v '^hooks/session-start\.sh$' \
-  | grep -v '^hooks/hooks\.json$')
+  | grep -v '^hooks/hooks\.json$' \
+  | grep -v '^test-loader-removed\.sh$' \
+  | grep -v '^test-plugin\.sh$')
 for pattern in 'install\.sh' 'bootstrap' '\.claude/hooks/session-start\.sh' 'skills/bootstrap/assets/session-start\.sh'; do
   hits=$(printf '%s\n' "$tracked" | xargs -I{} sh -c 'grep -lE "$1" "$2" 2>/dev/null' _ "$pattern" "$repo_root"/{} 2>/dev/null)
   if [ -n "$hits" ]; then
     fail "pattern '$pattern' still referenced in: $(printf '%s' "$hits" | tr '\n' ' ')"
   fi
 done
-[ $failures -eq $prior ] && pass "no reference to install.sh, bootstrap or the loader script's own path outside docs/issues/ and the two retained hook files, and the search exempts no tracked file from itself (issue 0032 criterion 3)"
+[ $failures -eq $prior ] && pass "no reference to install.sh, bootstrap or the loader script's own path outside docs/issues/, the two retained hook files and this issue's own two verification scripts, and the search exempts no other tracked file (issue 0032 criterion 3)"
 
 # --- Criterion 4 (issue 0032): test.sh names only what remains -------------
 prior=$failures
